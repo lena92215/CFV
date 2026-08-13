@@ -222,7 +222,7 @@
             <div>
               <label class="block text-slate-400 mb-1">⑤ 原(燃)物料種類 *</label>
               <select id="esEnergy" onchange="updateESPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
-                <option value="">載入中…</option>
+                <option value="">載入中 (若停滯請通知開發者)…</option>
               </select>
             </div>
           </div>
@@ -325,7 +325,7 @@
             <div class="sm:col-span-2">
               <label class="block text-slate-400 mb-1">原(燃)物料種類 *</label>
               <select id="editESEnergy" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
-                <option value="">載入中…</option>
+                <option value="">載入中 (若停滯請通知開發者)…</option>
               </select>
             </div>
           </div>
@@ -923,10 +923,16 @@
 
     // Init
     window.addEventListener('DOMContentLoaded', () => {
-      renderRecordsTable();
-      loadMaterialsFromCSV();      // 載入 CSV 並填充原(燃)物料下拉選單
-      renderEmissionSourceTable();
-      updateESPreview();
+      // 顯示全域錯誤，方便除錯
+      window.onerror = function(msg, url, line, col, error) {
+        alert("JavaScript 錯誤：\n" + msg + "\n行數：" + line);
+        return false;
+      };
+
+      try { renderRecordsTable(); } catch (e) { console.error('Error in renderRecordsTable:', e); }
+      try { loadMaterialsFromCSV(); } catch (e) { console.error('Error in loadMaterialsFromCSV:', e); }
+      try { renderEmissionSourceTable(); } catch (e) { console.error('Error in renderEmissionSourceTable:', e); }
+      try { updateESPreview(); } catch (e) { console.error('Error in updateESPreview:', e); }
     });
   </script>
 </body>
