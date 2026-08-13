@@ -220,13 +220,7 @@
             <div>
               <label class="block text-slate-400 mb-1">⑤ 原(燃)物料種類 *</label>
               <select id="esEnergy" onchange="updateESPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
-                <option value="外購電力">外購電力</option>
-                <option value="車用柴油">車用柴油</option>
-                <option value="車用汽油">車用汽油</option>
-                <option value="桶裝瓦斯(LPG)">桶裝瓦斯/LPG</option>
-                <option value="冷氣冷媒(R-410A)">冷媒 R-410A</option>
-                <option value="冷藏冷媒(R-404A)">冷媒 R-404A</option>
-                <option value="乾粉滅火藥劑">乾粉滅火藥劑</option>
+                <option value="">載入中…</option>
               </select>
             </div>
           </div>
@@ -329,13 +323,7 @@
             <div class="sm:col-span-2">
               <label class="block text-slate-400 mb-1">原(燃)物料種類 *</label>
               <select id="editESEnergy" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
-                <option value="外購電力">外購電力</option>
-                <option value="車用柴油">車用柴油</option>
-                <option value="車用汽油">車用汽油</option>
-                <option value="桶裝瓦斯(LPG)">桶裝瓦斯/LPG</option>
-                <option value="冷氣冷媒(R-410A)">冷媒 R-410A</option>
-                <option value="冷藏冷媒(R-404A)">冷媒 R-404A</option>
-                <option value="乾粉滅火藥劑">乾粉滅火藥劑</option>
+                <option value="">載入中…</option>
               </select>
             </div>
           </div>
@@ -442,9 +430,137 @@
   <!-- APP LOGIC -->
   <script>
     // =============================================
-    // SHEET 3: 排放源鑑別 (AC-01 / AC-02 / AC-03)
+    // CSV 載入函式：將原(燃)物料種類.csv 匯入至下拉選單
     // =============================================
 
+    /**
+     * loadMaterialsFromCSV()
+     * ----------------------
+     * 使用 fetch 讀取 Emission-source/原(燃)物料種類.csv（Big5 編碼），
+     * 解析後填充 #esEnergy 與 #editESEnergy 兩個下拉選單。
+     *
+     * CSV 欄位：序號, 原燃物料代碼, 原燃物料名稱, [顯示標籤]
+     * 共 6,255 筆料料（不含標頭）
+     *
+     * 該函式同時將全部物料存入 window.materialList 以供其他函式使用。
+     */
+    async function loadMaterialsFromCSV() {
+      const CSV_PATH = 'Emission-source/原(燃)物料種類.csv';
+      const SELECT_IDS = ['esEnergy', 'editESEnergy'];
+
+      // 顯示載入中狀態
+      SELECT_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '<option value="">載入中…</option>';
+      });
+
+      let rows;
+      try {
+        const response = await fetch(CSV_PATH);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        // 使用 TextDecoder 解碼 Big5
+        const buffer  = await response.arrayBuffer();
+        const decoder = new TextDecoder('big5', { fatal: false });
+        const text    = decoder.decode(buffer);
+
+        rows = _parseCSVText(text);
+        window.materialList = rows;  // 全局索引供其他函式參照
+      } catch (err) {
+        console.warn('[loadMaterialsFromCSV] 無法讀取 CSV，回覆預設選項。', err);
+        _fillFallbackOptions(SELECT_IDS);
+        return;
+      }
+
+      // 填充選單
+      SELECT_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = '';
+        // 首先加一個空白提示選項
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = '— 請選擇原(燃)物料 —';
+        placeholder.disabled = true;
+        el.appendChild(placeholder);
+
+        rows.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value       = r.name;           // value 使用名稱（与 GHG 對照相容）
+          opt.dataset.code = r.code;          // 儲存代碼對照
+          opt.textContent = `${r.code}　${r.name}`;
+          el.appendChild(opt);
+        });
+
+        // 恢復現有預填值（如果有）
+        const currentVal = el.dataset.pendingValue;
+        if (currentVal) {
+          el.value = currentVal;
+          delete el.dataset.pendingValue;
+        }
+      });
+
+      // 更新 GHG 預覽
+      updateESPreview();
+      console.log(`[loadMaterialsFromCSV] 載入完成：${rows.length} 筆原(燃)物料種類`);
+    }
+
+    /**
+     * 解析 CSV 文字內容，回傳 {seq, code, name, label}[] 。
+     */
+    function _parseCSVText(text) {
+      const lines = text.split(/\r?\n/);
+      const result = [];
+      for (let i = 1; i < lines.length; i++) {  // i=0 為標頭
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // 簡單 CSV 解析（分欄符為逗號，名稱不包含引號）
+        const cols = line.split(',');
+        if (cols.length < 3) continue;
+
+        const seq  = cols[0].trim();
+        const code = cols[1].trim();
+        const name = cols[2].trim();
+        if (!code || !name) continue;
+
+        // 標籤：移除序號前置（如 "123. 010001 水稺" → "010001 水稺"）
+        let label = cols.length > 3 ? cols[3].trim() : `${code} ${name}`;
+        const prefix = `${seq}. `;
+        if (label.startsWith(prefix)) label = label.slice(prefix.length);
+
+        result.push({ seq: parseInt(seq) || 0, code, name, label });
+      }
+      return result;
+    }
+
+    /** CSV 載入失敗時的回覆預設選項 */
+    function _fillFallbackOptions(selectIds) {
+      const fallback = [
+        { code: '170001', name: '車用汽油' },
+        { code: '170006', name: '車用柴油' },
+        { code: '050004', name: '液化天然氣(LNG)' },
+        { code: '170050', name: '桶裝瓦斯(LPG)' },
+        { code: '190239', name: '冷媒(R-410A)' },
+        { code: '190240', name: '冷媒(R-404A)' },
+        { code: '190278', name: '乾粉滅火藥劑' },
+        { code: 'EL0001', name: '外購電力' },
+      ];
+      selectIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerHTML = '';
+        fallback.forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f.name;
+          opt.textContent = `${f.code}　${f.name}`;
+          el.appendChild(opt);
+        });
+      });
+      window.materialList = fallback.map(f => ({ code: f.code, name: f.name, label: `${f.code} ${f.name}`, seq: 0 }));
+    }
+
+    // =============================================
     // AC-02: 七大 GHG 自動對照表
     const ES_MATERIAL_MAP = {
       '外購電力':           { sourceType: '外購能源',  scope: '範疇二 (能源間接)', ghg: ['CO₂', 'CH₄', 'N₂O'] },
@@ -827,6 +943,7 @@
     // Init
     window.addEventListener('DOMContentLoaded', () => {
       renderRecordsTable();
+      loadMaterialsFromCSV();      // 載入 CSV 並填充原(燃)物料下拉選單
       renderEmissionSourceTable();
       updateESPreview();
     });
