@@ -221,9 +221,7 @@
             </div>
             <div>
               <label class="block text-slate-400 mb-1">⑤ 原(燃)物料種類 *</label>
-              <select id="esEnergy" onchange="updateESPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
-                <option value="">載入中 (若停滯請通知開發者)…</option>
-              </select>
+              <input type="text" id="esEnergy" list="materialsList" onchange="updateESPreview()" oninput="updateESPreview()" placeholder="輸入關鍵字搜尋或選擇…" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
             </div>
           </div>
 
@@ -324,9 +322,7 @@
             </div>
             <div class="sm:col-span-2">
               <label class="block text-slate-400 mb-1">原(燃)物料種類 *</label>
-              <select id="editESEnergy" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
-                <option value="">載入中 (若停滯請通知開發者)…</option>
-              </select>
+              <input type="text" id="editESEnergy" list="materialsList" placeholder="輸入關鍵字搜尋或選擇…" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
             </div>
           </div>
           <div class="flex justify-end gap-2 pt-2">
@@ -429,6 +425,9 @@
 
   </main>
 
+  <!-- 用於原(燃)物料自動完成的 DataList -->
+  <datalist id="materialsList"></datalist>
+
   <!-- APP LOGIC -->
   <script>
     // =============================================
@@ -446,43 +445,22 @@
      * 共 6,255 筆原(燃)物料種類
      */
     function loadMaterialsFromCSV() {
-      const SELECT_IDS = ['esEnergy', 'editESEnergy'];
+      const datalist = document.getElementById('materialsList');
+      if (!datalist) return;
 
       if (!window.MATERIAL_LIST || window.MATERIAL_LIST.length === 0) {
         console.warn('[loadMaterials] window.MATERIAL_LIST 未定義，請確認 materials_data.js 已正確載入。');
-        _fillFallbackOptions(SELECT_IDS);
+        _fillFallbackDatalist(datalist);
         return;
       }
 
       const rows = window.MATERIAL_LIST;
-
-      SELECT_IDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-
-        // 儲存目前選定值（編輯 Modal 可能已填入）
-        const prevValue = el.value;
-        el.innerHTML = '';
-
-        // 加一個空白提示選項
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = '— 請選擇原(燃)物料 —';
-        placeholder.disabled = true;
-        el.appendChild(placeholder);
-
-        // 填入全部 6255 筆物料
-        rows.forEach(r => {
-          const opt = document.createElement('option');
-          opt.value        = r.name;   // value 使用名稱，與 GHG 自動對照相容
-          opt.dataset.code = r.code;  // 儲存代碼
-          opt.textContent  = `${r.code}　${r.name}`;
-          el.appendChild(opt);
-        });
-
-        // 恢復原選定值
-        if (prevValue) el.value = prevValue;
+      let html = '';
+      rows.forEach(r => {
+        // 設定 value 為物料名稱，這樣使用者選取後 input 會填入正確的值以供對照
+        html += `<option value="${r.name}">${r.code} ${r.name}</option>`;
       });
+      datalist.innerHTML = html;
 
       updateESPreview();
       console.log(`[loadMaterials] 完成：${rows.length} 筆原(燃)物料種類已載入選單。`);
