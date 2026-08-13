@@ -209,7 +209,8 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 text-xs">
             <div>
               <label class="block text-slate-400 mb-1">① 設備編號 *</label>
-              <input type="text" id="esEquipId" placeholder="例如：ES-001" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <input type="text" id="esEquipId" onblur="checkDuplicateEquipId()" placeholder="例如：ES-001" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <p id="esEquipIdHint" class="hidden text-orange-400 text-[10px] mt-1.5 leading-tight"></p>
             </div>
             <div>
               <label class="block text-slate-400 mb-1">② 設備名稱 *</label>
@@ -600,6 +601,31 @@
       ).join('');
     }
 
+    // AC-01: 設備編號重複檢查與自動帶入
+    function checkDuplicateEquipId() {
+      const equipId = document.getElementById('esEquipId').value.trim();
+      const hintEl = document.getElementById('esEquipIdHint');
+      
+      if (!equipId) {
+        hintEl.classList.add('hidden');
+        return;
+      }
+
+      // 尋找已建立的清單中是否有相同編號
+      const existing = emissionSources.find(e => e.equipId === equipId);
+      if (existing) {
+        // 顯示友善提醒
+        hintEl.textContent = '您已建立過此設備編號，若要為同設備新增另一種原(燃)物料，系統將為您自動帶入該設備的名稱與位置。';
+        hintEl.classList.remove('hidden');
+
+        // 自動帶入先前的設備名稱與位置
+        document.getElementById('esEquipName').value = existing.name;
+        document.getElementById('esLocation').value = existing.location;
+      } else {
+        hintEl.classList.add('hidden');
+      }
+    }
+
     // AC-01: 新增設備
     function addEmissionSource() {
       const equipId  = document.getElementById('esEquipId').value.trim();
@@ -612,10 +638,6 @@
         alert('請填寫設備編號、設備名稱及所屬部門/位置！');
         return;
       }
-      if (emissionSources.some(e => e.equipId === equipId)) {
-        const confirmed = confirm(`設備編號「${equipId}」重複，是否為同一設備？\n(例如同一台冷氣同時有電力與冷媒兩種原燃物料)`);
-        if (!confirmed) return;
-      }
 
       emissionSources.push({ id: Date.now(), equipId, name, location, energy, quantity });
 
@@ -624,6 +646,7 @@
       document.getElementById('esLocation').value  = '';
       document.getElementById('esQuantity').value  = '1';
       document.getElementById('esEnergy').value    = '';
+      document.getElementById('esEquipIdHint').classList.add('hidden'); // 新增後隱藏提示
 
       updateESPreview();
       renderEmissionSourceTable();
