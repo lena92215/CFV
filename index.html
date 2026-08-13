@@ -16,6 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <!-- 原(燃)物料種類資料（自 CSV 預先產生的 JS 資料檔，共 6255 筆） -->
   <script src="Emission-source/materials_data.js"></script>
+  <!-- 設備名稱資料（自 CSV 預先產生的 JS 資料檔） -->
+  <script src="Emission-source/equipments_data.js"></script>
 
   <style>
     body {
@@ -209,7 +211,7 @@
             </div>
             <div>
               <label class="block text-slate-400 mb-1">② 設備名稱 *</label>
-              <input type="text" id="esEquipName" placeholder="例如：冷藏展示櫃A" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <input type="text" id="esEquipName" list="equipmentsList" placeholder="例如：冷藏展示櫃A 或輸入關鍵字搜尋…" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
             </div>
             <div>
               <label class="block text-slate-400 mb-1">③ 所屬部門/詳細位置 *</label>
@@ -310,7 +312,7 @@
             </div>
             <div>
               <label class="block text-slate-400 mb-1">設備名稱 *</label>
-              <input type="text" id="editESName" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <input type="text" id="editESName" list="equipmentsList" placeholder="例如：冷藏展示櫃A 或輸入關鍵字搜尋…" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
             </div>
             <div>
               <label class="block text-slate-400 mb-1">所屬部門/詳細位置 *</label>
@@ -427,6 +429,8 @@
 
   <!-- 用於原(燃)物料自動完成的 DataList -->
   <datalist id="materialsList"></datalist>
+  <!-- 用於設備名稱自動完成的 DataList -->
+  <datalist id="equipmentsList"></datalist>
 
   <!-- APP LOGIC -->
   <script>
@@ -434,6 +438,28 @@
     // 原(燃)物料下拉選單載入函式
     // 資料來源：Emission-source/materials_data.js（即 window.MATERIAL_LIST）
     // =============================================
+
+    // =============================================
+    // 設備名稱下拉選單載入函式
+    // =============================================
+    function loadEquipmentsFromCSV() {
+      const datalist = document.getElementById('equipmentsList');
+      if (!datalist) return;
+
+      if (!window.EQUIPMENT_LIST || window.EQUIPMENT_LIST.length === 0) {
+        console.warn('[loadEquipments] window.EQUIPMENT_LIST 未定義。');
+        return;
+      }
+
+      const rows = window.EQUIPMENT_LIST;
+      let html = '';
+      rows.forEach(r => {
+        // 設定 value 為設備名稱，讓使用者可以打字或挑選
+        html += `<option value="${r.name}">${r.code} ${r.name}</option>`;
+      });
+      datalist.innerHTML = html;
+      console.log(`[loadEquipments] 完成：${rows.length} 筆設備名稱已載入 datalist。`);
+    }
 
     /**
      * loadMaterialsFromCSV()
@@ -909,6 +935,7 @@
 
       try { renderRecordsTable(); } catch (e) { console.error('Error in renderRecordsTable:', e); }
       try { loadMaterialsFromCSV(); } catch (e) { console.error('Error in loadMaterialsFromCSV:', e); }
+      try { loadEquipmentsFromCSV(); } catch (e) { console.error('Error in loadEquipmentsFromCSV:', e); }
       try { renderEmissionSourceTable(); } catch (e) { console.error('Error in renderEmissionSourceTable:', e); }
       try { updateESPreview(); } catch (e) { console.error('Error in updateESPreview:', e); }
     });
