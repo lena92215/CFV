@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <!-- 原(燃)物料種類資料（自 CSV 預先產生的 JS 資料檔，共 6255 筆） -->
+  <script src="Emission-source/materials_data.js"></script>
 
   <style>
     body {
@@ -430,111 +432,87 @@
   <!-- APP LOGIC -->
   <script>
     // =============================================
-    // CSV 載入函式：將原(燃)物料種類.csv 匯入至下拉選單
+    // 原(燃)物料下拉選單載入函式
+    // 資料來源：Emission-source/materials_data.js（即 window.MATERIAL_LIST）
     // =============================================
 
     /**
      * loadMaterialsFromCSV()
      * ----------------------
-     * 使用 fetch 讀取 Emission-source/原(燃)物料種類.csv（Big5 編碼），
-     * 解析後填充 #esEnergy 與 #editESEnergy 兩個下拉選單。
+     * 從 window.MATERIAL_LIST（由 materials_data.js 預先載入）
+     * 填充 #esEnergy 與 #editESEnergy 兩個下拉選單。
      *
-     * CSV 欄位：序號, 原燃物料代碼, 原燃物料名稱, [顯示標籤]
-     * 共 6,255 筆料料（不含標頭）
-     *
-     * 該函式同時將全部物料存入 window.materialList 以供其他函式使用。
+     * 資料欄位：{ seq, code, name, label }
+     * 共 6,255 筆原(燃)物料種類
      */
-    async function loadMaterialsFromCSV() {
-      const CSV_PATH = 'Emission-source/原(燃)物料種類.csv';
+    function loadMaterialsFromCSV() {
       const SELECT_IDS = ['esEnergy', 'editESEnergy'];
 
-      // 顯示載入中狀態
-      SELECT_IDS.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = '<option value="">載入中…</option>';
-      });
-
-      let rows;
-      try {
-        const response = await fetch(CSV_PATH);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        // 使用 TextDecoder 解碼 Big5
-        const buffer  = await response.arrayBuffer();
-        const decoder = new TextDecoder('big5', { fatal: false });
-        const text    = decoder.decode(buffer);
-
-        rows = _parseCSVText(text);
-        window.materialList = rows;  // 全局索引供其他函式參照
-      } catch (err) {
-        console.warn('[loadMaterialsFromCSV] 無法讀取 CSV，回覆預設選項。', err);
+      if (!window.MATERIAL_LIST || window.MATERIAL_LIST.length === 0) {
+        console.warn('[loadMaterials] window.MATERIAL_LIST 未定義，請確認 materials_data.js 已正確載入。');
         _fillFallbackOptions(SELECT_IDS);
         return;
       }
 
-      // 填充選單
+      const rows = window.MATERIAL_LIST;
+
       SELECT_IDS.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
+
+        // 儲存目前選定值（編輯 Modal 可能已填入）
+        const prevValue = el.value;
         el.innerHTML = '';
-        // 首先加一個空白提示選項
+
+        // 加一個空白提示選項
         const placeholder = document.createElement('option');
         placeholder.value = '';
         placeholder.textContent = '— 請選擇原(燃)物料 —';
         placeholder.disabled = true;
         el.appendChild(placeholder);
 
+        // 填入全部 6255 筆物料
         rows.forEach(r => {
           const opt = document.createElement('option');
-          opt.value       = r.name;           // value 使用名稱（与 GHG 對照相容）
-          opt.dataset.code = r.code;          // 儲存代碼對照
-          opt.textContent = `${r.code}　${r.name}`;
+          opt.value        = r.name;   // value 使用名稱，與 GHG 自動對照相容
+          opt.dataset.code = r.code;  // 儲存代碼
+          opt.textContent  = `${r.code}　${r.name}`;
           el.appendChild(opt);
         });
 
-        // 恢復現有預填值（如果有）
-        const currentVal = el.dataset.pendingValue;
-        if (currentVal) {
-          el.value = currentVal;
-          delete el.dataset.pendingValue;
-        }
+        // 恢復原選定值
+        if (prevValue) el.value = prevValue;
       });
 
-      // 更新 GHG 預覽
       updateESPreview();
-      console.log(`[loadMaterialsFromCSV] 載入完成：${rows.length} 筆原(燃)物料種類`);
+      console.log(`[loadMaterials] 完成：${rows.length} 筆原(燃)物料種類已載入選單。`);
     }
 
     /**
-     * 解析 CSV 文字內容，回傳 {seq, code, name, label}[] 。
+     * 解析 CSV 文字內容，回傳 {seq, code, name, label}[]。
+     * （保留供外部呼叫，實際用途已由 materials_data.js 取代）
      */
     function _parseCSVText(text) {
       const lines = text.split(/\r?\n/);
       const result = [];
-      for (let i = 1; i < lines.length; i++) {  // i=0 為標頭
+      for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
-
-        // 簡單 CSV 解析（分欄符為逗號，名稱不包含引號）
         const cols = line.split(',');
         if (cols.length < 3) continue;
-
         const seq  = cols[0].trim();
         const code = cols[1].trim();
         const name = cols[2].trim();
         if (!code || !name) continue;
-
-        // 標籤：移除序號前置（如 "123. 010001 水稺" → "010001 水稺"）
         let label = cols.length > 3 ? cols[3].trim() : `${code} ${name}`;
         const prefix = `${seq}. `;
         if (label.startsWith(prefix)) label = label.slice(prefix.length);
-
         result.push({ seq: parseInt(seq) || 0, code, name, label });
       }
       return result;
     }
 
-    /** CSV 載入失敗時的回覆預設選項 */
+    /** 資料載入失敗時的回退預設選項 */
     function _fillFallbackOptions(selectIds) {
       const fallback = [
         { code: '170001', name: '車用汽油' },
@@ -557,8 +535,9 @@
           el.appendChild(opt);
         });
       });
-      window.materialList = fallback.map(f => ({ code: f.code, name: f.name, label: `${f.code} ${f.name}`, seq: 0 }));
+      window.MATERIAL_LIST = fallback.map(f => ({ code: f.code, name: f.name, label: `${f.code} ${f.name}`, seq: 0 }));
     }
+
 
     // =============================================
     // AC-02: 七大 GHG 自動對照表
