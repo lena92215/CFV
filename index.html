@@ -543,35 +543,34 @@
     }
 
 
-    // =============================================
-    // AC-02: 七大 GHG 自動對照表 (Mapping Table)
-    const ES_MATERIAL_MAP = {
-      '外購電力': { scope: '範疇二 (外購電力)', ghg: ['CO₂'] },
-      '車用柴油': { scope: '範疇一 (移動燃燒)', ghg: ['CO₂', 'CH₄', 'N₂O'] },
-      '冷媒':     { scope: '範疇一 (逸散排放)', ghg: ['HFCs'] },
-      '天然氣':   { scope: '範疇一 (固定燃燒)', ghg: ['CO₂', 'CH₄', 'N₂O'] }
-    };
-
     // AC-01: 預填示範設備（對應既有 4 筆 records）
     let emissionSources = [
       { id: 1, equipId: 'ES-001', name: '營業用開放式冷藏展示櫃', location: '攤位本區',   energy: '外購電力',          quantity: 1 },
-      { id: 2, equipId: 'ES-002', name: '門市冷氣空調 (R-410A)',  location: '攤位本區',   energy: '冷氣冷媒(R-410A)',  quantity: 1 },
+      { id: 2, equipId: 'ES-002', name: '門市冷氣空調 (R-410A)',  location: '攤位本區',   energy: '冷媒(R-410A)',      quantity: 1 },
       { id: 3, equipId: 'ES-003', name: '批發載貨小貨車',         location: '對外運輸',   energy: '車用柴油',          quantity: 1 },
       { id: 4, equipId: 'ES-004', name: '攤位高亮度照明探照燈',   location: '攤位本區',   energy: '外購電力',          quantity: 2 }
     ];
 
-    // 取得某設備的自動判斷結果 (防呆與模糊比對)
+    // 取得某設備的自動判斷結果 (透過 mapping_data.js 查表)
     function getESAuto(energy) {
-      if (!energy) return null;
-      if (ES_MATERIAL_MAP[energy]) return ES_MATERIAL_MAP[energy];
+      if (!energy || !window.CFV_MAPPING || !window.CFV_MAPPING.materials) return null;
       
-      // 支援關鍵字模糊匹配 (例如 "天然氣(NG)" 會對應到 "天然氣")
-      for (const key in ES_MATERIAL_MAP) {
-        if (energy.includes(key)) {
-          return ES_MATERIAL_MAP[key];
+      const materials = window.CFV_MAPPING.materials;
+      // 使用 Object.values() 尋找名稱相符的物料
+      const match = Object.values(materials).find(item => item.name === energy);
+      
+      if (match && match.scope) {
+        return match;
+      }
+      
+      // 如果精確比對不到，再嘗試模糊比對 (涵蓋 "天然氣(NG)" 對應到 "天然氣" 等情況)
+      for (const item of Object.values(materials)) {
+        if (item.name && energy.includes(item.name) && item.scope) {
+          return item;
         }
       }
-      return null; // 不在清單內回傳 null 以觸發防呆機制
+      
+      return null; // 找不到對應型式回傳 null 以觸發防呆機制
     }
 
     // AC-02: 更新新增表單的 GHG 預覽區 (事件監聽已綁定於 HTML oninput/onchange)
