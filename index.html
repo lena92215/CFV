@@ -613,8 +613,8 @@
         return;
       }
       if (emissionSources.some(e => e.equipId === equipId)) {
-        alert(`設備編號「${equipId}」已存在，請使用不同編號。`);
-        return;
+        const confirmed = confirm(`設備編號「${equipId}」重複，是否為同一設備？\n(例如同一台冷氣同時有電力與冷媒兩種原燃物料)`);
+        if (!confirmed) return;
       }
 
       emissionSources.push({ id: Date.now(), equipId, name, location, energy, quantity });
@@ -672,11 +672,11 @@
         alert('請填寫設備編號、設備名稱及所屬部門/位置！');
         return;
       }
-      // 編號唯一性檢查（排除自身）
+      // 編號重複檢查（排除自身），改為跳出提示詢問
       const duplicate = emissionSources.some((e, i) => i !== index && e.equipId === equipId);
       if (duplicate) {
-        alert(`設備編號「${equipId}」已被其他設備使用。`);
-        return;
+        const confirmed = confirm(`設備編號「${equipId}」已被其他設備使用，是否設定為同一設備？\n(同一設備可擁有多種原燃物料)`);
+        if (!confirmed) return;
       }
 
       emissionSources[index] = { ...emissionSources[index], equipId, name, location, energy, quantity };
