@@ -545,13 +545,8 @@
     }
 
 
-    // AC-01: 預填示範設備（對應既有 4 筆 records）
-    let emissionSources = [
-      { id: 1, equipId: 'ES-001', name: '營業用開放式冷藏展示櫃', location: '攤位本區',   energy: '外購電力',          quantity: 1 },
-      { id: 2, equipId: 'ES-002', name: '門市冷氣空調 (R-410A)',  location: '攤位本區',   energy: '冷媒(R-410A)',      quantity: 1 },
-      { id: 3, equipId: 'ES-003', name: '批發載貨小貨車',         location: '對外運輸',   energy: '車用柴油',          quantity: 1 },
-      { id: 4, equipId: 'ES-004', name: '攤位高亮度照明探照燈',   location: '攤位本區',   energy: '外購電力',          quantity: 2 }
-    ];
+    // AC-01: 排放源設備清單 (預設為空)
+    let emissionSources = [];
 
     // 取得某設備的自動判斷結果 (透過 mapping_data.js 查表)
     function getESAuto(energy) {

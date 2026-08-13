@@ -39,6 +39,14 @@ with open(materials_csv, 'r', encoding='big5', errors='replace') as f:
                     'ghg': ghg
                 }
 
+# 手動補充缺失的公用資源 (例如外購電力)
+if 'EL0001' not in tree['materials']:
+    tree['materials']['EL0001'] = {
+        'name': '外購電力',
+        'scope': '範疇二 (外購電力)',
+        'ghg': ['CO₂']
+    }
+
 # 讀取設備名稱
 with open(equipments_csv, 'r', encoding='big5', errors='replace') as f:
     reader = csv.reader(f)
