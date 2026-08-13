@@ -811,8 +811,10 @@
       });
 
       const total = getTotalCarbon();
-      document.getElementById('recordCount').innerText = records.length;
-      document.getElementById('recordTotalCarbon').innerText = total.toFixed(2);
+      const elRecordCount = document.getElementById('recordCount');
+      if (elRecordCount) elRecordCount.innerText = records.length;
+      const elRecordTotal = document.getElementById('recordTotalCarbon');
+      if (elRecordTotal) elRecordTotal.innerText = total.toFixed(2);
 
       document.getElementById('sumScope1').innerText = `${s1.toFixed(2)} tCO₂e`;
       document.getElementById('sumScope2').innerText = `${s2.toFixed(2)} tCO₂e`;
