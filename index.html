@@ -544,15 +544,12 @@
 
 
     // =============================================
-    // AC-02: 七大 GHG 自動對照表
+    // AC-02: 七大 GHG 自動對照表 (Mapping Table)
     const ES_MATERIAL_MAP = {
-      '外購電力':           { sourceType: '外購能源',  scope: '範疇二 (能源間接)', ghg: ['CO₂', 'CH₄', 'N₂O'] },
-      '車用柴油':           { sourceType: '移動燃燒',  scope: '範疇一 (直接排放)', ghg: ['CO₂', 'CH₄', 'N₂O'] },
-      '車用汽油':           { sourceType: '移動燃燒',  scope: '範疇一 (直接排放)', ghg: ['CO₂', 'CH₄', 'N₂O'] },
-      '桶裝瓦斯(LPG)':     { sourceType: '固定燃燒',  scope: '範疇一 (直接排放)', ghg: ['CO₂', 'CH₄', 'N₂O'] },
-      '冷氣冷媒(R-410A)':  { sourceType: '逸散排放',  scope: '範疇一 (直接排放)', ghg: ['HFCs'] },
-      '冷藏冷媒(R-404A)':  { sourceType: '逸散排放',  scope: '範疇一 (直接排放)', ghg: ['HFCs'] },
-      '乾粉滅火藥劑':       { sourceType: '逸散排放',  scope: '範疇一 (直接排放)', ghg: ['CO₂'] }
+      '外購電力': { scope: '範疇二 (外購電力)', ghg: ['CO₂'] },
+      '車用柴油': { scope: '範疇一 (移動燃燒)', ghg: ['CO₂', 'CH₄', 'N₂O'] },
+      '冷媒':     { scope: '範疇一 (逸散排放)', ghg: ['HFCs'] },
+      '天然氣':   { scope: '範疇一 (固定燃燒)', ghg: ['CO₂', 'CH₄', 'N₂O'] }
     };
 
     // AC-01: 預填示範設備（對應既有 4 筆 records）
@@ -563,23 +560,46 @@
       { id: 4, equipId: 'ES-004', name: '攤位高亮度照明探照燈',   location: '攤位本區',   energy: '外購電力',          quantity: 2 }
     ];
 
-    // 取得某設備的自動判斷結果
+    // 取得某設備的自動判斷結果 (防呆與模糊比對)
     function getESAuto(energy) {
-      return ES_MATERIAL_MAP[energy] || { sourceType: '其他', scope: '範疇一 (直接排放)', ghg: ['CO₂'] };
+      if (!energy) return null;
+      if (ES_MATERIAL_MAP[energy]) return ES_MATERIAL_MAP[energy];
+      
+      // 支援關鍵字模糊匹配 (例如 "天然氣(NG)" 會對應到 "天然氣")
+      for (const key in ES_MATERIAL_MAP) {
+        if (energy.includes(key)) {
+          return ES_MATERIAL_MAP[key];
+        }
+      }
+      return null; // 不在清單內回傳 null 以觸發防呆機制
     }
 
-    // AC-02: 更新新增表單的 GHG 預覽區
+    // AC-02: 更新新增表單的 GHG 預覽區 (事件監聽已綁定於 HTML oninput/onchange)
     function updateESPreview() {
-      const energy = document.getElementById('esEnergy').value;
+      const energy = document.getElementById('esEnergy').value.trim();
       const auto   = getESAuto(energy);
+      
+      const scopeBadge = document.getElementById('esPreviewScope');
+      const ghgContainer = document.getElementById('esPreviewGHG');
+
+      // 防呆機制：物料不存在時顯示待確認
+      if (!auto) {
+        scopeBadge.className = 'px-2 py-0.5 rounded border text-[11px] font-semibold text-slate-100 bg-slate-600 border-slate-500';
+        scopeBadge.textContent = '待確認';
+        ghgContainer.innerHTML = '<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]">查無預設溫室氣體，請確認物料名稱</span>';
+        return;
+      }
+
+      // 動態更新樣式與資料 (橘底白字/藍底白字)
       const isScope2 = auto.scope.includes('二');
       const scopeColor = isScope2
-        ? 'text-cyan-300 bg-cyan-900/40 border-cyan-500/30'
-        : 'text-amber-300 bg-amber-900/40 border-amber-500/30';
-      document.getElementById('esPreviewScope').className =
-        `px-2 py-0.5 rounded border text-[11px] font-semibold ${scopeColor}`;
-      document.getElementById('esPreviewScope').textContent = auto.scope;
-      document.getElementById('esPreviewGHG').innerHTML = auto.ghg.map(g =>
+        ? 'text-white bg-cyan-600 border-cyan-500' 
+        : 'text-white bg-orange-500 border-orange-400';
+
+      scopeBadge.className = `px-2 py-0.5 rounded border text-[11px] font-semibold ${scopeColor}`;
+      scopeBadge.textContent = auto.scope;
+      
+      ghgContainer.innerHTML = auto.ghg.map(g =>
         `<span class="px-1.5 py-0.5 rounded bg-slate-700 border border-slate-600 text-slate-200 text-[10px] font-mono">${g}</span>`
       ).join('');
     }
@@ -689,16 +709,17 @@
         tr.className = 'hover:bg-slate-900/40 transition-colors';
 
         // GHG tags
-        const ghgTags = auto.ghg.map(g =>
+        const ghgTags = auto ? auto.ghg.map(g =>
           `<span class="px-1.5 py-0.5 rounded bg-slate-700 border border-slate-600 text-slate-200 text-[10px] font-mono">${g}</span>`
-        ).join(' ');
+        ).join(' ') : `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]">待確認</span>`;
 
         // Scope badge
-        const isScope2   = auto.scope.includes('二');
-        const scopeColor = isScope2
-          ? 'text-cyan-300 bg-cyan-900/40 border-cyan-500/30'
-          : 'text-amber-300 bg-amber-900/40 border-amber-500/30';
-        const scopeBadge = `<span class="px-2 py-0.5 rounded border text-[10px] font-semibold whitespace-nowrap ${scopeColor}">${auto.scope}</span>`;
+        const isScope2   = auto ? auto.scope.includes('二') : false;
+        const scopeColor = auto 
+          ? (isScope2 ? 'text-white bg-cyan-600 border-cyan-500' : 'text-white bg-orange-500 border-orange-400')
+          : 'text-slate-100 bg-slate-600 border-slate-500';
+        const scopeText  = auto ? auto.scope : '待確認';
+        const scopeBadge = `<span class="px-2 py-0.5 rounded border text-[10px] font-semibold whitespace-nowrap ${scopeColor}">${scopeText}</span>`;
 
         tr.innerHTML = `
           <td class="p-3 font-mono text-slate-400 whitespace-nowrap">${es.equipId}</td>
