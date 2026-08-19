@@ -13,7 +13,13 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <!-- 原(燃)物料種類資料（自 CSV 預先產生的 JS 資料檔，共 6255 筆） -->
+  <script src="Emission-source/materials_data.js"></script>
+  <!-- 設備名稱資料（自 CSV 預先產生的 JS 資料檔） -->
+  <script src="Emission-source/equipments_data.js"></script>
+  <!-- 溫室氣體與排放型式 Mapping 資料 (自動產生) -->
+  <script src="Emission-source/mapping_data.js"></script>
 
   <style>
     body {
@@ -21,6 +27,9 @@
       background: radial-gradient(circle at top left, #0f172a, #020617);
       color: #f8fafc;
       min-height: 100vh;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
     }
     .glass-panel {
       background: rgba(30, 41, 59, 0.8);
@@ -45,6 +54,7 @@
       background-color: #059669;
       color: #ffffff;
       border-color: #10b981;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
     /* Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -96,20 +106,20 @@
       
       <!-- Excel Sheet Tabs (Mirrors the Excel workbook sheets) -->
       <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
-        <button onclick="switchSheetTab('sheet1')" id="stab-sheet1" class="sheet-tab active px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
+        <button onclick="switchSheetTab('sheet1')" id="stab-sheet1" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
           <i class="fa-solid fa-id-card"></i> 一、事業基本資料
         </button>
         <button onclick="switchSheetTab('sheet2')" id="stab-sheet2" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
           <i class="fa-solid fa-map-pin"></i> 二、邊界設定
         </button>
         <button onclick="switchSheetTab('sheet3')" id="stab-sheet3" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
-          <i class="fa-solid fa-industry"></i> 三、排放源鑑別
+          <i class="fa-solid fa-industry"></i> 三、排放源鑑別 (Emission source)
         </button>
         <button onclick="switchSheetTab('sheet4')" id="stab-sheet4" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
           <i class="fa-solid fa-calculator"></i> 四、活動數據填報
         </button>
-        <button onclick="switchSheetTab('sheet5')" id="stab-sheet5" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
-          <i class="fa-solid fa-table"></i> 五、定量盤查明細
+        <button onclick="switchSheetTab('sheet5')" id="stab-sheet5" class="sheet-tab active px-4 py-2 rounded-xl text-xs font-black border border-emerald-500 bg-emerald-600 text-white shadow flex items-center gap-1.5">
+          <i class="fa-solid fa-table-list text-amber-300"></i> 五、定量盤查明細清冊 (Step 3: Itemized list)
         </button>
         <button onclick="switchSheetTab('sheet6')" id="stab-sheet6" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
           <i class="fa-solid fa-chart-pie"></i> 六、排放量彙總統計
@@ -117,7 +127,7 @@
       </div>
 
       <!-- SHEET 1: 事業基本資料 -->
-      <div id="sec-sheet1" class="sheet-content glass-panel rounded-2xl p-6 space-y-4">
+      <div id="sec-sheet1" class="sheet-content glass-panel rounded-2xl p-6 space-y-4 hidden">
         <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2 border-b border-slate-700 pb-3">
           <i class="fa-solid fa-id-card text-emerald-400"></i> 一、事業基本資料 (Business Information)
         </h2>
@@ -181,85 +191,355 @@
         </div>
       </div>
 
-      <!-- SHEET 3 & 4 & 5: 排放源鑑別、活動數據與定量盤查明細 (Interactive Input & Record Table) -->
-      <div id="sec-sheet3" class="sheet-content space-y-6">
-        <!-- Input Card -->
+      <!-- SHEET 3: 排放源鑑別 (AC-01/02/03 per ISO 14064-1) -->
+      <div id="sec-sheet3" class="sheet-content space-y-6 hidden">
+
+        <!-- ISO Notice Banner -->
+        <div class="flex items-start gap-3 bg-emerald-950/40 border border-emerald-500/30 rounded-xl px-4 py-3 text-xs text-emerald-300">
+          <i class="fa-solid fa-circle-info text-emerald-400 mt-0.5 shrink-0"></i>
+          <span>依據 <strong>ISO 14064-1 第 5.2 節</strong>，組織應鑑別所有可能產生溫室氣體排放與移除之設施與活動。系統將自動根據選取之原物料判斷排放範疇，並標記對應之七大溫室氣體。</span>
+        </div>
+
+        <!-- AC-01: 排放源設備新增表單 -->
         <div class="glass-panel rounded-2xl p-6 space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-700 pb-3">
             <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
-              <i class="fa-solid fa-plus-circle text-emerald-400"></i> 新增排放源與活動數據紀錄
+              <i class="fa-solid fa-plus-circle text-emerald-400"></i>
+              <span>AC-01　排放源設備新增與建立</span>
             </h2>
-            <span class="text-xs text-slate-400">填寫後會自動計算 CO₂e 並記錄在下方 Excel 表格中</span>
+            <span class="text-xs text-slate-500">選擇原(燃)物料後，排放範疇與七大 GHG 標記將自動帶入</span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 text-xs">
             <div>
-              <label class="block text-slate-400 mb-1">設備/設施名稱*</label>
-              <input type="text" id="inEquipName" placeholder="例如：營業用冷藏展示櫃、柴油機車" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <label class="block text-slate-400 mb-1">① 設備編號 *</label>
+              <input type="text" id="esEquipId" onblur="checkDuplicateEquipId()" placeholder="例如：ES-001" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <p id="esEquipIdHint" class="hidden text-orange-400 text-[10px] mt-1.5 leading-tight"></p>
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">原(燃)物料/能源名稱*</label>
-              <select id="inFuelType" onchange="autoFillFactor()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
-                <option value="外購電力">外購電力 (範疇二)</option>
-                <option value="車用柴油">車用柴油 (範疇一 移動燃燒)</option>
-                <option value="車用汽油">車用汽油 (範疇一 移動燃燒)</option>
-                <option value="桶裝瓦斯(LPG)">桶裝瓦斯/LPG (範疇一 固定燃燒)</option>
-                <option value="冷氣冷媒(R-410A)">冷氣冷媒 R-410A (範疇一 逸散)</option>
-                <option value="冷藏冷媒(R-404A)">冷藏冷媒 R-404A (範疇一 逸散)</option>
-                <option value="乾粉滅火藥劑">乾粉滅火藥劑 (範疇一 逸散)</option>
-              </select>
+              <label class="block text-slate-400 mb-1">② 設備名稱 *</label>
+              <input type="text" id="esEquipName" list="equipmentsList" placeholder="例如：冷藏展示櫃A 或輸入關鍵字搜尋…" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">年度活動數據 (使用量)*</label>
-              <input type="number" id="inActivityData" placeholder="例如：12500" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <label class="block text-slate-400 mb-1">③ 所屬部門/詳細位置 *</label>
+              <input type="text" id="esLocation" placeholder="例如：拍賣場1F、冷鏈供應區3F" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">單位 (Unit)*</label>
-              <input type="text" id="inUnit" value="度 (kWh)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <label class="block text-slate-400 mb-1">④ 設備數量</label>
+              <input type="number" id="esQuantity" value="1" min="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">⑤ 原(燃)物料種類 *</label>
+              <input type="text" id="esEnergy" list="materialsList" onchange="updateESPreview()" oninput="updateESPreview()" placeholder="輸入關鍵字搜尋或選擇…" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
             </div>
           </div>
 
-          <div class="flex justify-end gap-2 pt-2">
-            <button onclick="addSourceRecord()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs shadow-md transition flex items-center gap-1.5">
-              <i class="fa-solid fa-plus"></i> 新增並記錄入清冊
+          <!-- AC-02: 七大 GHG 自動標記預覽 -->
+          <div id="esGHGPreview" class="bg-slate-900/60 border border-slate-700 rounded-xl p-3 text-xs space-y-2">
+            <div class="text-slate-400 font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-atom text-teal-400"></i> AC-02　系統自動判斷結果
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-1.5">
+                <span class="text-slate-500">排放型式：</span>
+                <span id="esPreviewScope" class="px-2 py-0.5 rounded border text-[11px] font-semibold text-cyan-300 bg-cyan-900/40 border-cyan-500/30">範疇二 (能源間接)</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-slate-500">溫室氣體：</span>
+                <span id="esPreviewGHG" class="flex flex-wrap gap-1"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-1">
+            <button onclick="addEmissionSource()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs shadow-md transition flex items-center gap-1.5">
+              <i class="fa-solid fa-plus"></i> 新增設備
             </button>
           </div>
         </div>
 
-        <!-- Recorded Inventory Table (Mirrors Sheet 5 定量盤查表) -->
+        <!-- AC-03: 排放源資料清單列表 -->
         <div class="glass-panel rounded-2xl p-6 space-y-4">
-          <div class="flex flex-col sm:flex-row items-center justify-between gap-2 border-b border-slate-700 pb-3">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-700 pb-3">
             <div>
               <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
-                <i class="fa-solid fa-table text-teal-400"></i> 定量盤查紀錄總表 (五、定量盤查)
+                <i class="fa-solid fa-list-check text-teal-400"></i> AC-03　排放源資料清單
               </h3>
-              <p class="text-xs text-slate-400">系統即時記錄之溫室氣體排放量與排放當量明細</p>
+              <p class="text-xs text-slate-400 mt-0.5">支援關鍵字搜尋（設備名稱、位置或物料）；刪除時將提示連動影響</p>
             </div>
-            <div class="text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
-              共計 <span id="recordCount">4</span> 筆紀錄 | 總碳排：<span id="recordTotalCarbon">0.0</span> tCO₂e
-            </div>
+            <span class="font-bold text-slate-300 bg-slate-800 border border-slate-600 px-3 py-1.5 rounded-xl text-xs whitespace-nowrap">
+              共 <span id="esCount">0</span> 筆設備
+            </span>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="esSearchInput" oninput="renderEmissionSourceTable()" placeholder="搜尋設備名稱、位置或物料…" class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-200 focus:border-emerald-500 focus:outline-none" />
           </div>
 
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
+            <table class="w-full text-left text-xs border-collapse min-w-[860px]">
               <thead>
                 <tr class="bg-slate-900/80 text-slate-300 border-b border-slate-700">
-                  <th class="p-3">編號</th>
-                  <th class="p-3">設備/設施名稱</th>
-                  <th class="p-3">原/燃物料</th>
-                  <th class="p-3">排放類別</th>
-                  <th class="p-3">活動數據 (使用量)</th>
-                  <th class="p-3">排放係數 (kg CO₂e/單位)</th>
-                  <th class="p-3">年碳排放當量 (tCO₂e)</th>
-                  <th class="p-3 text-right">操作</th>
+                  <th class="p-3 font-semibold">設備編號</th>
+                  <th class="p-3 font-semibold">設備名稱</th>
+                  <th class="p-3 font-semibold">所屬部門/位置</th>
+                  <th class="p-3 font-semibold">原(燃)物料</th>
+                  <th class="p-3 font-semibold">排放型式</th>
+                  <th class="p-3 font-semibold">溫室氣體</th>
+                  <th class="p-3 font-semibold text-center">數量</th>
+                  <th class="p-3 text-center font-semibold">操作</th>
                 </tr>
               </thead>
-              <tbody id="recordsTableBody" class="divide-y divide-slate-800">
+              <tbody id="esTableBody" class="divide-y divide-slate-800">
                 <!-- Rendered dynamically -->
               </tbody>
             </table>
           </div>
         </div>
+
+      </div>
+
+      <!-- Edit Modal -->
+      <div id="esEditModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeEditModal()"></div>
+        <div class="relative glass-panel rounded-2xl p-6 w-full max-w-xl mx-4 space-y-4 z-10">
+          <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+            <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-pen-to-square text-emerald-400"></i> 編輯排放源設備
+            </h3>
+            <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <input type="hidden" id="editESIndex" />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">設備編號 *</label>
+              <input type="text" id="editESId" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">設備名稱 *</label>
+              <input type="text" id="editESName" list="equipmentsList" placeholder="例如：冷藏展示櫃A 或輸入關鍵字搜尋…" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">所屬部門/詳細位置 *</label>
+              <input type="text" id="editESLocation" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">設備數量</label>
+              <input type="number" id="editESQuantity" min="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-slate-400 mb-1">原(燃)物料種類 *</label>
+              <input type="text" id="editESEnergy" list="materialsList" placeholder="輸入關鍵字搜尋或選擇…" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button onclick="closeEditModal()" class="px-4 py-2 rounded-xl text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 transition">取消</button>
+            <button onclick="saveEditModal()" class="px-5 py-2 rounded-xl text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition flex items-center gap-1.5"><i class="fa-solid fa-floppy-disk"></i> 儲存變更</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHEET 4: 活動數據填報 -->
+      <div id="sec-sheet4" class="sheet-content glass-panel rounded-2xl p-6 space-y-4 hidden">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
+            <i class="fa-solid fa-calculator text-cyan-400"></i> 四、活動數據填報
+          </h2>
+          <span class="text-xs text-slate-400">輸入活動數據後，將自動連結至 Step 3 定量盤查明細計算</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1">設備/設施名稱*</label>
+            <input type="text" id="inEquipName" placeholder="例如：營業用冷藏展示櫃、柴油小貨車" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">原(燃)物料/能源名稱*</label>
+            <select id="inFuelType" onchange="autoFillFactor()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
+              <option value="外購電力">外購電力 (範疇二)</option>
+              <option value="車用柴油">車用柴油 (範疇一 移動燃燒)</option>
+              <option value="車用汽油">車用汽油 (範疇一 移動燃燒)</option>
+              <option value="桶裝瓦斯(LPG)">桶裝瓦斯 LPG (範疇一 固定燃燒)</option>
+              <option value="冷藏冷媒(R-404A)">冷藏冷媒 R-404A (範疇一 逸散)</option>
+              <option value="冷氣冷媒(R-410A)">冷氣冷媒 R-410A (範疇一 逸散)</option>
+              <option value="乾粉滅火藥劑">乾粉滅火藥劑 (範疇一 逸散)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">年度活動數據 (使用量)*</label>
+            <input type="number" id="inActivityData" placeholder="例如：12500" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">單位 (Unit)*</label>
+            <input type="text" id="inUnit" value="度 (kWh)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button onclick="addSourceRecord()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs shadow-md transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> 新增活動數據並同步計算
+          </button>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- SHEET 5: STEP 3: ITEMIZED LIST (五、定量盤查明細清冊 - 核心功能)            -->
+      <!-- ========================================================================= -->
+      <div id="sec-sheet5" class="sheet-content space-y-6">
+        
+        <!-- Key KPI Banners -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Total GHG -->
+          <div class="glass-panel p-4 rounded-2xl border-emerald-500/40 relative overflow-hidden">
+            <div class="text-[11px] text-emerald-300 font-bold uppercase tracking-wider">總溫室氣體排放當量 (Total GHG)</div>
+            <div class="text-3xl font-black text-emerald-400 mt-2 font-mono" id="kpiTotalCarbon">0.00</div>
+            <div class="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+              <span>公噸 CO₂e / 年 (tCO₂e)</span>
+              <span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 text-[10px]" id="kpiItemCount">0 筆項目</span>
+            </div>
+            <div class="absolute right-3 top-3 text-3xl opacity-15">📊</div>
+          </div>
+
+          <!-- Scope 1 -->
+          <div class="glass-panel p-4 rounded-2xl border-amber-500/30 relative overflow-hidden">
+            <div class="text-[11px] text-amber-300 font-bold uppercase tracking-wider">範疇一 (Scope 1 直接排放)</div>
+            <div class="text-3xl font-black text-amber-400 mt-2 font-mono" id="kpiScope1">0.00</div>
+            <div class="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+              <span>佔比：<strong id="kpiScope1Ratio" class="text-amber-300">0%</strong></span>
+              <span class="text-[10px] text-slate-400">固定/移動/逸散</span>
+            </div>
+            <div class="absolute right-3 top-3 text-3xl opacity-15">🔥</div>
+          </div>
+
+          <!-- Scope 2 -->
+          <div class="glass-panel p-4 rounded-2xl border-cyan-500/30 relative overflow-hidden">
+            <div class="text-[11px] text-cyan-300 font-bold uppercase tracking-wider">範疇二 (Scope 2 能源間接)</div>
+            <div class="text-3xl font-black text-cyan-400 mt-2 font-mono" id="kpiScope2">0.00</div>
+            <div class="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+              <span>佔比：<strong id="kpiScope2Ratio" class="text-cyan-300">0%</strong></span>
+              <span class="text-[10px] text-slate-400">外購電力使用</span>
+            </div>
+            <div class="absolute right-3 top-3 text-3xl opacity-15">⚡</div>
+          </div>
+
+          <!-- Top Hotspot -->
+          <div class="glass-panel p-4 rounded-2xl border-rose-500/30 relative overflow-hidden">
+            <div class="text-[11px] text-rose-300 font-bold uppercase tracking-wider">最大排碳熱點 (Key Hotspot)</div>
+            <div class="text-base font-bold text-rose-300 mt-2 truncate" id="kpiHotspotName">-</div>
+            <div class="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+              <span id="kpiHotspotVal" class="font-mono text-rose-400">0.00 tCO₂e</span>
+              <span class="px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 text-[10px]" id="kpiHotspotPct">0%</span>
+            </div>
+            <div class="absolute right-3 top-3 text-3xl opacity-15">🎯</div>
+          </div>
+        </div>
+
+        <!-- How Itemized list works Info Banner -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/60 border border-indigo-500/30 text-xs text-slate-300 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-indigo-300 flex items-center gap-1.5 text-sm">
+              <i class="fa-solid fa-circle-info text-indigo-400"></i> Step 3: Itemized List (定量盤查明細清冊) 的作用與計算標準
+            </span>
+            <span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-200 text-[10px] font-mono font-bold">
+              $E = \text{Activity} \times \text{Factor} \times \text{GWP}$
+            </span>
+          </div>
+          <p class="leading-relaxed text-slate-300">
+            依照 <strong>ISO 14064-1</strong> 規範，Itemized List 係將 Step 2 的<strong>活動數據</strong>，依照原(燃)物料類別分別匹配 <strong>7 大溫室氣體 ($CO_2, CH_4, N_2O, HFCs, PFCs, SF_6, NF_3$)</strong> 排放係數與 <strong>全球暖化潛勢 (GWP)</strong>，定量算出每項設施的碳排放當量 ($tCO_2e$) 與全廠佔比，精準抓出排碳熱點！
+          </p>
+        </div>
+
+        <!-- Filter & Control Toolbar -->
+        <div class="glass-panel rounded-2xl p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span class="text-slate-400 font-semibold"><i class="fa-solid fa-filter text-emerald-400"></i> 範疇篩選：</span>
+            <button onclick="filterItemizedScope('ALL')" id="btn-f-all" class="px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold transition">全部項目</button>
+            <button onclick="filterItemizedScope('Scope 1')" id="btn-f-s1" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">範疇一 (直接)</button>
+            <button onclick="filterItemizedScope('Scope 2')" id="btn-f-s2" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">範疇二 (外購電力)</button>
+            
+            <div class="h-4 w-px bg-slate-700 mx-1 hidden sm:block"></div>
+            
+            <div class="flex items-center gap-1.5">
+              <span class="text-slate-400">GWP 報告版本:</span>
+              <select id="gwpSelector" onchange="changeGWPVersion()" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-slate-200">
+                <option value="AR5">IPCC 第五次評估報告 (AR5, 常用標準)</option>
+                <option value="AR6">IPCC 第六次評估報告 (AR6, 最新)</option>
+                <option value="AR4">IPCC 第四次評估報告 (AR4, 舊制)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="switchSheetTab('sheet4')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-semibold transition flex items-center gap-1">
+              <i class="fa-solid fa-plus text-emerald-400"></i> 新增活動數據
+            </button>
+            <button onclick="switchAppMode('game')" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition flex items-center gap-1 shadow">
+              轉化為減碳遊戲 <i class="fa-solid fa-gamepad text-amber-300"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- MAIN ITEMIZED LIST TABLE -->
+        <div class="glass-panel rounded-2xl p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-700 pb-3">
+            <div>
+              <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-table-cells text-emerald-400"></i> 五、定量盤查明細清冊 (Itemized Greenhouse Gas Emission List)
+              </h3>
+              <p class="text-xs text-slate-400">包含活動數據、個別氣體排放量、排放係數與 $tCO_2e$ 當量明細</p>
+            </div>
+            <div class="text-xs text-slate-400">
+              計量單位：公噸二氧化碳當量 (<span class="font-mono text-emerald-400 font-bold">tCO₂e</span>)
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse min-w-[1000px]">
+              <thead>
+                <tr class="bg-slate-900/90 text-slate-300 border-b border-slate-700">
+                  <th class="p-3 w-12 text-center">序號</th>
+                  <th class="p-3">設備編號 / 代碼 / 名稱</th>
+                  <th class="p-3">所屬部門 / 詳細位置</th>
+                  <th class="p-3">原(燃)物料 / 範疇</th>
+                  <th class="p-3">有效活動數據</th>
+                  <th class="p-3">7大溫室氣體個別排放量 (t)</th>
+                  <th class="p-3 text-right">排放係數 / 基準</th>
+                  <th class="p-3 text-right font-bold text-emerald-300">年碳排當量 (tCO₂e)</th>
+                  <th class="p-3 w-32">全廠佔比 (%)</th>
+                  <th class="p-3 text-center">減碳潛力</th>
+                  <th class="p-3 text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody id="itemizedTableBody" class="divide-y divide-slate-800/80">
+                <!-- Rendered dynamically via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Charts: Scope Ratio & Top Hotspots -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="glass-panel rounded-2xl p-5 space-y-3">
+            <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5 border-b border-slate-700 pb-2">
+              <i class="fa-solid fa-chart-pie text-cyan-400"></i> 範疇一 / 範疇二 排放結構佔比
+            </h4>
+            <div class="h-60 relative">
+              <canvas id="chartScope"></canvas>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-5 space-y-3">
+            <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5 border-b border-slate-700 pb-2">
+              <i class="fa-solid fa-chart-column text-emerald-400"></i> 主要排碳設備當量排行 (tCO₂e)
+            </h4>
+            <div class="h-60 relative">
+              <canvas id="chartItemsBar"></canvas>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- SHEET 6: 溫室氣體排放量彙總 -->
@@ -276,17 +556,17 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="p-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-center">
             <div class="text-xs text-slate-400">範疇一 (Scope 1 直接排放)</div>
-            <div class="text-2xl font-black text-amber-400 mt-2" id="sumScope1">0.0 tCO₂e</div>
+            <div class="text-2xl font-black text-amber-400 mt-2" id="sumScope1">0.00 tCO₂e</div>
             <div class="text-[11px] text-slate-500 mt-1">包含固定/移動燃燒與冷媒逸散</div>
           </div>
           <div class="p-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-center">
             <div class="text-xs text-slate-400">範疇二 (Scope 2 能源間接)</div>
-            <div class="text-2xl font-black text-cyan-400 mt-2" id="sumScope2">0.0 tCO₂e</div>
+            <div class="text-2xl font-black text-cyan-400 mt-2" id="sumScope2">0.00 tCO₂e</div>
             <div class="text-[11px] text-slate-500 mt-1">外購電力使用當量</div>
           </div>
           <div class="p-4 bg-emerald-950/40 rounded-2xl border border-emerald-500/40 text-center">
             <div class="text-xs text-emerald-300 font-bold">全廠/攤販 總溫室氣體當量</div>
-            <div class="text-3xl font-black text-emerald-400 mt-2" id="sumTotal">0.0 tCO₂e</div>
+            <div class="text-3xl font-black text-emerald-400 mt-2" id="sumTotal">0.00 tCO₂e</div>
             <div class="text-[11px] text-emerald-300/70 mt-1">公噸 CO₂e / 年</div>
           </div>
         </div>
@@ -311,7 +591,7 @@
         </div>
         <div class="flex items-center gap-3">
           <div class="text-xs bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
-            基期碳排：<strong id="gameBaseCarbon" class="text-rose-400">0.0</strong> tCO₂e
+            基期碳排：<strong id="gameBaseCarbon" class="text-rose-400">0.00</strong> tCO₂e
           </div>
           <div class="text-xs bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
             預算：<strong id="gameBudget" class="text-cyan-400">$500 萬</strong>
@@ -355,26 +635,513 @@
 
   </main>
 
+  <!-- 用於原(燃)物料自動完成的 DataList -->
+  <datalist id="materialsList"></datalist>
+  <!-- 用於設備名稱自動完成的 DataList -->
+  <datalist id="equipmentsList"></datalist>
+
   <!-- APP LOGIC -->
   <script>
-    // State Store for Form Records
-    let records = [
-      { id: 1, name: "營業用開放式冷藏展示櫃", fuel: "外購電力", scope: "Scope 2 - 外購電力", activity: 12500, unit: "度 (kWh)", factor: 0.495, carbon: 6.19 },
-      { id: 2, name: "門市冷氣空調 (R-410A)", fuel: "冷氣冷媒(R-410A)", scope: "Scope 1 - 逸散排放", activity: 2.5, unit: "kg", factor: 2088, carbon: 5.22 },
-      { id: 3, name: "批發載貨小貨車", fuel: "車用柴油", scope: "Scope 1 - 移動燃燒", activity: 1200, unit: "公升", factor: 2.66, carbon: 3.19 },
-      { id: 4, name: "攤位高亮度照明探照燈", fuel: "外購電力", scope: "Scope 2 - 外購電力", activity: 3800, unit: "度 (kWh)", factor: 0.495, carbon: 1.88 }
+    // =============================================
+    // 設備與物料清單載入 (保留原始 repo 功能)
+    // =============================================
+    function loadEquipmentsFromCSV() {
+      const datalist = document.getElementById('equipmentsList');
+      if (!datalist) return;
+      if (!window.EQUIPMENT_LIST || window.EQUIPMENT_LIST.length === 0) return;
+      const rows = window.EQUIPMENT_LIST;
+      let html = '';
+      rows.forEach(r => {
+        html += `<option value="${r.name}">${r.code} ${r.name}</option>`;
+      });
+      datalist.innerHTML = html;
+    }
+
+    function loadMaterialsFromCSV() {
+      const datalist = document.getElementById('materialsList');
+      if (!datalist) return;
+      if (!window.MATERIAL_LIST || window.MATERIAL_LIST.length === 0) {
+        _fillFallbackOptions(['esEnergy', 'editESEnergy']);
+        return;
+      }
+      const rows = window.MATERIAL_LIST;
+      let html = '';
+      rows.forEach(r => {
+        html += `<option value="${r.name}">${r.code} ${r.name}</option>`;
+      });
+      datalist.innerHTML = html;
+      updateESPreview();
+    }
+
+    function _fillFallbackOptions(selectIds) {
+      const fallback = [
+        { code: '170001', name: '車用汽油' },
+        { code: '170006', name: '車用柴油' },
+        { code: '050004', name: '液化天然氣(LNG)' },
+        { code: '170050', name: '桶裝瓦斯(LPG)' },
+        { code: '190239', name: '冷媒(R-410A)' },
+        { code: '190240', name: '冷媒(R-404A)' },
+        { code: '190278', name: '乾粉滅火藥劑' },
+        { code: 'EL0001', name: '外購電力' },
+      ];
+      window.MATERIAL_LIST = fallback.map(f => ({ code: f.code, name: f.name, label: `${f.code} ${f.name}`, seq: 0 }));
+    }
+
+    // 排放源清單 (Sheet 3)
+    let emissionSources = [
+      { id: 1, equipId: "ES-001", name: "營業用冷藏展示櫃", location: "1F 門市展售區", energy: "外購電力", quantity: 2 },
+      { id: 2, equipId: "ES-002", name: "大型低溫冷藏庫", location: "1F 後方倉儲區", energy: "冷藏冷媒(R-404A)", quantity: 1 },
+      { id: 3, equipId: "ES-003", name: "3.5噸批發載貨車", location: "公務停車場", energy: "車用柴油", quantity: 1 },
+      { id: 4, equipId: "ES-004", name: "門市分離式冷氣", location: "2F 營運辦公室", energy: "冷氣冷媒(R-410A)", quantity: 3 }
     ];
 
-    // Factors lookup
-    const FACTOR_MAP = {
-      "外購電力": { factor: 0.495, unit: "度 (kWh)", scope: "Scope 2 - 外購電力" },
-      "車用柴油": { factor: 2.66, unit: "公升", scope: "Scope 1 - 移動燃燒" },
-      "車用汽油": { factor: 2.36, unit: "公升", scope: "Scope 1 - 移動燃燒" },
-      "桶裝瓦斯(LPG)": { factor: 3.11, unit: "公斤", scope: "Scope 1 - 固定燃燒" },
-      "冷氣冷媒(R-410A)": { factor: 2088, unit: "kg", scope: "Scope 1 - 逸散排放" },
-      "冷藏冷媒(R-404A)": { factor: 3922, unit: "kg", scope: "Scope 1 - 逸散排放" },
-      "乾粉滅火藥劑": { factor: 28, unit: "kg", scope: "Scope 1 - 逸散排放" }
+    function getESAuto(energy) {
+      if (!energy) return null;
+      if (window.CFV_MAPPING && window.CFV_MAPPING.materials) {
+        const materials = window.CFV_MAPPING.materials;
+        const match = Object.values(materials).find(item => item.name === energy);
+        if (match && match.scope) return match;
+        for (const item of Object.values(materials)) {
+          if (item.name && energy.includes(item.name) && item.scope) return item;
+        }
+      }
+      // Fallback lookup
+      if (energy.includes("電力")) return { scope: "範疇二 (能源間接)", ghg: ["CO2"] };
+      if (energy.includes("柴油") || energy.includes("汽油")) return { scope: "範疇一 (移動燃燒)", ghg: ["CO2", "CH4", "N2O"] };
+      if (energy.includes("冷媒") || energy.includes("410") || energy.includes("404")) return { scope: "範疇一 (逸散排放)", ghg: ["HFCs"] };
+      return { scope: "範疇一 (直接排放)", ghg: ["CO2", "CH4", "N2O"] };
+    }
+
+    function updateESPreview() {
+      const energyEl = document.getElementById('esEnergy');
+      if (!energyEl) return;
+      const energy = energyEl.value.trim();
+      const auto = getESAuto(energy);
+      const scopeBadge = document.getElementById('esPreviewScope');
+      const ghgContainer = document.getElementById('esPreviewGHG');
+      if (!scopeBadge || !ghgContainer) return;
+
+      if (!auto) {
+        scopeBadge.className = 'px-2 py-0.5 rounded border text-[11px] font-semibold text-slate-100 bg-slate-600 border-slate-500';
+        scopeBadge.textContent = '待確認';
+        ghgContainer.innerHTML = '<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]">查無預設溫室氣體，請確認物料名稱</span>';
+        return;
+      }
+
+      const isScope2 = auto.scope.includes('二');
+      const scopeColor = isScope2 ? 'text-white bg-cyan-600 border-cyan-500' : 'text-white bg-orange-500 border-orange-400';
+      scopeBadge.className = `px-2 py-0.5 rounded border text-[11px] font-semibold ${scopeColor}`;
+      scopeBadge.textContent = auto.scope;
+      ghgContainer.innerHTML = auto.ghg.map(g => `<span class="px-1.5 py-0.5 rounded bg-slate-700 border border-slate-600 text-slate-200 text-[10px] font-mono">${g}</span>`).join('');
+    }
+
+    function checkDuplicateEquipId() {
+      const equipId = document.getElementById('esEquipId').value.trim();
+      const hintEl = document.getElementById('esEquipIdHint');
+      if (!equipId) { if (hintEl) hintEl.classList.add('hidden'); return; }
+      const existing = emissionSources.find(e => e.equipId === equipId);
+      if (existing && hintEl) {
+        hintEl.textContent = '您已建立過此設備編號，系統已為您自動帶入該設備名稱與位置。';
+        hintEl.classList.remove('hidden');
+        document.getElementById('esEquipName').value = existing.name;
+        document.getElementById('esLocation').value = existing.location;
+      } else if (hintEl) {
+        hintEl.classList.add('hidden');
+      }
+    }
+
+    function addEmissionSource() {
+      const equipId = document.getElementById('esEquipId').value.trim();
+      const name = document.getElementById('esEquipName').value.trim();
+      const location = document.getElementById('esLocation').value.trim();
+      const quantity = parseInt(document.getElementById('esQuantity').value) || 1;
+      const energy = document.getElementById('esEnergy').value;
+
+      if (!equipId || !name || !location) {
+        alert('請填寫設備編號、設備名稱及所屬部門/位置！');
+        return;
+      }
+
+      emissionSources.push({ id: Date.now(), equipId, name, location, energy, quantity });
+      document.getElementById('esEquipId').value = '';
+      document.getElementById('esEquipName').value = '';
+      document.getElementById('esLocation').value = '';
+      document.getElementById('esQuantity').value = '1';
+      document.getElementById('esEnergy').value = '';
+      const hintEl = document.getElementById('esEquipIdHint');
+      if (hintEl) hintEl.classList.add('hidden');
+
+      updateESPreview();
+      renderEmissionSourceTable();
+    }
+
+    function deleteEmissionSource(index) {
+      if (confirm('確定要刪除此排放源設備嗎？')) {
+        emissionSources.splice(index, 1);
+        renderEmissionSourceTable();
+      }
+    }
+
+    function openEditModal(index) {
+      const es = emissionSources[index];
+      document.getElementById('editESIndex').value = index;
+      document.getElementById('editESId').value = es.equipId;
+      document.getElementById('editESName').value = es.name;
+      document.getElementById('editESLocation').value = es.location;
+      document.getElementById('editESQuantity').value = es.quantity;
+      document.getElementById('editESEnergy').value = es.energy;
+      document.getElementById('esEditModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('esEditModal').classList.add('hidden');
+    }
+
+    function saveEditModal() {
+      const index = parseInt(document.getElementById('editESIndex').value);
+      const equipId = document.getElementById('editESId').value.trim();
+      const name = document.getElementById('editESName').value.trim();
+      const location = document.getElementById('editESLocation').value.trim();
+      const quantity = parseInt(document.getElementById('editESQuantity').value) || 1;
+      const energy = document.getElementById('editESEnergy').value;
+      if (!equipId || !name || !location) {
+        alert('請填寫完整資訊！');
+        return;
+      }
+      emissionSources[index] = { ...emissionSources[index], equipId, name, location, energy, quantity };
+      closeEditModal();
+      renderEmissionSourceTable();
+    }
+
+    function renderEmissionSourceTable() {
+      const tbody = document.getElementById('esTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      const keyword = (document.getElementById('esSearchInput')?.value || '').trim().toLowerCase();
+      const filtered = keyword
+        ? emissionSources.filter(e => e.name.toLowerCase().includes(keyword) || e.location.toLowerCase().includes(keyword) || e.energy.toLowerCase().includes(keyword) || e.equipId.toLowerCase().includes(keyword))
+        : emissionSources;
+
+      filtered.forEach((es, filteredIdx) => {
+        const realIdx = emissionSources.indexOf(es);
+        const auto = getESAuto(es.energy);
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/40 transition-colors';
+        const ghgTags = auto ? auto.ghg.map(g => `<span class="px-1.5 py-0.5 rounded bg-slate-700 border border-slate-600 text-slate-200 text-[10px] font-mono">${g}</span>`).join(' ') : `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]">待確認</span>`;
+        const isScope2 = auto ? auto.scope.includes('二') : false;
+        const scopeColor = auto ? (isScope2 ? 'text-white bg-cyan-600 border-cyan-500' : 'text-white bg-orange-500 border-orange-400') : 'text-slate-100 bg-slate-600 border-slate-500';
+        const scopeText = auto ? auto.scope : '待確認';
+        const scopeBadge = `<span class="px-2 py-0.5 rounded border text-[10px] font-semibold whitespace-nowrap ${scopeColor}">${scopeText}</span>`;
+
+        tr.innerHTML = `
+          <td class="p-3 font-mono text-slate-400 whitespace-nowrap">${es.equipId}</td>
+          <td class="p-3 font-semibold text-slate-200 whitespace-nowrap">${es.name}</td>
+          <td class="p-3 text-slate-400 whitespace-nowrap">${es.location}</td>
+          <td class="p-3 text-slate-300 whitespace-nowrap">${es.energy}</td>
+          <td class="p-3">${scopeBadge}</td>
+          <td class="p-3"><div class="flex flex-wrap gap-1">${ghgTags}</div></td>
+          <td class="p-3 text-slate-300 text-center">${es.quantity}</td>
+          <td class="p-3 text-center">
+            <div class="flex justify-center gap-2">
+              <button onclick="openEditModal(${realIdx})" title="編輯" class="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition text-[11px] flex items-center gap-1"><i class="fa-solid fa-pen text-[9px]"></i> 編輯</button>
+              <button onclick="deleteEmissionSource(${realIdx})" title="刪除" class="px-2.5 py-1 rounded-lg bg-rose-900/60 hover:bg-rose-800 text-rose-400 hover:text-rose-200 border border-rose-500/30 transition text-[11px] flex items-center gap-1"><i class="fa-solid fa-trash-can text-[9px]"></i> 刪除</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      const esCountEl = document.getElementById('esCount');
+      if (esCountEl) esCountEl.innerText = emissionSources.length;
+    }
+
+    // =============================================
+    // STEP 3: ITEMIZED LIST CALCULATION ENGINE
+    // =============================================
+    const GWP_DATA = {
+      "AR5": { CO2: 1, CH4: 28, N2O: 265, "R-410A": 2088, "R-404A": 3922, "R-134a": 1430, SF6: 23500, NF3: 16100 },
+      "AR6": { CO2: 1, CH4: 27.9, N2O: 273, "R-410A": 2255.5, "R-404A": 4728, "R-134a": 1526, SF6: 25200, NF3: 17400 },
+      "AR4": { CO2: 1, CH4: 25, N2O: 298, "R-410A": 2088, "R-404A": 3922, "R-134a": 1430, SF6: 22800, NF3: 17200 }
     };
+    let currentGWP = "AR5";
+
+    const FACTOR_MAP = {
+      "外購電力": { factor: 0.495, co2: 0.495, ch4: 0, n2o: 0, unit: "度 (kWh)", scope: "Scope 2 - 外購電力", ref: "經濟部電力排碳係數" },
+      "車用柴油": { factor: 2.66, co2: 2.606, ch4: 0.00039, n2o: 0.00018, unit: "公升 (L)", scope: "Scope 1 - 移動燃燒", ref: "環境部 6.0.4 柴油" },
+      "車用汽油": { factor: 2.36, co2: 2.263, ch4: 0.00078, n2o: 0.00021, unit: "公升 (L)", scope: "Scope 1 - 移動燃燒", ref: "環境部 6.0.4 汽油" },
+      "桶裝瓦斯(LPG)": { factor: 3.11, co2: 3.003, ch4: 0.0001, n2o: 0.00005, unit: "公斤 (kg)", scope: "Scope 1 - 固定燃燒", ref: "環境部 6.0.4 LPG" },
+      "冷氣冷媒(R-410A)": { factor: 2088, co2: 0, ch4: 0, n2o: 0, other: 1.0, gas: "R-410A", unit: "kg", scope: "Scope 1 - 逸散排放", ref: "IPCC GWP" },
+      "冷藏冷媒(R-404A)": { factor: 3922, co2: 0, ch4: 0, n2o: 0, other: 1.0, gas: "R-404A", unit: "kg", scope: "Scope 1 - 逸散排放", ref: "IPCC GWP" },
+      "乾粉滅火藥劑": { factor: 28, co2: 28, ch4: 0, n2o: 0, unit: "kg", scope: "Scope 1 - 逸散排放", ref: "環境部逸散係數" }
+    };
+
+    let itemizedRecords = [
+      { id: 1, equipNo: "EQ-001", equipCode: "REF-C01", name: "營業用開放式冷藏展示櫃", dept: "營運部", location: "1F 展售區 A08", fuel: "外購電力", scope: "Scope 2", emissionType: "外購電力使用", annualTotal: 25000, activity: 25000, ratio: 100, unit: "度 (kWh)" },
+      { id: 2, equipNo: "EQ-002", equipCode: "COLD-02", name: "大型低溫冷藏庫 (R-404A)", dept: "倉儲部", location: "1F 後方倉儲", fuel: "冷藏冷媒(R-404A)", scope: "Scope 1", emissionType: "逸散排放", annualTotal: 3.5, activity: 3.5, ratio: 100, unit: "kg" },
+      { id: 3, equipNo: "EQ-003", equipCode: "VEH-01", name: "3.5噸批發載貨柴油小貨車", dept: "物流部", location: "公務停車場", fuel: "車用柴油", scope: "Scope 1", emissionType: "移動燃燒", annualTotal: 1200, activity: 1200, ratio: 100, unit: "公升 (L)" },
+      { id: 4, equipNo: "EQ-004", equipCode: "AC-01", name: "門市分離式冷氣空調 (R-410A)", dept: "行政部", location: "2F 辦公室", fuel: "冷氣冷媒(R-410A)", scope: "Scope 1", emissionType: "逸散排放", annualTotal: 2.0, activity: 2.0, ratio: 100, unit: "kg" },
+      { id: 5, equipNo: "EQ-005", equipCode: "LGT-01", name: "攤位高亮度照明探照燈", dept: "廠務部", location: "1F 全場照明", fuel: "外購電力", scope: "Scope 2", emissionType: "外購電力使用", annualTotal: 8600, activity: 8600, ratio: 100, unit: "度 (kWh)" }
+    ];
+
+    let currentScopeFilter = "ALL";
+
+    function computeItemizedList() {
+      const gwp = GWP_DATA[currentGWP];
+      let totalCarbon = 0, s1Total = 0, s2Total = 0;
+
+      const items = itemizedRecords.map(r => {
+        const fInfo = FACTOR_MAP[r.fuel] || FACTOR_MAP["外購電力"];
+        const effectiveActivity = (parseFloat(r.annualTotal) || 0) * ((parseFloat(r.ratio) || 100) / 100);
+
+        let tCO2 = 0, tCH4 = 0, tN2O = 0, tOther = 0;
+        let itemCO2e = 0;
+        let factorText = "";
+
+        if (r.fuel.includes("冷媒")) {
+          const gName = fInfo.gas || "R-410A";
+          const gwpVal = gwp[gName] || 2088;
+          tOther = effectiveActivity / 1000;
+          itemCO2e = tOther * gwpVal;
+          factorText = `GWP: ${gwpVal}`;
+        } else if (r.fuel === "外購電力") {
+          tCO2 = (effectiveActivity * fInfo.co2) / 1000;
+          itemCO2e = tCO2;
+          factorText = `${fInfo.co2} kg/度`;
+        } else {
+          tCO2 = (effectiveActivity * (fInfo.co2 || 0)) / 1000;
+          tCH4 = (effectiveActivity * (fInfo.ch4 || 0)) / 1000;
+          tN2O = (effectiveActivity * (fInfo.n2o || 0)) / 1000;
+          itemCO2e = (tCO2 * gwp.CO2) + (tCH4 * gwp.CH4) + (tN2O * gwp.N2O);
+          factorText = `${fInfo.factor || 0} kg/單位`;
+        }
+
+        itemCO2e = Math.round(itemCO2e * 1000) / 1000;
+
+        if (fInfo.scope.includes("Scope 1") || r.scope === "Scope 1") s1Total += itemCO2e;
+        if (fInfo.scope.includes("Scope 2") || r.scope === "Scope 2") s2Total += itemCO2e;
+        totalCarbon += itemCO2e;
+
+        let potential = "中等";
+        let potentialColor = "bg-amber-950 text-amber-300 border-amber-500/30";
+        if (itemCO2e >= 10 || r.fuel.includes("冷媒")) {
+          potential = "極高 (優先改善)";
+          potentialColor = "bg-rose-950 text-rose-300 border-rose-500/30 font-bold";
+        } else if (itemCO2e < 2) {
+          potential = "基本 (行為節約)";
+          potentialColor = "bg-slate-800 text-slate-300 border-slate-700";
+        }
+
+        return {
+          ...r,
+          effectiveActivity: Math.round(effectiveActivity * 100) / 100,
+          scopeType: fInfo.scope.includes("Scope 2") ? "Scope 2" : "Scope 1",
+          tCO2: Math.round(tCO2 * 1000) / 1000,
+          tCH4: Math.round(tCH4 * 10000) / 10000,
+          tN2O: Math.round(tN2O * 10000) / 10000,
+          tOther: Math.round(tOther * 1000) / 1000,
+          itemCO2e,
+          factorText,
+          potential,
+          potentialColor
+        };
+      });
+
+      items.forEach(it => {
+        it.pct = totalCarbon > 0 ? ((it.itemCO2e / totalCarbon) * 100).toFixed(1) : "0.0";
+      });
+
+      return {
+        items,
+        totalCarbon: Math.round(totalCarbon * 100) / 100,
+        s1Total: Math.round(s1Total * 100) / 100,
+        s2Total: Math.round(s2Total * 100) / 100
+      };
+    }
+
+    function renderStep3Itemized() {
+      const { items, totalCarbon, s1Total, s2Total } = computeItemizedList();
+
+      document.getElementById('kpiTotalCarbon').innerText = totalCarbon.toFixed(2);
+      document.getElementById('kpiItemCount').innerText = `${items.length} 筆項目`;
+      document.getElementById('kpiScope1').innerText = `${s1Total.toFixed(2)} t`;
+      document.getElementById('kpiScope2').innerText = `${s2Total.toFixed(2)} t`;
+
+      const s1Pct = totalCarbon > 0 ? Math.round((s1Total / totalCarbon) * 100) : 0;
+      const s2Pct = totalCarbon > 0 ? Math.round((s2Total / totalCarbon) * 100) : 0;
+      document.getElementById('kpiScope1Ratio').innerText = `${s1Pct}%`;
+      document.getElementById('kpiScope2Ratio').innerText = `${s2Pct}%`;
+
+      document.getElementById('sumScope1').innerText = `${s1Total.toFixed(2)} tCO₂e`;
+      document.getElementById('sumScope2').innerText = `${s2Total.toFixed(2)} tCO₂e`;
+      document.getElementById('sumTotal').innerText = `${totalCarbon.toFixed(2)} tCO₂e`;
+
+      if (items.length > 0) {
+        const sorted = [...items].sort((a, b) => b.itemCO2e - a.itemCO2e);
+        const top = sorted[0];
+        document.getElementById('kpiHotspotName').innerText = top.name;
+        document.getElementById('kpiHotspotVal').innerText = `${top.itemCO2e.toFixed(2)} tCO₂e`;
+        document.getElementById('kpiHotspotPct').innerText = `${top.pct}%`;
+      } else {
+        document.getElementById('kpiHotspotName').innerText = "尚無數據";
+        document.getElementById('kpiHotspotVal').innerText = "0.00 tCO₂e";
+        document.getElementById('kpiHotspotPct').innerText = "0%";
+      }
+
+      let displayItems = items;
+      if (currentScopeFilter !== "ALL") {
+        displayItems = items.filter(it => it.scopeType === currentScopeFilter);
+      }
+
+      const tbody = document.getElementById('itemizedTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (displayItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-500">目前尚無符合篩選的盤查明細項目。</td></tr>`;
+        return;
+      }
+
+      displayItems.forEach((it, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/60 transition";
+
+        let scopeBadge = it.scopeType === "Scope 1" 
+          ? `<span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/30 text-[10px] font-bold">Scope 1 直接</span>`
+          : `<span class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold">Scope 2 間接</span>`;
+
+        let gasBreakdown = "";
+        if (it.fuel.includes("冷媒")) {
+          gasBreakdown = `<span class="text-rose-400 font-mono">HFCs: ${it.tOther} t</span>`;
+        } else if (it.fuel === "外購電力") {
+          gasBreakdown = `<span class="text-cyan-400 font-mono">CO₂: ${it.tCO2} t</span>`;
+        } else {
+          gasBreakdown = `<span class="text-slate-300 font-mono">CO₂: ${it.tCO2} | CH₄: ${it.tCH4}</span>`;
+        }
+
+        tr.innerHTML = `
+          <td class="p-3 text-center font-mono text-slate-500">${idx + 1}</td>
+          <td class="p-3">
+            <div class="font-bold text-slate-100">${it.name}</div>
+            <div class="text-[10px] text-slate-400 font-mono">${it.equipCode || it.equipNo || 'EQ'} (${it.location})</div>
+          </td>
+          <td class="p-3">
+            <div class="text-slate-300">${it.dept}</div>
+            <div class="text-[10px] text-slate-500">${it.location}</div>
+          </td>
+          <td class="p-3">
+            <div class="text-slate-200 font-medium">${it.fuel}</div>
+            <div class="mt-0.5">${scopeBadge}</div>
+          </td>
+          <td class="p-3 font-mono">
+            <div class="text-slate-200 font-bold">${it.effectiveActivity} ${it.unit}</div>
+            <div class="text-[10px] text-slate-400">總量 ${it.annualTotal} (${it.ratio}%)</div>
+          </td>
+          <td class="p-3 text-[11px] leading-tight">
+            ${gasBreakdown}
+          </td>
+          <td class="p-3 text-right font-mono text-slate-400">
+            ${it.factorText}
+          </td>
+          <td class="p-3 text-right">
+            <span class="text-sm font-black text-emerald-400 font-mono">${it.itemCO2e.toFixed(2)}</span>
+            <span class="text-[10px] text-slate-400 block">tCO₂e</span>
+          </td>
+          <td class="p-3">
+            <div class="flex items-center gap-2">
+              <div class="w-16 bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" style="width: ${it.pct}%"></div>
+              </div>
+              <span class="font-mono text-[11px] font-bold text-slate-300">${it.pct}%</span>
+            </div>
+          </td>
+          <td class="p-3 text-center">
+            <span class="px-2 py-0.5 rounded text-[10px] border ${it.potentialColor}">${it.potential}</span>
+          </td>
+          <td class="p-3 text-right">
+            <button onclick="deleteItemizedRecord(${it.id})" class="text-slate-500 hover:text-rose-400 p-1.5 transition" title="刪除此項目">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      renderStep3Charts(s1Total, s2Total, items);
+
+      // Sync to game & summary
+      document.getElementById('gameBaseCarbon').innerText = totalCarbon.toFixed(2);
+      document.getElementById('gameVendorTitle').innerText = document.getElementById('infoName').value || "阿文水果攤";
+    }
+
+    let chartScopeObj = null;
+    let chartBarObj = null;
+
+    function renderStep3Charts(s1, s2, items) {
+      const ctxScope = document.getElementById('chartScope');
+      if (ctxScope) {
+        if (chartScopeObj) chartScopeObj.destroy();
+        chartScopeObj = new Chart(ctxScope, {
+          type: 'doughnut',
+          data: {
+            labels: ['範疇一 (Scope 1 直接排放)', '範疇二 (Scope 2 外購電力)'],
+            datasets: [{
+              data: [s1, s2],
+              backgroundColor: ['#f59e0b', '#06b6d4'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { size: 11 } } }
+            },
+            cutout: '65%'
+          }
+        });
+      }
+
+      const ctxBar = document.getElementById('chartItemsBar');
+      if (ctxBar) {
+        if (chartBarObj) chartBarObj.destroy();
+        const topItems = [...items].sort((a, b) => b.itemCO2e - a.itemCO2e).slice(0, 5);
+
+        chartBarObj = new Chart(ctxBar, {
+          type: 'bar',
+          data: {
+            labels: topItems.map(i => i.name.length > 10 ? i.name.substring(0, 10) + '...' : i.name),
+            datasets: [{
+              label: '年碳排放當量 (tCO₂e)',
+              data: topItems.map(i => i.itemCO2e),
+              backgroundColor: topItems.map(i => i.scopeType === 'Scope 1' ? 'rgba(245, 158, 11, 0.85)' : 'rgba(6, 182, 212, 0.85)'),
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+              x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+              y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 11 } } }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+      }
+    }
+
+    function filterItemizedScope(scope) {
+      currentScopeFilter = scope;
+      document.getElementById('btn-f-all').className = scope === 'ALL' ? 'px-3 py-1 rounded-lg bg-emerald-600 text-white font-bold transition' : 'px-3 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 transition';
+      document.getElementById('btn-f-s1').className = scope === 'Scope 1' ? 'px-3 py-1 rounded-lg bg-amber-600 text-white font-bold transition' : 'px-3 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 transition';
+      document.getElementById('btn-f-s2').className = scope === 'Scope 2' ? 'px-3 py-1 rounded-lg bg-cyan-600 text-white font-bold transition' : 'px-3 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 transition';
+      renderStep3Itemized();
+    }
+
+    function changeGWPVersion() {
+      currentGWP = document.getElementById('gwpSelector').value;
+      renderStep3Itemized();
+    }
 
     function autoFillFactor() {
       const fuel = document.getElementById('inFuelType').value;
@@ -394,147 +1161,53 @@
         return;
       }
 
-      const fInfo = FACTOR_MAP[fuel] || { factor: 1.0, scope: "Scope 1 - 固定燃燒" };
-      const carbon = Math.round((activity * fInfo.factor / 1000) * 100) / 100;
+      const fInfo = FACTOR_MAP[fuel] || { factor: 1.0, scope: "Scope 1" };
+      const scopeType = fInfo.scope.includes("Scope 2") ? "Scope 2" : "Scope 1";
 
-      records.push({
+      itemizedRecords.push({
         id: Date.now(),
+        equipNo: `EQ-${Date.now().toString().slice(-3)}`,
+        equipCode: "EQ-GEN",
         name,
+        dept: "營運部",
+        location: "門市場域",
         fuel,
-        scope: fInfo.scope,
+        scope: scopeType,
+        emissionType: scopeType === "Scope 2" ? "外購電力使用" : "固定/移動/逸散",
+        annualTotal: activity,
         activity,
-        unit,
-        factor: fInfo.factor,
-        carbon
+        ratio: 100,
+        unit
       });
 
       document.getElementById('inEquipName').value = '';
       document.getElementById('inActivityData').value = '';
-      renderRecordsTable();
+
+      switchSheetTab('sheet5');
+      renderStep3Itemized();
     }
 
-    function deleteRecord(index) {
-      records.splice(index, 1);
-      renderRecordsTable();
+    function deleteItemizedRecord(id) {
+      if (confirm('確定要刪除這筆定量盤查明細嗎？')) {
+        itemizedRecords = itemizedRecords.filter(r => r.id !== id);
+        renderStep3Itemized();
+      }
     }
 
-    function getTotalCarbon() {
-      return records.reduce((s, i) => s + i.carbon, 0);
-    }
-
-    function renderRecordsTable() {
-      const tbody = document.getElementById('recordsTableBody');
-      tbody.innerHTML = '';
-
-      let s1 = 0, s2 = 0;
-
-      records.forEach((r, idx) => {
-        if (r.scope.includes('Scope 1')) s1 += r.carbon;
-        if (r.scope.includes('Scope 2')) s2 += r.carbon;
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-900/40";
-        tr.innerHTML = `
-          <td class="p-3 text-slate-500">${idx + 1}</td>
-          <td class="p-3 font-semibold text-slate-200">${r.name}</td>
-          <td class="p-3 text-slate-300">${r.fuel}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px]">${r.scope}</span></td>
-          <td class="p-3 text-slate-300">${r.activity} ${r.unit}</td>
-          <td class="p-3 text-slate-400">${r.factor}</td>
-          <td class="p-3 font-bold text-emerald-400">${r.carbon} tCO₂e</td>
-          <td class="p-3 text-right">
-            <button onclick="deleteRecord(${idx})" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash-can"></i></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      const total = getTotalCarbon();
-      document.getElementById('recordCount').innerText = records.length;
-      document.getElementById('recordTotalCarbon').innerText = total.toFixed(2);
-
-      document.getElementById('sumScope1').innerText = `${s1.toFixed(2)} tCO₂e`;
-      document.getElementById('sumScope2').innerText = `${s2.toFixed(2)} tCO₂e`;
-      document.getElementById('sumTotal').innerText = `${total.toFixed(2)} tCO₂e`;
-
-      renderSummaryChart(s1, s2);
-    }
-
-    // Chart
-    let chartObj = null;
-    function renderSummaryChart(s1, s2) {
-      const ctx = document.getElementById('summaryChart');
-      if (!ctx) return;
-      if (chartObj) chartObj.destroy();
-
-      chartObj = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['範疇一 (直接排放)', '範疇二 (外購電力)'],
-          datasets: [{
-            data: [s1, s2],
-            backgroundColor: ['#f59e0b', '#06b6d4'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: '#cbd5e1' } }
-          }
-        }
-      });
-    }
-
-    // Export Real Excel (.xlsx) using SheetJS
-    function exportToExcel() {
-      const wb = XLSX.utils.book_new();
-
-      // Sheet 1: 基本資料
-      const s1Data = [
-        ["事業名稱", document.getElementById('infoName').value],
-        ["統一編號", document.getElementById('infoTaxId').value],
-        ["盤查年度", document.getElementById('infoYear').value],
-        ["負責人", document.getElementById('infoOwner').value],
-        ["聯絡人", document.getElementById('infoContact').value],
-        ["行業別", document.getElementById('infoIndustry').value]
-      ];
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s1Data), "一、事業基本資料");
-
-      // Sheet 2: 邊界設定
-      const s2Data = [
-        ["機構名稱", document.getElementById('boundOrgName').value],
-        ["縣市/鄉鎮", document.getElementById('boundCity').value],
-        ["地址", document.getElementById('boundAddress').value],
-        ["電號", document.getElementById('boundPowerNo').value],
-        ["共用電表", document.getElementById('boundSharedPower').value]
-      ];
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s2Data), "二、邊界設定");
-
-      // Sheet 5: 定量盤查紀錄
-      const s5Header = [["編號", "設備名稱", "原/燃物料", "排放範疇", "活動數據", "單位", "排放係數", "排放當量(tCO2e)"]];
-      const s5Rows = records.map((r, i) => [i + 1, r.name, r.fuel, r.scope, r.activity, r.unit, r.factor, r.carbon]);
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s5Header.concat(s5Rows)), "五、定量盤查表");
-
-      const vendorNameStr = document.getElementById('infoName').value || "溫室氣體清冊";
-      XLSX.writeFile(wb, `溫室氣體排放量清冊表單-${vendorNameStr}.xlsx`);
-    }
-
-    // Switch Sheet Tabs
     function switchSheetTab(sheetId) {
       document.querySelectorAll('.sheet-content').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.sheet-tab').forEach(el => el.classList.remove('active'));
 
-      document.getElementById(`sec-${sheetId}`).classList.remove('hidden');
-      document.getElementById(`stab-${sheetId}`).classList.add('active');
+      const target = document.getElementById(`sec-${sheetId}`);
+      const btn = document.getElementById(`stab-${sheetId}`);
+      if (target) target.classList.remove('hidden');
+      if (btn) btn.classList.add('active');
 
-      if (sheetId === 'sheet6') {
-        renderRecordsTable();
+      if (sheetId === 'sheet5' || sheetId === 'sheet6') {
+        renderStep3Itemized();
       }
     }
 
-    // App Mode Switcher
     function switchAppMode(mode) {
       if (mode === 'form') {
         document.getElementById('mode-form-section').classList.remove('hidden');
@@ -546,16 +1219,60 @@
         document.getElementById('mode-game-section').classList.remove('hidden');
         document.getElementById('btn-mode-form').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
         document.getElementById('btn-mode-game').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition";
-
-        // Load game with recorded items
-        document.getElementById('gameVendorTitle').innerText = document.getElementById('infoName').value || "自訂攤販";
-        document.getElementById('gameBaseCarbon').innerText = getTotalCarbon().toFixed(2);
       }
+    }
+
+    function exportToExcel() {
+      const wb = XLSX.utils.book_new();
+
+      const s1Data = [
+        ["事業名稱", document.getElementById('infoName').value],
+        ["統一編號", document.getElementById('infoTaxId').value],
+        ["盤查年度", document.getElementById('infoYear').value],
+        ["負責人", document.getElementById('infoOwner').value],
+        ["聯絡人", document.getElementById('infoContact').value],
+        ["行業別", document.getElementById('infoIndustry').value]
+      ];
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s1Data), "一、事業基本資料");
+
+      const s2Data = [
+        ["機構名稱", document.getElementById('boundOrgName').value],
+        ["縣市/鄉鎮", document.getElementById('boundCity').value],
+        ["地址", document.getElementById('boundAddress').value],
+        ["電號", document.getElementById('boundPowerNo').value],
+        ["共用電表", document.getElementById('boundSharedPower').value]
+      ];
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s2Data), "二、邊界設定");
+
+      const s3Header = [["編號", "設備名稱", "所在位置", "原(燃)物料", "數量"]];
+      const s3Rows = emissionSources.map((es, i) => [i + 1, es.name, es.location, es.energy, es.quantity]);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s3Header.concat(s3Rows)), "三、排放源鑑別");
+
+      const { items, totalCarbon } = computeItemizedList();
+      const s5Header = [
+        "序號", "設備編號", "設備名稱", "所屬部門", "詳細位置", "原(燃)物料", "排放範疇", "排放型式",
+        "有效活動數據", "單位", "CO2排放量(t)", "CH4排放量(t)", "N2O排放量(t)", "其他氣體/冷媒(t)",
+        "綜合排放係數", "總碳排放當量(tCO2e)", "佔全廠比例(%)", "減碳潛力評級"
+      ];
+      const s5Rows = items.map((it, idx) => [
+        idx + 1, it.equipNo, it.name, it.dept, it.location, it.fuel, it.scopeType, it.emissionType,
+        it.effectiveActivity, it.unit, it.tCO2, it.tCH4, it.tN2O, it.tOther,
+        it.factorText, it.itemCO2e, `${it.pct}%`, it.potential
+      ]);
+      s5Rows.push(["", "", "", "", "", "", "", "", "", "", "", "", "", "", "全廠總計", totalCarbon, "100%", ""]);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([s5Header].concat(s5Rows)), "五、定量盤查明細清冊(Itemized)");
+
+      const vendorNameStr = document.getElementById('infoName').value || "溫室氣體清冊";
+      XLSX.writeFile(wb, `溫室氣體排放量清冊表單-${vendorNameStr}.xlsx`);
     }
 
     // Init
     window.addEventListener('DOMContentLoaded', () => {
-      renderRecordsTable();
+      try { loadMaterialsFromCSV(); } catch (e) { console.error('Error in loadMaterialsFromCSV:', e); }
+      try { loadEquipmentsFromCSV(); } catch (e) { console.error('Error in loadEquipmentsFromCSV:', e); }
+      try { renderEmissionSourceTable(); } catch (e) { console.error('Error in renderEmissionSourceTable:', e); }
+      try { updateESPreview(); } catch (e) { console.error('Error in updateESPreview:', e); }
+      try { renderStep3Itemized(); } catch (e) { console.error('Error in renderStep3Itemized:', e); }
     });
   </script>
 </body>
