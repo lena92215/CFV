@@ -49,12 +49,19 @@
     }
     .sheet-tab {
       transition: all 0.2s ease;
+      background-color: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+    }
+    .sheet-tab:hover {
+      border-color: #10b981;
+      color: #ffffff;
     }
     .sheet-tab.active {
-      background-color: #059669;
-      color: #ffffff;
-      border-color: #10b981;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      background-color: #059669 !important;
+      color: #ffffff !important;
+      border-color: #10b981 !important;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
     }
     /* Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -106,28 +113,28 @@
       
       <!-- Excel Sheet Tabs (Mirrors the Excel workbook sheets) -->
       <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
-        <button onclick="switchSheetTab('sheet1')" id="stab-sheet1" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
+        <button onclick="switchSheetTab('sheet1')" id="stab-sheet1" class="sheet-tab active px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5">
           <i class="fa-solid fa-id-card"></i> 一、事業基本資料
         </button>
-        <button onclick="switchSheetTab('sheet2')" id="stab-sheet2" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
+        <button onclick="switchSheetTab('sheet2')" id="stab-sheet2" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5">
           <i class="fa-solid fa-map-pin"></i> 二、邊界設定
         </button>
-        <button onclick="switchSheetTab('sheet3')" id="stab-sheet3" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
+        <button onclick="switchSheetTab('sheet3')" id="stab-sheet3" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5">
           <i class="fa-solid fa-industry"></i> 三、排放源鑑別 (Emission source)
         </button>
-        <button onclick="switchSheetTab('sheet4')" id="stab-sheet4" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
+        <button onclick="switchSheetTab('sheet4')" id="stab-sheet4" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5">
           <i class="fa-solid fa-calculator"></i> 四、活動數據填報
         </button>
-        <button onclick="switchSheetTab('sheet5')" id="stab-sheet5" class="sheet-tab active px-4 py-2 rounded-xl text-xs font-black border border-emerald-500 bg-emerald-600 text-white shadow flex items-center gap-1.5">
-          <i class="fa-solid fa-table-list text-amber-300"></i> 五、定量盤查明細清冊 (Step 3: Itemized list)
+        <button onclick="switchSheetTab('sheet5')" id="stab-sheet5" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-table-list"></i> 五、定量盤查明細清冊 (Step 3: Itemized list)
         </button>
-        <button onclick="switchSheetTab('sheet6')" id="stab-sheet6" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
+        <button onclick="switchSheetTab('sheet6')" id="stab-sheet6" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5">
           <i class="fa-solid fa-chart-pie"></i> 六、排放量彙總統計
         </button>
       </div>
 
       <!-- SHEET 1: 事業基本資料 -->
-      <div id="sec-sheet1" class="sheet-content glass-panel rounded-2xl p-6 space-y-4 hidden">
+      <div id="sec-sheet1" class="sheet-content glass-panel rounded-2xl p-6 space-y-4">
         <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2 border-b border-slate-700 pb-3">
           <i class="fa-solid fa-id-card text-emerald-400"></i> 一、事業基本資料 (Business Information)
         </h2>
@@ -705,7 +712,7 @@
       <!-- ========================================================================= -->
       <!-- SHEET 5: STEP 3: ITEMIZED LIST (五、定量盤查明細清冊 - 核心功能)            -->
       <!-- ========================================================================= -->
-      <div id="sec-sheet5" class="sheet-content space-y-6">
+      <div id="sec-sheet5" class="sheet-content space-y-6 hidden">
         
         <!-- Key KPI Banners -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
