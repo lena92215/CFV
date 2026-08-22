@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>遊戲化碳管理平台：綠色智慧工廠養成遊戲</title>
+  <title>開心農場式：綠色碳管理養成遊戲</title>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
@@ -15,88 +16,37 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      font-family: 'Noto Sans TC', 'Outfit', sans-serif;
-      background: radial-gradient(circle at top left, #0f172a, #020617);
-      color: #f8fafc;
-      min-height: 100vh;
-    }
-    .glass-panel {
-      background: rgba(30, 41, 59, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    }
-    .glass-card {
-      background: rgba(51, 65, 85, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .glass-card:hover {
-      transform: translateY(-3px);
-      border-color: #10b981;
-      box-shadow: 0 12px 24px -10px rgba(16, 185, 129, 0.3);
-    }
-    .warning-card {
-      background: rgba(153, 27, 27, 0.25);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-    }
-    .warning-card:hover {
-      border-color: #ef4444;
-      box-shadow: 0 12px 24px -10px rgba(239, 68, 68, 0.3);
-    }
-
-    #canvasContainer {
-      position: relative;
-      background: radial-gradient(circle at bottom, #1e293b, #0f172a);
-      border-radius: 1.5rem;
-      border: 2px solid rgba(16, 185, 129, 0.3);
-      overflow: hidden;
-      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
-    }
-
-    .sheet-tab.active {
-      background-color: #059669;
-      color: #ffffff;
-      border-color: #10b981;
-    }
-
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #10b981; }
-  </style>
+  <!-- 獨立專案樣式 (css/style.css) -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="p-2 md:p-6 pb-20">
 
-  <!-- TOP HEADER -->
+  <!-- TOP APP HEADER -->
   <header class="max-w-7xl mx-auto glass-panel rounded-2xl p-4 mb-6 border-emerald-500/30">
     <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
       
       <div class="flex items-center gap-3">
         <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20 animate-bounce">
-          🏭
+          🌱
         </div>
         <div>
           <h1 class="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200">
-            智慧綠色工廠養成遊戲 (feature/Game)
+            開心農場式：綠色碳管理養成遊戲
           </h1>
           <p class="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            即時動態繪製虛擬工廠、煙囪粒子與 5 年減碳養成模擬
+            輸入車輛顯示車、輸入冷氣顯示冷氣、輸入發電機顯示發動機！點擊土地巡視與減碳！
           </p>
         </div>
       </div>
 
-      <!-- App Action Buttons -->
+      <!-- App Mode Switcher -->
       <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
         <button onclick="switchAppMode('game')" id="btn-mode-game" class="px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition">
-          <i class="fa-solid fa-gamepad text-amber-400"></i> 1. 動態工廠養成 (主遊戲)
+          <i class="fa-solid fa-gamepad text-amber-400"></i> 1. 開心農場養成 (主遊戲)
         </button>
         <button onclick="switchAppMode('form')" id="btn-mode-form" class="px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-          <i class="fa-solid fa-pen-to-square"></i> 2. 盤查填報 (功能一二三)
+          <i class="fa-solid fa-pen-to-square"></i> 2. 數據填報 (功能一二三)
         </button>
         <button onclick="openCertificateModal()" class="px-3.5 py-2 rounded-xl font-bold text-xs bg-cyan-600 hover:bg-cyan-500 text-white shadow-md transition flex items-center gap-1">
           <i class="fa-solid fa-award"></i> 淨零認證書
@@ -112,12 +62,10 @@
   <!-- MAIN APP CONTAINER -->
   <main class="max-w-7xl mx-auto space-y-6">
 
-    <!-- ========================================================================= -->
-    <!-- MODE 1: DYNAMIC ANIMATED FACTORY GAME INTERFACE                           -->
-    <!-- ========================================================================= -->
+    <!-- MODE 1: HAPPY FARM VIRTUAL PLANT RAISING GAME -->
     <section id="mode-game-section" class="space-y-6">
       
-      <!-- TOP STATUS & XP LEVEL BAR -->
+      <!-- GAME DASHBOARD & XP / LEVEL STATUS BAR -->
       <div class="glass-panel rounded-2xl p-5 border-emerald-500/40 space-y-4">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
           
@@ -131,15 +79,15 @@
                 </div>
               </div>
               <span class="absolute -bottom-1 -right-1 px-1.5 py-0.5 bg-emerald-500 text-slate-950 font-black text-[10px] rounded-md shadow">
-                智慧綠色工廠
+                農場式場域
               </span>
             </div>
 
             <div>
               <div class="flex items-center gap-2">
-                <h2 class="text-lg font-black text-slate-100" id="gameCompanyName">綠洲製造與冷鏈管理廠</h2>
+                <h2 class="text-lg font-black text-slate-100" id="gameCompanyName">綠洲農場與綠色企業場域</h2>
                 <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[11px] font-bold border border-emerald-500/30">
-                  <i class="fa-solid fa-leaf"></i> 減碳養成中
+                  <i class="fa-solid fa-wheat-awn"></i> 農場養成中
                 </span>
               </div>
               <!-- XP Progress Bar -->
@@ -148,7 +96,7 @@
               </div>
               <div class="flex justify-between text-[11px] text-slate-400 mt-1">
                 <span>經驗值 (XP): <strong id="xpText" class="text-emerald-400">650 / 1000</strong></span>
-                <span>距下一級還差 <strong id="xpNeeded" class="text-amber-400">350 XP</strong></span>
+                <span>距解鎖新農地還差 <strong id="xpNeeded" class="text-amber-400">350 XP</strong></span>
               </div>
             </div>
           </div>
@@ -166,7 +114,7 @@
             </div>
 
             <div class="glass-card rounded-xl p-3 text-center min-w-[110px]">
-              <div class="text-xs text-slate-400 font-medium">轉型預算金</div>
+              <div class="text-xs text-slate-400 font-medium">農場預算金</div>
               <div class="text-lg font-black text-cyan-400" id="gameBudget">$500 <span class="text-xs">萬</span></div>
             </div>
 
@@ -181,8 +129,8 @@
 
       <!-- GAME NAVIGATION SUB-TABS -->
       <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
-        <button onclick="switchGameSubTab('animated-map')" id="gtab-animated-map" class="game-sub-tab px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition">
-          <i class="fa-solid fa-city text-amber-300"></i> 1. 動態虛擬工廠養成畫面
+        <button onclick="switchGameSubTab('happy-farm')" id="gtab-happy-farm" class="game-sub-tab px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition">
+          <i class="fa-solid fa-wheat-awn text-amber-300"></i> 1. 開心農場養成地圖 (點擊土地)
         </button>
         <button onclick="switchGameSubTab('simulation')" id="gtab-simulation" class="game-sub-tab px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
           <i class="fa-solid fa-calculator text-cyan-400"></i> 2. 模擬擴建新增排放源
@@ -199,66 +147,62 @@
         </button>
       </div>
 
-      <!-- DYNAMIC ANIMATED VIRTUAL FACTORY CANVAS & MAP -->
-      <div id="gsec-animated-map" class="game-sub-view space-y-6">
+      <!-- HAPPY FARM MAP VIEW -->
+      <div id="gsec-happy-farm" class="game-sub-view space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <!-- HTML5 Canvas & Animated Factory Visualizer -->
-          <div class="lg:col-span-2 glass-panel rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between" id="canvasContainer">
+          <!-- Happy Farm Interactive Grid Area -->
+          <div class="lg:col-span-2 glass-panel rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between" id="farmContainer">
             
-            <!-- Canvas Overlay Header -->
-            <div class="flex items-center justify-between mb-2 z-10">
+            <div class="flex items-center justify-between mb-4 z-10">
               <div>
                 <h3 class="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <i class="fa-solid fa-industry text-emerald-400"></i>
-                  <span id="canvasPlantTitle">綠洲智慧綠色工廠</span> (即時動態養成畫面)
+                  <i class="fa-solid fa-wheat-awn text-emerald-400"></i>
+                  開心農場式綠色場域網格 (根據功能一二三真實輸入渲染)
                 </h3>
-                <p class="text-xs text-slate-400">煙囪粒子、太陽能板閃光與巡邏車輛皆依據盤查數據動態繪製中</p>
+                <p class="text-xs text-slate-400">輸入車輛出現車🚚、冷氣出現冷氣❄️、發電機出現發動機⚡！點擊土地進行巡視與升級！</p>
               </div>
-              <div class="flex items-center gap-2">
-                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full text-xs font-semibold animate-pulse">
-                  🌱 運作與降碳中
-                </span>
-              </div>
+              <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-full text-xs font-semibold">
+                🌾 開心農場養成中
+              </span>
             </div>
 
-            <!-- HTML5 Interactive Canvas -->
-            <div class="relative w-full h-[360px] my-auto">
-              <canvas id="factoryCanvas" class="w-full h-full rounded-xl"></canvas>
+            <!-- Happy Farm Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 z-10 my-4" id="farmGrid">
+              <!-- Rendered dynamically via gameEngine.js -->
             </div>
 
-            <!-- Animated Interactive Equipment Cards Below Canvas -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 z-10 mt-4" id="initialPlantMapGrid">
-              <!-- Equipment Cards Rendered via JS -->
+            <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-700/50">
+              <span>💡 提示：點擊地號可直接對該設備進行綠色升級與巡視獲得 XP！</span>
+              <span class="text-emerald-400 font-bold">目前土地利用：<span id="usedPlotsCount">4</span> / 12 格</span>
             </div>
 
           </div>
 
-          <!-- Dynamic Inspection & Upgrade Action Drawer -->
+          <!-- Dynamic Inspection & Plot Action Drawer -->
           <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between space-y-4">
             <div>
               <div class="flex items-center gap-3 mb-3">
                 <span class="text-3xl p-2 rounded-xl bg-slate-800 text-emerald-400" id="inspectIcon">🔍</span>
                 <div>
-                  <h4 class="font-bold text-slate-100 text-base" id="inspectTitle">點擊場域設備</h4>
-                  <span class="text-xs text-slate-400" id="inspectSubtitle">查看細部數據與動態狀態</span>
+                  <h4 class="font-bold text-slate-100 text-base" id="inspectTitle">點擊農場土地</h4>
+                  <span class="text-xs text-slate-400" id="inspectSubtitle">檢視設備狀態與減碳任務</span>
                 </div>
               </div>
 
               <div class="space-y-3 text-xs text-slate-300 bg-slate-900/70 rounded-xl p-4 border border-slate-800" id="inspectBody">
                 <p class="text-slate-400 leading-relaxed">
-                  👉 上方畫布即時繪製了您的工廠！包含煙囪排煙 💨、太陽能光電 ☀️ 與巡邏車輛 🚚。點擊設備查看詳細排碳當量與減碳處方！
+                  👉 左側為您的專屬開心農場網格！當您在功能一、二輸入冷氣、車輛、發電機時，網格上會即時出現對應的動態實體設備。點擊土地可獲得 XP 與執行綠色替換！
                 </p>
               </div>
             </div>
 
-            <!-- Quick Upgrade Action Box -->
             <div class="p-3.5 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-xs space-y-2">
               <div class="flex items-center gap-2 font-bold text-emerald-300">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> 養成升級快速處方：
+                <i class="fa-solid fa-wheat-fill"></i> 開心農場巡視效益：
               </div>
               <p class="text-[11px] text-slate-300 leading-relaxed">
-                將工廠升級至 <strong>LV.3 智慧綠色極致工廠</strong>，不僅能大幅降低碳費，還能獲得【綠色企業冠軍徽章】！
+                點擊巡視帶有 ⚠️ 警示的冷氣或發電機，可立即觸發 5 年綠色替換，大幅削減碳排當量！
               </p>
               <button onclick="switchGameSubTab('recommend')" class="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg transition text-xs mt-1">
                 查看 5 年綠色減碳推薦
@@ -344,7 +288,7 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="warningsGridContainer">
-            <!-- Rendered dynamically based on user's initial state -->
+            <!-- Rendered dynamically via gameEngine.js -->
           </div>
         </div>
       </div>
@@ -358,7 +302,13 @@
               <i class="fa-solid fa-tasks text-amber-400"></i> 每日任務與主線減碳挑戰
             </h3>
             <div class="space-y-3 text-xs" id="questsListContainer">
-              <!-- Dynamic Quests -->
+              <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex justify-between items-center">
+                <div>
+                  <div class="font-bold text-slate-200">每日任務：完成 1 筆碳盤查數據輸入</div>
+                  <div class="text-[11px] text-slate-400">獎勵：+100 XP | +$20 萬預算</div>
+                </div>
+                <span class="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 font-bold rounded-lg border border-emerald-500/30">已完成</span>
+              </div>
             </div>
           </div>
 
@@ -367,7 +317,13 @@
               <i class="fa-solid fa-award text-amber-300"></i> 綠色企業成就徽章庫
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="badgesContainer">
-              <!-- Rendered via JS -->
+              <div class="p-3 bg-emerald-950/40 border border-emerald-500/40 rounded-xl flex items-center gap-3">
+                <div class="text-2xl">🏅</div>
+                <div>
+                  <div class="font-bold text-xs text-emerald-300">盤查先鋒者</div>
+                  <div class="text-[11px] text-slate-400">完成功能一二三數據建立</div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -400,8 +356,8 @@
                 <tbody class="divide-y divide-slate-800" id="leaderboardBody">
                   <tr class="bg-emerald-950/30 border-l-4 border-emerald-500">
                     <td class="p-2.5 font-bold text-emerald-400">🥇 第 1 名</td>
-                    <td class="p-2.5 font-bold text-slate-100" id="lbYourName">綠洲製造與冷鏈管理廠 (您)</td>
-                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">LV.2 智慧工廠</span></td>
+                    <td class="p-2.5 font-bold text-slate-100" id="lbYourName">綠洲農場與綠色企業場域 (您)</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">LV.2 智慧農場</span></td>
                     <td class="p-2.5 font-bold text-emerald-400">38.5%</td>
                     <td class="p-2.5 text-right font-black text-amber-400">650 XP</td>
                   </tr>
@@ -459,7 +415,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
           <div>
             <label class="block text-slate-400 mb-1">事業/場域名稱*</label>
-            <input type="text" id="infoName" value="綠洲製造與冷鏈管理廠" onchange="updateFormName()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+            <input type="text" id="infoName" value="綠洲農場與綠色企業場域" onchange="updateFormName()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
           </div>
           <div>
             <label class="block text-slate-400 mb-1">統一編號 / 管制編號*</label>
@@ -479,11 +435,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
           <div>
             <label class="block text-slate-400 mb-1">機構名稱*</label>
-            <input type="text" id="boundOrgName" value="綠洲廠區本店" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+            <input type="text" id="boundOrgName" value="綠洲農場場區" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
           </div>
           <div>
             <label class="block text-slate-400 mb-1">詳細地址*</label>
-            <input type="text" id="boundAddress" value="台中市南屯區工業區五路88號" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+            <input type="text" id="boundAddress" value="台中市南屯區五權西路88號" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
           </div>
         </div>
       </div>
@@ -494,13 +450,13 @@
             <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
               <i class="fa-solid fa-plus-circle text-emerald-400"></i> 新增排放源與活動數據 (功能一、二、三)
             </h2>
-            <span class="text-xs text-slate-400">填寫後會自動更新至遊戲初始型態中！</span>
+            <span class="text-xs text-slate-400">填寫後會自動生成對應之開心農場網格設備！</span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
             <div>
               <label class="block text-slate-400 mb-1">設備/設施名稱*</label>
-              <input type="text" id="inEquipName" placeholder="例如：舊型冷氣機、柴油貨車" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <input type="text" id="inEquipName" placeholder="例如：舊型冷氣機、柴油貨車、發電機" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
             </div>
             <div>
               <label class="block text-slate-400 mb-1">燃料/能源種類*</label>
@@ -514,7 +470,7 @@
             </div>
             <div>
               <label class="block text-slate-400 mb-1">年度活動數據使用量*</label>
-              <input type="number" id="inActivityData" placeholder="例如：2.5 或 1200" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <input type="number" id="inActivityData" placeholder="例如：3.5 或 1800" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
             </div>
             <div>
               <label class="block text-slate-400 mb-1">單位*</label>
@@ -524,7 +480,7 @@
 
           <div class="flex justify-end pt-2">
             <button onclick="addSourceRecord()" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition">
-              <i class="fa-solid fa-plus"></i> 新增並記錄入盤查庫
+              <i class="fa-solid fa-plus"></i> 新增並生成開心農場設備
             </button>
           </div>
         </div>
@@ -547,7 +503,7 @@
                 </tr>
               </thead>
               <tbody id="recordsTableBody" class="divide-y divide-slate-800">
-                <!-- Rendered dynamically -->
+                <!-- Rendered dynamically via app.js -->
               </tbody>
             </table>
           </div>
@@ -558,7 +514,6 @@
   </main>
 
   <!-- MODALS -->
-  <!-- 1. SIMULATE MODAL -->
   <div id="simModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="glass-panel max-w-md w-full rounded-2xl p-6 border-cyan-500/50 space-y-4">
       <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -597,7 +552,6 @@
     </div>
   </div>
 
-  <!-- 2. NET-ZERO CERTIFICATE MODAL -->
   <div id="certModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="glass-panel max-w-xl w-full rounded-2xl p-8 border-emerald-500/50 space-y-6 text-center">
       <div class="border-b border-slate-700 pb-4">
@@ -611,7 +565,7 @@
       <div class="space-y-4 text-xs text-left bg-slate-900/80 rounded-xl p-4 border border-slate-800">
         <div class="flex justify-between">
           <span class="text-slate-400">企業/場域名稱：</span>
-          <span class="font-bold text-emerald-300" id="certCompanyName">綠洲製造與冷鏈管理廠</span>
+          <span class="font-bold text-emerald-300" id="certCompanyName">綠洲農場與綠色企業場域</span>
         </div>
         <div class="flex justify-between">
           <span class="text-slate-400">初始基準碳排當量：</span>
@@ -636,608 +590,9 @@
     </div>
   </div>
 
-  <!-- SCRIPT LOGIC -->
-  <script>
-    let records = [
-      { id: 1, name: "門市冷氣空調 (舊型R22)", fuel: "冷氣冷媒(R-22)", scope: "Scope 1 - 逸散排放", activity: 3.5, unit: "kg", factor: 1810, carbon: 6.34, icon: "❄️", gwp: 1810, isHighCarbon: true },
-      { id: 2, name: "物流載貨小貨車", fuel: "車用柴油", scope: "Scope 1 - 移動燃燒", activity: 1800, unit: "公升", factor: 2.66, carbon: 4.79, icon: "🚚", gwp: 1, isHighCarbon: false },
-      { id: 3, name: "備用柴油發電機", fuel: "柴油發電機燃料", scope: "Scope 1 - 固定燃燒", activity: 850, unit: "公升", factor: 2.66, carbon: 2.26, icon: "⚡", gwp: 1, isHighCarbon: true },
-      { id: 4, name: "全廠基礎照明與營業電力", fuel: "外購電力", scope: "Scope 2 - 外購電力", activity: 6240, unit: "度 (kWh)", factor: 0.495, carbon: 3.09, icon: "💡", gwp: 1, isHighCarbon: false }
-    ];
-
-    let simulatedItems = [];
-    let userXp = 650;
-    let userBudget = 500;
-    let installedReplacements = new Set();
-
-    const FACTOR_MAP = {
-      "冷氣冷媒(R-22)": { factor: 1810, unit: "kg", scope: "Scope 1 - 逸散排放", icon: "❄️", gwp: 1810, isHighCarbon: true },
-      "外購電力": { factor: 0.495, unit: "度 (kWh)", scope: "Scope 2 - 外購電力", icon: "💡", gwp: 1, isHighCarbon: false },
-      "車用柴油": { factor: 2.66, unit: "公升", scope: "Scope 1 - 移動燃燒", icon: "🚚", gwp: 1, isHighCarbon: false },
-      "柴油發電機燃料": { factor: 2.66, unit: "公升", scope: "Scope 1 - 固定燃燒", icon: "⚡", gwp: 1, isHighCarbon: true },
-      "冷藏冷媒(R-404A)": { factor: 3922, unit: "kg", scope: "Scope 1 - 逸散排放", icon: "❄️", gwp: 3922, isHighCarbon: true }
-    };
-
-    function getBaseCarbon() {
-      return records.reduce((sum, item) => sum + item.carbon, 0);
-    }
-
-    function getCurrentCarbon() {
-      let total = getBaseCarbon();
-      installedReplacements.forEach(recId => {
-        const item = records.find(r => r.id === recId);
-        if (item) total -= (item.carbon * 0.75);
-      });
-      return Math.max(0, Math.round(total * 100) / 100);
-    }
-
-    function get5YearCarbonSavings() {
-      let annualSavings = 0;
-      installedReplacements.forEach(recId => {
-        const item = records.find(r => r.id === recId);
-        if (item) annualSavings += (item.carbon * 0.75);
-      });
-      return Math.round(annualSavings * 5 * 10) / 10;
-    }
-
-    // CANVAS ENGINE
-    let canvas, ctx;
-    let particles = [];
-    let vehicleX = 50;
-    let vehicleDir = 1;
-
-    function initCanvasEngine() {
-      canvas = document.getElementById('factoryCanvas');
-      if (!canvas) return;
-
-      const parent = canvas.parentNode;
-      canvas.width = parent.clientWidth;
-      canvas.height = parent.clientHeight;
-
-      particles = [];
-      for (let i = 0; i < 25; i++) {
-        particles.push({
-          x: 180 + Math.random() * 20,
-          y: canvas.height - 180 - Math.random() * 40,
-          vx: (Math.random() - 0.5) * 0.8,
-          vy: - (1 + Math.random() * 1.5),
-          size: 4 + Math.random() * 8,
-          alpha: 0.8
-        });
-      }
-
-      requestAnimationFrame(renderCanvasLoop);
-    }
-
-    function renderCanvasLoop() {
-      if (!canvas || !canvas.getContext) return;
-      ctx = canvas.getContext('2d');
-      const w = canvas.width;
-      const h = canvas.height;
-
-      ctx.clearRect(0, 0, w, h);
-
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
-      skyGrad.addColorStop(0, '#0f172a');
-      skyGrad.addColorStop(0.7, '#1e293b');
-      skyGrad.addColorStop(1, '#0f172a');
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.fillStyle = '#334155';
-      ctx.fillRect(0, h - 50, w, 50);
-      ctx.fillStyle = '#10b981';
-      ctx.fillRect(0, h - 52, w, 2);
-
-      const isGreenFactory = installedReplacements.size > 0;
-
-      ctx.fillStyle = isGreenFactory ? '#064e3b' : '#1e293b';
-      ctx.strokeStyle = isGreenFactory ? '#10b981' : '#475569';
-      ctx.lineWidth = 3;
-      ctx.fillRect(100, h - 200, 220, 150);
-      ctx.strokeRect(100, h - 200, 220, 150);
-
-      ctx.beginPath();
-      ctx.moveTo(80, h - 200);
-      ctx.lineTo(210, h - 260);
-      ctx.lineTo(340, h - 200);
-      ctx.closePath();
-      ctx.fillStyle = isGreenFactory ? '#047857' : '#334155';
-      ctx.fill();
-      ctx.stroke();
-
-      for (let rx = 120; rx < 300; rx += 45) {
-        for (let ry = h - 180; ry < h - 70; ry += 40) {
-          ctx.fillStyle = isGreenFactory ? '#6ee7b7' : '#f59e0b';
-          ctx.fillRect(rx, ry, 25, 20);
-        }
-      }
-
-      if (installedReplacements.size > 0) {
-        ctx.fillStyle = '#0284c7';
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 2;
-        ctx.fillRect(120, h - 240, 70, 25);
-        ctx.strokeRect(120, h - 240, 70, 25);
-        ctx.fillRect(210, h - 240, 70, 25);
-        ctx.strokeRect(210, h - 240, 70, 25);
-      }
-
-      ctx.fillStyle = '#475569';
-      ctx.fillRect(170, h - 270, 30, 70);
-
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.size += 0.15;
-        p.alpha -= 0.008;
-
-        if (p.alpha <= 0 || p.y < 20) {
-          p.x = 185 + (Math.random() - 0.5) * 10;
-          p.y = h - 270;
-          p.size = 4 + Math.random() * 4;
-          p.alpha = 0.7;
-        }
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = isGreenFactory ? `rgba(52, 211, 153, ${p.alpha * 0.5})` : `rgba(148, 163, 184, ${p.alpha})`;
-        ctx.fill();
-      });
-
-      vehicleX += 1.2 * vehicleDir;
-      if (vehicleX > w - 120 || vehicleX < 40) vehicleDir *= -1;
-
-      ctx.fillStyle = isGreenFactory ? '#10b981' : '#f59e0b';
-      ctx.fillRect(vehicleX, h - 45, 50, 25);
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(vehicleX + (vehicleDir > 0 ? 30 : 5), h - 40, 15, 12);
-      ctx.beginPath();
-      ctx.arc(vehicleX + 12, h - 20, 6, 0, Math.PI * 2);
-      ctx.arc(vehicleX + 38, h - 20, 6, 0, Math.PI * 2);
-      ctx.fillStyle = '#64748b';
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '10px Noto Sans TC';
-      ctx.fillText(isGreenFactory ? '⚡ 電動卡車' : '🚚 柴油貨車', vehicleX - 5, h - 50);
-
-      requestAnimationFrame(renderCanvasLoop);
-    }
-
-    function renderInitialPlantMap() {
-      const container = document.getElementById('initialPlantMapGrid');
-      if (!container) return;
-      container.innerHTML = '';
-
-      records.forEach((item) => {
-        const card = document.createElement('div');
-        card.className = `glass-card rounded-2xl p-3 cursor-pointer relative group ${item.isHighCarbon ? 'border-rose-500/40 bg-rose-950/10' : ''}`;
-        card.onclick = () => inspectInitialItem(item);
-
-        card.innerHTML = `
-          <div class="flex justify-between items-start mb-1">
-            <span class="text-2xl p-1.5 rounded-xl bg-slate-800 group-hover:scale-110 transition">${item.icon}</span>
-            ${item.isHighCarbon ? '<span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[9px] font-bold border border-rose-500/40 animate-pulse">高碳排</span>' : '<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-bold">常態</span>'}
-          </div>
-          <h4 class="font-bold text-slate-100 text-xs truncate group-hover:text-emerald-300 transition">${item.name}</h4>
-          <div class="mt-1 flex justify-between items-center text-[11px]">
-            <span class="text-slate-400">年碳排：</span>
-            <span class="font-bold ${item.isHighCarbon ? 'text-rose-400' : 'text-emerald-400'}">${item.carbon} tCO₂e</span>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function inspectInitialItem(item) {
-      document.getElementById('inspectIcon').innerText = item.icon;
-      document.getElementById('inspectTitle').innerText = item.name;
-      document.getElementById('inspectSubtitle').innerText = `${item.scope} | GWP: ${item.gwp}`;
-
-      const body = document.getElementById('inspectBody');
-      body.innerHTML = `
-        <div class="space-y-2">
-          <div class="flex justify-between">
-            <span class="text-slate-400">使用燃料/氣體：</span>
-            <span class="font-bold text-slate-200">${item.fuel}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">年度活動數據量：</span>
-            <span class="font-bold text-slate-200">${item.activity} ${item.unit}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">排放係數：</span>
-            <span class="font-bold text-slate-200">${item.factor}</span>
-          </div>
-          <div class="flex justify-between pt-2 border-t border-slate-700">
-            <span class="text-slate-400">年碳排放當量：</span>
-            <span class="font-black text-emerald-400 text-sm">${item.carbon} tCO₂e</span>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderWarningsAndRecommendations() {
-      const container = document.getElementById('warningsGridContainer');
-      if (!container) return;
-      container.innerHTML = '';
-
-      const highCarbonItems = records.filter(r => r.isHighCarbon || r.gwp > 100);
-      document.getElementById('warningCountText').innerText = highCarbonItems.length;
-
-      highCarbonItems.forEach(item => {
-        const isReplaced = installedReplacements.has(item.id);
-        const annualCut = Math.round(item.carbon * 0.75 * 100) / 100;
-        const fiveYearCut = Math.round(annualCut * 5 * 10) / 10;
-        const refPrice = item.fuel.includes('R-22') ? 12.0 : (item.fuel.includes('R-404A') ? 25.0 : 18.0);
-
-        let recTitle = "🌿 推薦替代：R-32 變頻一級能效冷氣空調";
-        let recDesc = "蒙特婁公約管制的 R-22 冷媒 GWP 高達 1810！更換為低 GWP 之 R-32 變頻冷氣，可大幅降低逸散當量與電力消耗！";
-
-        if (item.fuel.includes('柴油')) {
-          recTitle = "🌿 推薦替代：鋰電智慧電動機台／發電機備援";
-          recDesc = "舊型柴油設備產生高碳排與空氣污染，建議替換為高效率綠電鋰電池備援系統。";
-        }
-
-        const card = document.createElement('div');
-        card.className = `glass-card warning-card rounded-2xl p-5 flex flex-col justify-between ${isReplaced ? 'border-emerald-500/50 bg-emerald-950/20' : ''}`;
-
-        card.innerHTML = `
-          <div>
-            <div class="flex justify-between items-start mb-3">
-              <div>
-                <span class="px-2 py-0.5 bg-rose-500 text-slate-950 text-[10px] font-black rounded-md uppercase">⚠️ 高碳排警示</span>
-                <h4 class="font-bold text-slate-100 text-base mt-1">${item.name}</h4>
-                <p class="text-xs text-rose-300">使用 ${item.fuel} (GWP: ${item.gwp}) | 年碳排: ${item.carbon} tCO₂e</p>
-              </div>
-              <span class="text-3xl p-2 rounded-xl bg-slate-900">${item.icon}</span>
-            </div>
-
-            <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-2 mb-4 text-xs">
-              <div class="font-bold text-emerald-400 flex items-center gap-1.5">
-                <i class="fa-solid fa-seedling"></i> ${recTitle}
-              </div>
-              <p class="text-[11px] text-slate-400 leading-relaxed">${recDesc}</p>
-            </div>
-          </div>
-
-          <div class="space-y-3 pt-3 border-t border-slate-700/50 text-xs">
-            <div class="grid grid-cols-2 gap-2">
-              <div class="p-2 bg-slate-900 rounded-lg">
-                <div class="text-[10px] text-slate-400">市售參考價格</div>
-                <div class="font-bold text-amber-400">$${refPrice} 萬元</div>
-              </div>
-              <div class="p-2 bg-emerald-950/50 rounded-lg border border-emerald-500/30">
-                <div class="text-[10px] text-emerald-300">預估 5 年累計減碳當量</div>
-                <div class="font-black text-emerald-400">${fiveYearCut} tCO₂e</div>
-              </div>
-            </div>
-
-            <button onclick="applyEcoReplacement(${item.id}, ${refPrice})" ${isReplaced || userBudget < refPrice ? 'disabled' : ''} class="w-full py-2.5 rounded-xl font-bold text-xs ${isReplaced ? 'bg-slate-800 text-slate-500 border border-slate-700' : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md'} transition">
-              ${isReplaced ? '✅ 已執行綠色替代替換' : (userBudget < refPrice ? '預算不足' : '立即執行綠色升級替換')}
-            </button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function applyEcoReplacement(itemId, price) {
-      if (userBudget < price || installedReplacements.has(itemId)) return;
-
-      userBudget -= price;
-      installedReplacements.add(itemId);
-      userXp += 200;
-
-      updateGameUI();
-      renderWarningsAndRecommendations();
-
-      alert(`🎉 成功執行綠色升級替換！獲得 200 XP！\n工廠外觀已動態升級！預估 5 年內為您減少大量碳費成本！`);
-    }
-
-    function openSimulateModal() {
-      document.getElementById('simModal').classList.remove('hidden');
-    }
-    function closeSimModal() {
-      document.getElementById('simModal').classList.add('hidden');
-    }
-    function saveSimModal() {
-      const name = document.getElementById('modalSimName').value.trim();
-      const type = document.getElementById('modalSimType').value;
-      const carbon = parseFloat(document.getElementById('modalSimCarbon').value);
-
-      if (!name || isNaN(carbon) || carbon <= 0) {
-        alert('請填寫正確的模擬擴建設備名稱與預估碳排量！');
-        return;
-      }
-
-      simulatedItems.push({ id: Date.now(), name, type, carbon });
-      closeSimModal();
-      updateSimulationUI();
-    }
-
-    function deleteSimItem(index) {
-      simulatedItems.splice(index, 1);
-      updateSimulationUI();
-    }
-
-    function updateSimulationUI() {
-      const baseCarbon = getCurrentCarbon();
-      const addedCarbon = simulatedItems.reduce((sum, item) => sum + item.carbon, 0);
-      const totalSimCarbon = Math.round((baseCarbon + addedCarbon) * 100) / 100;
-
-      document.getElementById('simBaseCarbonText').innerText = `${baseCarbon.toFixed(2)} tCO₂e`;
-      document.getElementById('simAddedCarbonText').innerText = `+ ${addedCarbon.toFixed(2)} tCO₂e`;
-      document.getElementById('simAddedCountText').innerText = `已加入 ${simulatedItems.length} 項模擬擴建`;
-      document.getElementById('simTotalCarbonText').innerText = `${totalSimCarbon.toFixed(2)} tCO₂e`;
-
-      const tbody = document.getElementById('simTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      if (simulatedItems.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">目前尚無模擬擴建項目，點擊右上角「新增模擬擴建設備」試算！</td></tr>`;
-        return;
-      }
-
-      simulatedItems.forEach((item, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-900/40";
-        tr.innerHTML = `
-          <td class="p-2.5 font-semibold text-slate-200">${item.name}</td>
-          <td class="p-2.5 text-slate-400">${item.type}</td>
-          <td class="p-2.5 text-slate-400">1 式</td>
-          <td class="p-2.5 font-bold text-rose-400">+ ${item.carbon} tCO₂e</td>
-          <td class="p-2.5 text-right">
-            <button onclick="deleteSimItem(${idx})" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash-can"></i></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function openCertificateModal() {
-      document.getElementById('certCompanyName').innerText = document.getElementById('infoName').value || "綠洲製造與冷鏈管理廠";
-      document.getElementById('certBaseCarbon').innerText = `${getBaseCarbon().toFixed(2)} tCO₂e`;
-      document.getElementById('certCurrentCarbon').innerText = `${getCurrentCarbon().toFixed(2)} tCO₂e`;
-      document.getElementById('cert5YearSavings').innerText = `${get5YearCarbonSavings().toFixed(1)} tCO₂e`;
-      document.getElementById('certModal').classList.remove('hidden');
-    }
-    function closeCertificateModal() {
-      document.getElementById('certModal').classList.add('hidden');
-    }
-
-    function renderQuestsAndBadges() {
-      const qContainer = document.getElementById('questsListContainer');
-      if (!qContainer) return;
-      qContainer.innerHTML = `
-        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex justify-between items-center">
-          <div>
-            <div class="font-bold text-slate-200">每日任務：完成 1 筆碳盤查數據輸入</div>
-            <div class="text-[11px] text-slate-400">獎勵：+100 XP | +$20 萬預算</div>
-          </div>
-          <span class="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 font-bold rounded-lg border border-emerald-500/30">已完成</span>
-        </div>
-
-        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 flex justify-between items-center">
-          <div>
-            <div class="font-bold text-slate-200">主線任務：替換 1 項高 GWP 冷媒設備</div>
-            <div class="text-[11px] text-slate-400">獎勵：+200 XP | 觸發 5年減碳節電</div>
-          </div>
-          <span class="px-2.5 py-1 ${installedReplacements.size > 0 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-800 text-slate-500 border-slate-700'} font-bold rounded-lg border">
-            ${installedReplacements.size > 0 ? '已完成' : '進行中'}
-          </span>
-        </div>
-      `;
-
-      const bContainer = document.getElementById('badgesContainer');
-      if (!bContainer) return;
-      bContainer.innerHTML = `
-        <div class="p-3 bg-emerald-950/40 border border-emerald-500/40 rounded-xl flex items-center gap-3">
-          <div class="text-2xl">🏅</div>
-          <div>
-            <div class="font-bold text-xs text-emerald-300">盤查先鋒者</div>
-            <div class="text-[11px] text-slate-400">完成功能一二三數據建立</div>
-          </div>
-        </div>
-
-        <div class="p-3 ${installedReplacements.size > 0 ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-slate-900/40 border-slate-800 text-slate-600'} rounded-xl border flex items-center gap-3">
-          <div class="text-2xl">${installedReplacements.size > 0 ? '🏆' : '🔒'}</div>
-          <div>
-            <div class="font-bold text-xs">冷媒減碳專家</div>
-            <div class="text-[11px] text-slate-400">成功替換高 GWP 冷媒設備</div>
-          </div>
-        </div>
-      `;
-    }
-
-    function sendAiMessage() {
-      const input = document.getElementById('aiInput');
-      const msg = input.value.trim();
-      if (!msg) return;
-
-      const chatBox = document.getElementById('aiChatBox');
-      const uDiv = document.createElement('div');
-      uDiv.className = "p-2.5 bg-emerald-600/30 rounded-xl border border-emerald-500/30 text-right text-emerald-200 text-xs";
-      uDiv.innerText = msg;
-      chatBox.appendChild(uDiv);
-
-      input.value = '';
-
-      setTimeout(() => {
-        const aiDiv = document.createElement('div');
-        aiDiv.className = "p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-slate-300 text-xs leading-relaxed";
-        
-        if (msg.includes('GWP') || msg.includes('冷媒')) {
-          aiDiv.innerText = "🤖 GWP (全球暖化潛勢) 代表氣體的溫室效應強度！例如 R-22 的 GWP 為 1810，代表 1 公斤 R-22 散逸相當於 1,810 公斤 CO₂！替換為 R-32 可以大幅降低 5 年累計碳排！";
-        } else {
-          aiDiv.innerText = `🤖 收到您的詢問！建議您在【高碳排警告】頁面查看 5 年預估減碳當量，並優先替換耗能或冷媒設備！`;
-        }
-        chatBox.appendChild(aiDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-      }, 600);
-    }
-
-    function autoFillFactor() {
-      const fuel = document.getElementById('inFuelType').value;
-      if (FACTOR_MAP[fuel]) {
-        document.getElementById('inUnit').value = FACTOR_MAP[fuel].unit;
-      }
-    }
-
-    function addSourceRecord() {
-      const name = document.getElementById('inEquipName').value.trim();
-      const fuel = document.getElementById('inFuelType').value;
-      const activity = parseFloat(document.getElementById('inActivityData').value);
-      const unit = document.getElementById('inUnit').value;
-
-      if (!name || isNaN(activity) || activity <= 0) {
-        alert('請填寫正確的設備名稱與活動數據使用量！');
-        return;
-      }
-
-      const fInfo = FACTOR_MAP[fuel] || { factor: 1.0, scope: "Scope 1 - 固定燃燒", icon: "⚡", gwp: 1, isHighCarbon: false };
-      const carbon = Math.round((activity * fInfo.factor / 1000) * 100) / 100;
-
-      records.push({
-        id: Date.now(),
-        name,
-        fuel,
-        scope: fInfo.scope,
-        activity,
-        unit,
-        factor: fInfo.factor,
-        carbon,
-        icon: fInfo.icon,
-        gwp: fInfo.gwp,
-        isHighCarbon: fInfo.isHighCarbon
-      });
-
-      document.getElementById('inEquipName').value = '';
-      document.getElementById('inActivityData').value = '';
-      renderRecordsTable();
-      updateGameUI();
-    }
-
-    function deleteRecord(index) {
-      records.splice(index, 1);
-      renderRecordsTable();
-      updateGameUI();
-    }
-
-    function renderRecordsTable() {
-      const tbody = document.getElementById('recordsTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      records.forEach((r, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-900/40";
-        tr.innerHTML = `
-          <td class="p-3 text-slate-500">${idx + 1}</td>
-          <td class="p-3 font-semibold text-slate-200">${r.name}</td>
-          <td class="p-3 text-slate-300">${r.fuel}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px]">${r.scope}</span></td>
-          <td class="p-3 text-slate-300">${r.activity} ${r.unit}</td>
-          <td class="p-3 font-bold text-emerald-400">${r.carbon} tCO₂e</td>
-          <td class="p-3 text-right">
-            <button onclick="deleteRecord(${idx})" class="text-rose-400 hover:text-rose-300"><i class="fa-solid fa-trash-can"></i></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function updateFormName() {
-      const val = document.getElementById('infoName').value.trim();
-      if (val) {
-        document.getElementById('gameCompanyName').innerText = val;
-        document.getElementById('canvasPlantTitle').innerText = val;
-        document.getElementById('lbYourName').innerText = `${val} (您)`;
-      }
-    }
-
-    function updateGameUI() {
-      const baseCarbon = getBaseCarbon();
-      const currCarbon = getCurrentCarbon();
-      const savings5Years = get5YearCarbonSavings();
-
-      document.getElementById('gameBaseCarbon').innerText = baseCarbon.toFixed(2);
-      document.getElementById('gameCurrentCarbon').innerText = currCarbon.toFixed(2);
-      document.getElementById('gameBudget').innerText = `$${userBudget} 萬`;
-      document.getElementById('game5YearSavings').innerText = `${savings5Years.toFixed(1)} tCO₂e`;
-
-      document.getElementById('xpBar').style.width = `${(userXp / 1000) * 100}%`;
-      document.getElementById('xpText').innerText = `${userXp} / 1000`;
-      document.getElementById('xpNeeded').innerText = `${Math.max(0, 1000 - userXp)} XP`;
-
-      renderInitialPlantMap();
-      renderWarningsAndRecommendations();
-      updateSimulationUI();
-      renderQuestsAndBadges();
-    }
-
-    function switchGameSubTab(tabKey) {
-      document.querySelectorAll('.game-sub-view').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.game-sub-tab').forEach(el => {
-        el.classList.remove('bg-emerald-600', 'text-white', 'shadow-lg');
-        el.classList.add('bg-slate-800', 'text-slate-300');
-      });
-
-      document.getElementById(`gsec-${tabKey}`).classList.remove('hidden');
-      const activeBtn = document.getElementById(`gtab-${tabKey}`);
-      activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
-      activeBtn.classList.add('bg-emerald-600', 'text-white', 'shadow-lg');
-
-      if (tabKey === 'animated-map') {
-        setTimeout(initCanvasEngine, 100);
-      }
-    }
-
-    function switchAppMode(mode) {
-      if (mode === 'game') {
-        document.getElementById('mode-game-section').classList.remove('hidden');
-        document.getElementById('mode-form-section').classList.add('hidden');
-        document.getElementById('btn-mode-game').className = "px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition";
-        document.getElementById('btn-mode-form').className = "px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
-        updateGameUI();
-        setTimeout(initCanvasEngine, 100);
-      } else {
-        document.getElementById('mode-game-section').classList.add('hidden');
-        document.getElementById('mode-form-section').classList.remove('hidden');
-        document.getElementById('btn-mode-game').className = "px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
-        document.getElementById('btn-mode-form').className = "px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition";
-        renderRecordsTable();
-      }
-    }
-
-    function exportToExcel() {
-      const wb = XLSX.utils.book_new();
-      const s1Data = [["事業名稱", document.getElementById('infoName').value]];
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s1Data), "一、事業基本資料");
-
-      const s5Header = [["項次", "設備名稱", "燃料種類", "排放範疇", "活動數據", "單位", "排放當量(tCO2e)"]];
-      const s5Rows = records.map((r, i) => [i + 1, r.name, r.fuel, r.scope, r.activity, r.unit, r.carbon]);
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s5Header.concat(s5Rows)), "定量盤查明細");
-
-      XLSX.writeFile(wb, `溫室氣體盤查清冊-${document.getElementById('infoName').value}.xlsx`);
-    }
-
-    function switchSheetTab(sheetId) {
-      document.querySelectorAll('.sheet-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.sheet-tab').forEach(el => el.classList.remove('active'));
-
-      document.getElementById(`sec-${sheetId}`).classList.remove('hidden');
-      document.getElementById(`stab-${sheetId}`).classList.add('active');
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      renderRecordsTable();
-      updateGameUI();
-      initCanvasEngine();
-      if (records.length > 0) inspectInitialItem(records[0]);
-    });
-  </script>
+  <!-- JavaScript 模組依序引入 -->
+  <script src="js/data.js"></script>
+  <script src="js/gameEngine.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
