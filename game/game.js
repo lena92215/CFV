@@ -761,7 +761,7 @@ function toggleWarnings() {
 // 18. 返回主應用
 // =============================================
 function goBack() {
-  window.location.href = '../index.html';
+  window.location.href = 'index.html';
 }
 
 // =============================================
