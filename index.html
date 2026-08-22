@@ -337,6 +337,88 @@
         </div>
       </div>
 
+      <!-- SHEET 4: 四、活動數據填報 -->
+      <div id="sec-sheet4" class="sheet-content glass-panel rounded-2xl p-6 space-y-4 hidden">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-emerald-400"></i> 四、活動數據填報與計算
+            </h2>
+            <p class="text-xs text-slate-400">填寫電力、燃油或冷媒等活動數據使用量，系統自動帶入排放係數計算 $tCO_2e$</p>
+          </div>
+        </div>
+
+        <!-- Activity Data Form -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1">設備/設施名稱*</label>
+            <input type="text" id="inEquipName" placeholder="例如：營業用冷藏展示櫃" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">原(燃)物料/能源種類*</label>
+            <select id="inFuelType" onchange="autoFillFactor()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
+              <option value="外購電力">外購電力 (範疇二)</option>
+              <option value="車用柴油">車用柴油 (範疇一 移動燃燒)</option>
+              <option value="車用汽油">車用汽油 (範疇一 移動燃燒)</option>
+              <option value="桶裝瓦斯(LPG)">桶裝瓦斯/LPG (範疇一 固定燃燒)</option>
+              <option value="冷氣冷媒(R-410A)">冷氣冷媒 R-410A (範疇一 逸散)</option>
+              <option value="冷藏冷媒(R-404A)">冷藏冷媒 R-404A (範疇一 逸散)</option>
+              <option value="乾粉滅火藥劑">乾粉滅火藥劑 (範疇一 逸散)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">年度活動數據 (使用量)*</label>
+            <input type="number" id="inActivityData" placeholder="例如：12500" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">單位 (Unit)*</label>
+            <input type="text" id="inUnit" value="度 (kWh)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button onclick="addSourceRecord()" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs shadow-md transition flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> 新增數據並計算排放量
+          </button>
+        </div>
+      </div>
+
+      <!-- SHEET 5: 五、定量盤查明細清冊 -->
+      <div id="sec-sheet5" class="sheet-content glass-panel rounded-2xl p-6 space-y-4 hidden">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-table-list text-emerald-400"></i> 五、定量盤查明細清冊 (Itemized List)
+            </h2>
+            <p class="text-xs text-slate-400">所有已填報設施之活動數據、排放係數與溫室氣體當量 ($tCO_2e$) 清冊</p>
+          </div>
+          <button onclick="exportToExcel()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition flex items-center gap-1">
+            <i class="fa-solid fa-file-excel"></i> 匯出清冊 Excel
+          </button>
+        </div>
+
+        <!-- Record Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse min-w-[700px]">
+            <thead>
+              <tr class="bg-slate-900/80 text-slate-300 border-b border-slate-700">
+                <th class="p-3 font-semibold">編號</th>
+                <th class="p-3 font-semibold">設備/設施名稱</th>
+                <th class="p-3 font-semibold">原/燃物料</th>
+                <th class="p-3 font-semibold">排放範疇</th>
+                <th class="p-3 font-semibold text-right">活動數據</th>
+                <th class="p-3 font-semibold">單位</th>
+                <th class="p-3 font-semibold text-right">排放當量 ($tCO_2e$)</th>
+                <th class="p-3 text-center font-semibold">操作</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTableBody" class="divide-y divide-slate-800">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- SHEET 6: 溫室氣體排放量彙總 -->
       <div id="sec-sheet6" class="sheet-content glass-panel rounded-2xl p-6 space-y-6 hidden">
         <div class="flex items-center justify-between border-b border-slate-700 pb-3">
