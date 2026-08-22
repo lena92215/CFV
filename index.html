@@ -2255,17 +2255,48 @@
       }
     }
 
+    // App Mode Switcher & 2D Game Launcher
     function switchAppMode(mode) {
       if (mode === 'form') {
         document.getElementById('mode-form-section').classList.remove('hidden');
-        document.getElementById('mode-game-section').classList.add('hidden');
         document.getElementById('btn-mode-form').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition";
         document.getElementById('btn-mode-game').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
       } else {
-        document.getElementById('mode-form-section').classList.add('hidden');
-        document.getElementById('mode-game-section').classList.remove('hidden');
-        document.getElementById('btn-mode-form').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
-        document.getElementById('btn-mode-game').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition";
+        // Save company basic info for Game mode
+        const companyInfo = {
+          name: document.getElementById('infoName')?.value || '我的工廠',
+          taxId: document.getElementById('infoTaxId')?.value || '',
+          owner: document.getElementById('infoOwner')?.value || '',
+          industry: document.getElementById('infoIndustry')?.value || '',
+          year: document.getElementById('infoYear')?.value || '',
+        };
+        localStorage.setItem('cfv_company_info', JSON.stringify(companyInfo));
+
+        // Save filled emission sources / activity records for Game mode
+        let sourcesForGame = [];
+        if (typeof emissionSources !== 'undefined' && emissionSources.length > 0) {
+          sourcesForGame = emissionSources.map((s, i) => ({
+            id: `dev_${i}`,
+            name: s.name,
+            energy: s.energy,
+            quantity: s.quantity || 1,
+            location: s.location || '攤位場域',
+            scope: s.scope || '範疇一'
+          }));
+        } else if (typeof activityRecords !== 'undefined' && activityRecords.length > 0) {
+          sourcesForGame = activityRecords.map((r, i) => ({
+            id: `dev_${i}`,
+            name: r.equipName || r.name,
+            energy: r.materialName || r.fuel,
+            quantity: r.quantity || 1,
+            location: r.location || '攤位場域',
+            scope: r.scopeType || '範疇一'
+          }));
+        }
+        localStorage.setItem('cfv_emission_sources', JSON.stringify(sourcesForGame));
+
+        // Launch 2D Game Page
+        window.location.href = 'game.html';
       }
     }
 
