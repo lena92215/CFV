@@ -95,6 +95,63 @@ const VECTOR_SVG_SPRITES = {
     <rect x="26" y="30" width="12" height="12" rx="3" fill="#FFFFFF" stroke="#0F172A" stroke-width="2"/>
   </svg>`,
 
+  // 1. 鍋爐 / 蒸氣大鍋子 (Big Cauldron / Pot with Steam)
+  boiler: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="14" y="52" width="36" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <!-- 兩側耳把 -->
+    <rect x="8" y="26" width="8" height="12" rx="4" fill="#F97316" stroke="#0F172A" stroke-width="3"/>
+    <rect x="48" y="26" width="8" height="12" rx="4" fill="#F97316" stroke="#0F172A" stroke-width="3"/>
+    <!-- 大鍋子主體 -->
+    <path d="M12 22H52V34C52 44 43 50 32 50C21 50 12 44 12 34V22Z" fill="#FB923C" stroke="#0F172A" stroke-width="3.5"/>
+    <rect x="10" y="18" width="44" height="6" rx="3" fill="#FED7AA" stroke="#0F172A" stroke-width="3"/>
+    <!-- 沸騰蒸汽泡泡 -->
+    <circle cx="24" cy="12" r="3" fill="#FDE68A" stroke="#0F172A" stroke-width="2"/>
+    <circle cx="34" cy="9" r="4" fill="#FDE68A" stroke="#0F172A" stroke-width="2"/>
+    <circle cx="42" cy="13" r="2.5" fill="#FDE68A" stroke="#0F172A" stroke-width="2"/>
+  </svg>`,
+
+  // 2. 渦輪機 (Turbine - Rounded Housing + Fan Blades)
+  turbine: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="16" y="52" width="32" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <!-- 外殼底座 -->
+    <rect x="24" y="44" width="16" height="10" rx="3" fill="#64748B" stroke="#0F172A" stroke-width="3"/>
+    <!-- 圓形風扇外殼 -->
+    <circle cx="32" cy="28" r="20" fill="#0284C7" stroke="#0F172A" stroke-width="3.5"/>
+    <circle cx="32" cy="28" r="14" fill="#38BDF8" stroke="#0F172A" stroke-width="2.5"/>
+    <!-- 渦輪葉片與軸心 -->
+    <path d="M32 16L35 25M44 28L35 31M32 40L29 31M20 28L29 25" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="32" cy="28" r="5" fill="#BAE6FD" stroke="#0F172A" stroke-width="2.5"/>
+  </svg>`,
+
+  // 3. 焚化爐 (Incinerator - Furnace Tower + Fire Chamber)
+  incinerator: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="14" y="52" width="36" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <!-- 煙囪 -->
+    <rect x="36" y="8" width="10" height="16" rx="3" fill="#64748B" stroke="#0F172A" stroke-width="3"/>
+    <!-- 爐體 -->
+    <rect x="12" y="20" width="40" height="32" rx="8" fill="#E11D48" stroke="#0F172A" stroke-width="3.5"/>
+    <!-- 觀察窗與火焰 -->
+    <rect x="22" y="28" width="20" height="16" rx="5" fill="#1E293B" stroke="#0F172A" stroke-width="2.5"/>
+    <path d="M32 32C32 32 37 37 34 42C31 44 29 41 32 32Z" fill="#FACC15" stroke="#0F172A" stroke-width="2"/>
+    <!-- 煙囪微煙 -->
+    <circle cx="41" cy="5" r="2.5" fill="#CBD5E1"/>
+  </svg>`,
+
+  // 4. 工業機台 / 機 (Machinery Unit - Panel & Gears)
+  machine: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="12" y="52" width="40" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <!-- 機台主體 -->
+    <rect x="10" y="14" width="44" height="38" rx="10" fill="#6366F1" stroke="#0F172A" stroke-width="3.5"/>
+    <!-- 螢幕面板 -->
+    <rect x="16" y="20" width="20" height="14" rx="4" fill="#38BDF8" stroke="#0F172A" stroke-width="2.5"/>
+    <line x1="20" y1="27" x2="30" y2="27" stroke="#0F172A" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- 控制按鈕 -->
+    <circle cx="42" cy="24" r="3.5" fill="#34D399" stroke="#0F172A" stroke-width="2"/>
+    <circle cx="42" cy="34" r="3.5" fill="#F43F5E" stroke="#0F172A" stroke-width="2"/>
+    <!-- 機台底盤軸傳動 -->
+    <rect x="16" y="40" width="32" height="6" rx="3" fill="#475569" stroke="#0F172A" stroke-width="2"/>
+  </svg>`,
+
   // 其他 / 預設 (Grey Rounded Box)
   other: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="14" y="52" width="36" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
@@ -301,6 +358,15 @@ function loadODSDemoDevices() {
 function getDeviceConfig(name, energy) {
   const targetStr = ((name || '') + ' ' + (energy || '')).toLowerCase();
   
+  if (targetStr.includes('鍋爐') || targetStr.includes('蒸氣') || targetStr.includes('鍋')) {
+    return { type: 'boiler', vectorKey: 'boiler', label: '蒸氣鍋爐', gwpFactor: 2.5 };
+  }
+  if (targetStr.includes('渦輪') || targetStr.includes('風力') || targetStr.includes('turbine')) {
+    return { type: 'turbine', vectorKey: 'turbine', label: '渦輪機組', gwpFactor: 1.2 };
+  }
+  if (targetStr.includes('焚化') || targetStr.includes('焚化爐') || targetStr.includes('廢棄物')) {
+    return { type: 'incinerator', vectorKey: 'incinerator', label: '焚化設施', gwpFactor: 3.2 };
+  }
   if (targetStr.includes('冷藏') || targetStr.includes('冷凍') || targetStr.includes('r404') || targetStr.includes('r408') || targetStr.includes('r417') || targetStr.includes('展示櫃')) {
     return { type: 'fridge', vectorKey: 'fridge', label: '大型冷藏庫', gwpFactor: 0, gwpWarning: { refrigerant: 'R-404A', gwp: 3922 } };
   }
@@ -311,14 +377,17 @@ function getDeviceConfig(name, energy) {
     if (targetStr.includes('汽油') || targetStr.includes('小貨')) return { type: 'car', vectorKey: 'car', label: '汽油車輛', gwpFactor: 2.263 };
     return { type: 'truck', vectorKey: 'truck', label: '運輸車輛', gwpFactor: 2.606 };
   }
-  if (targetStr.includes('發電') || targetStr.includes('引擎') || targetStr.includes('柴油')) {
+  if (targetStr.includes('發電') || targetStr.includes('引擎')) {
     return { type: 'generator', vectorKey: 'generator', label: '柴油發電機', gwpFactor: 2.606 };
   }
-  if (targetStr.includes('化糞池') || targetStr.includes('污水') || targetStr.includes('水肥')) {
-    return { type: 'septic', vectorKey: 'septic', label: '化糞池/污水', gwpFactor: 1.5 };
+  if (targetStr.includes('化糞池') || targetStr.includes('污水') || targetStr.includes('水肥') || targetStr.includes('馬桶')) {
+    return { type: 'septic', vectorKey: 'septic', label: '化糞池/馬桶', gwpFactor: 1.5 };
   }
   if (targetStr.includes('消防') || targetStr.includes('滅火') || targetStr.includes('乾粉')) {
     return { type: 'fire', vectorKey: 'fire', label: '消防設施', gwpFactor: 1.0 };
+  }
+  if (targetStr.includes('機') || targetStr.includes('機台') || targetStr.includes('設備')) {
+    return { type: 'machine', vectorKey: 'machine', label: '工業機台', gwpFactor: 1.8 };
   }
   if (targetStr.includes('電') || targetStr.includes('照明') || targetStr.includes('外購')) {
     return { type: 'electricity', vectorKey: 'electricity', label: '電力設施', gwpFactor: 0.495 };
