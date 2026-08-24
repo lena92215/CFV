@@ -1,12 +1,12 @@
 /* =============================================
-   CFV 碳排放遊戲 - Duolingo 扁平向量卡通風格邏輯
+   CFV 碳排放遊戲 - 扁平向量卡通風格邏輯
    game/game.js
    ============================================= */
 
 'use strict';
 
 // =============================================
-// 1. Duolingo 扁平向量 SVG Sprites 資料庫
+// 1. 扁平向量 SVG Sprites 資料庫
 // =============================================
 
 const VECTOR_SVG_SPRITES = {
@@ -325,7 +325,7 @@ function getGWPWarning(device) {
 }
 
 // =============================================
-// 6. Canvas 繪製（Duolingo 場景皮膚）
+// 6. Canvas 繪製（場景皮膚）
 // =============================================
 function redrawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -348,7 +348,7 @@ function redrawCanvas() {
     ctx.fillStyle = 'rgba(15, 23, 42, 0.4)';
     ctx.fillRect(0, 0, w, h);
   } else {
-    // 繪制 Duolingo 風格地面皮膚
+    // 繪製地面皮膚
     if (gameState.currentSkin === 'market') {
       // 🛒 水果市場：雙色綠白瓷磚
       const tileSize = 50;
@@ -386,7 +386,7 @@ function redrawCanvas() {
 }
 
 // =============================================
-// 7. Duolingo Vector Sprite 渲染與自然粒子
+// 7. 向量精靈圖渲染與自然粒子
 // =============================================
 function renderSprites() {
   spritesLayer.innerHTML = '';

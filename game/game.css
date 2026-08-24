@@ -1,5 +1,5 @@
 /* =============================================
-   CFV 碳排放遊戲 - Duolingo 扁平向量卡通風格樣式
+   CFV 碳排放遊戲 - 扁平向量卡通風格樣式
    game/game.css
    ============================================= */
 
@@ -51,7 +51,7 @@
   padding: 4px 0;
 }
 
-/* ---- Duolingo Chunky 3D Buttons ---- */
+/* ---- 立體 3D 按鈕樣式 ---- */
 .pixel-btn-back {
   background: #334155;
   border: 2px solid #64748b;
@@ -156,7 +156,7 @@
   background: #0f172a;
 }
 
-/* ---- Duolingo Vector Cartoon Device Sprites ---- */
+/* ---- 扁平向量卡通設備精靈 ---- */
 .device-sprite {
   position: absolute;
   cursor: grab;
@@ -332,7 +332,7 @@
 .sprite-car .vector-icon-box, .sprite-truck .vector-icon-box { animation: vehicleIdle 1.2s ease-in-out infinite; }
 .sprite-electricity .vector-icon-box { animation: electricPulse 1.5s ease-in-out infinite; }
 
-/* ---- Duolingo Left Panel Cards ---- */
+/* ---- 左側設備面板卡片 ---- */
 .device-list-card {
   background: #1e293b;
   border: 2px solid #334155;
@@ -355,7 +355,7 @@
   background: rgba(245, 158, 11, 0.1);
 }
 
-/* ---- RPG Dialogue Box & Modals (Duolingo Style) ---- */
+/* ---- RPG 對話框與 Modals ---- */
 .rpg-dialogue-card {
   background: #0f172a;
   border: 3px solid #10b981;
