@@ -6,43 +6,48 @@
   <title>🌱 碳排放減少遊戲 | CFV 碳管理平台</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="game/game.css">
 </head>
-<body class="game-bg min-h-screen text-white overflow-x-hidden">
+<body class="game-bg min-h-screen text-white overflow-x-hidden skin-market">
 
   <!-- ===== HEADER ===== -->
   <header class="pixel-header flex items-center justify-between px-4 py-3 border-b-4 border-emerald-400">
     <div class="flex items-center gap-3">
-      <button onclick="goBack()" class="pixel-btn-back text-xs px-3 py-2">
-        ← 返回清冊
+      <button onclick="goBack()" class="pixel-btn-back text-xs px-3 py-2 flex items-center gap-1">
+        <i class="fa-solid fa-arrow-left"></i> 返回清冊
       </button>
       <div class="flex items-center gap-2">
-        <span class="text-2xl">🏭</span>
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-xl font-black text-emerald-300 shadow-md">
+          🌱
+        </div>
         <div>
-          <h1 class="pixel-title text-emerald-400 text-xs leading-tight" id="gameCompanyName">我的工廠</h1>
-          <p class="text-slate-400 text-[10px]">碳排放減少模擬遊戲</p>
+          <h1 class="font-black text-emerald-400 text-sm md:text-base leading-tight tracking-wide" id="gameCompanyName">我的場域</h1>
+          <p class="text-slate-400 text-[10px] flex items-center gap-1">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Duolingo 2D 減碳模擬遊戲
+          </p>
         </div>
       </div>
     </div>
 
     <!-- Stats Bar -->
-    <div class="flex items-center gap-4">
-      <div class="stat-chip">
+    <div class="flex items-center gap-2 md:gap-3 flex-wrap">
+      <div class="stat-chip bg-amber-950/60 border-amber-500/40">
         <span class="text-amber-400">⭐ XP</span>
         <span id="statXP" class="font-bold text-amber-300">0</span>
       </div>
-      <div class="stat-chip">
-        <span class="text-red-400">💨 CO₂</span>
-        <span id="statCO2" class="font-bold text-red-300">計算中...</span>
+      <div class="stat-chip bg-rose-950/60 border-rose-500/40">
+        <span class="text-rose-400">💨 CO₂</span>
+        <span id="statCO2" class="font-bold text-rose-300">計算中...</span>
       </div>
-      <div class="stat-chip">
-        <span class="text-cyan-400">🏢 設備</span>
+      <div class="stat-chip bg-cyan-950/60 border-cyan-500/40">
+        <span class="text-cyan-400">🏬 設備</span>
         <span id="statDevices" class="font-bold text-cyan-300">0</span>
       </div>
-      <div class="stat-chip">
-        <span class="text-green-400">🌿 等級</span>
-        <span id="statLevel" class="font-bold text-green-300">Lv.1</span>
+      <div class="stat-chip bg-emerald-950/60 border-emerald-500/40">
+        <span class="text-emerald-400">🌿 等級</span>
+        <span id="statLevel" class="font-bold text-emerald-300">Lv.1</span>
       </div>
     </div>
   </header>
@@ -51,11 +56,11 @@
   <div class="flex h-[calc(100vh-64px)]">
 
     <!-- LEFT SIDEBAR: Device Panel -->
-    <aside class="left-panel w-64 flex-shrink-0 border-r-2 border-emerald-900 overflow-y-auto p-3 space-y-3">
+    <aside class="left-panel w-72 flex-shrink-0 border-r-2 border-emerald-900/50 overflow-y-auto p-3 space-y-3">
 
       <div class="panel-header">
-        <i class="fa-solid fa-industry text-emerald-400"></i>
-        <span>我的排放源</span>
+        <i class="fa-solid fa-store text-emerald-400"></i>
+        <span>已登錄盤查設備</span>
       </div>
 
       <!-- Device List -->
@@ -64,25 +69,34 @@
       </div>
 
       <!-- Add Simulation Device -->
-      <div class="mt-4 border-t border-emerald-900 pt-3">
+      <div class="mt-4 border-t border-slate-700/60 pt-3">
         <div class="panel-header mb-2">
-          <i class="fa-solid fa-plus-circle text-amber-400"></i>
+          <i class="fa-solid fa-circle-plus text-amber-400"></i>
           <span class="text-amber-300">模擬新增排放源</span>
         </div>
         <div class="space-y-2">
-          <input type="text" id="simDeviceName" placeholder="設備名稱..." class="pixel-input w-full text-xs"/>
+          <input type="text" id="simDeviceName" placeholder="例如：冷凍展示櫃、堆高機..." class="pixel-input w-full text-xs"/>
           <select id="simDeviceType" class="pixel-input w-full text-xs">
-            <option value="">選擇類型...</option>
-            <option value="外購電力">外購電力</option>
-            <option value="車用汽油">汽油車輛</option>
-            <option value="車用柴油">柴油車輛</option>
-            <option value="冷氣冷媒(R-410A)">冷氣 (R-410A)</option>
-            <option value="冷藏冷媒(R-404A)">冷藏 (R-404A)</option>
-            <option value="柴油發電機組">柴油發電機</option>
-            <option value="天然氣">天然氣設備</option>
+            <option value="">選擇設備與能源種類...</option>
+            <optgroup label="📋 (舊)盤查清冊.ods 實體設備">
+              <option value="中、大型冷凍、冷藏裝備">中大型冷凍冷藏裝備 (R-404A/R-408A)</option>
+              <option value="發電機">發電機組 (柴油)</option>
+              <option value="運輸作業車輛">運輸作業車輛 (汽油/柴油/R-134a)</option>
+              <option value="住宅及商業建築冷氣機">門市冷氣空調 (R-410A/R-32)</option>
+              <option value="化糞池">化糞池 / 污水處理 (沼氣逸散)</option>
+              <option value="消防設施">消防滅火設施 (乾粉/CO₂)</option>
+              <option value="電錶(計算電力用)">外購電力設施 (電錶)</option>
+            </optgroup>
+            <optgroup label="⚡ 常見場域設施">
+              <option value="外購電力">外購電力設備</option>
+              <option value="車用汽油">汽油小貨車 / 載貨車</option>
+              <option value="車用柴油">柴油物流卡車</option>
+              <option value="桶裝瓦斯(LPG)">桶裝瓦斯 / 爐具</option>
+              <option value="天然氣">天然氣鍋爐 / 設備</option>
+            </optgroup>
           </select>
-          <button onclick="addSimDevice()" class="pixel-btn-green w-full text-xs py-2">
-            ＋ 加入模擬
+          <button onclick="addSimDevice()" class="pixel-btn-green w-full text-xs py-2.5 flex items-center justify-center gap-1.5 shadow-md">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> ＋ 呼叫顧問模擬新增
           </button>
         </div>
       </div>
@@ -90,80 +104,93 @@
     </aside>
 
     <!-- CENTER: Game Map Canvas -->
-    <main class="flex-1 relative overflow-hidden">
+    <main class="flex-1 relative overflow-hidden flex flex-col">
 
       <!-- Map Toolbar -->
-      <div class="map-toolbar absolute top-2 left-2 right-2 z-20 flex items-center gap-2 flex-wrap">
-        <button onclick="document.getElementById('floorPlanUpload').click()" class="pixel-btn-blue text-xs px-3 py-1.5">
-          <i class="fa-solid fa-image"></i> 上傳場地圖
+      <div class="map-toolbar absolute top-3 left-3 right-3 z-20 flex items-center gap-2 flex-wrap">
+        
+        <!-- Scene Skin Switcher -->
+        <div class="flex items-center gap-1 bg-slate-900/90 border border-slate-700/80 rounded-xl p-1 text-xs">
+          <span class="text-slate-400 font-bold px-1.5">🎨 場景皮膚：</span>
+          <button onclick="changeSkin('market')" id="skinBtnMarket" class="skin-btn active px-2.5 py-1 rounded-lg text-[11px] font-bold">🛒 市場水果攤</button>
+          <button onclick="changeSkin('factory')" id="skinBtnFactory" class="skin-btn px-2.5 py-1 rounded-lg text-[11px] font-bold">🏭 綠色工廠</button>
+          <button onclick="changeSkin('office')" id="skinBtnOffice" class="skin-btn px-2.5 py-1 rounded-lg text-[11px] font-bold">🏢 商業門市</button>
+        </div>
+
+        <button onclick="document.getElementById('floorPlanUpload').click()" class="pixel-btn-blue text-xs px-3 py-1.5 flex items-center gap-1">
+          <i class="fa-solid fa-cloud-arrow-up"></i> 上傳場地底圖
         </button>
         <input type="file" id="floorPlanUpload" accept="image/*" class="hidden" onchange="handleFloorPlanUpload(event)">
 
-        <div class="flex items-center gap-1.5 bg-slate-900/80 rounded px-2 py-1 text-xs">
+        <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-1 text-xs">
           <span class="text-slate-400">像素化：</span>
-          <input type="range" id="pixelSlider" min="2" max="20" value="6" class="w-20" oninput="applyPixelEffect()">
-          <span id="pixelVal" class="text-emerald-400 text-[10px]">6px</span>
+          <input type="range" id="pixelSlider" min="2" max="20" value="6" class="w-16 accent-emerald-500" oninput="applyPixelEffect()">
+          <span id="pixelVal" class="text-emerald-400 font-mono text-[10px]">6px</span>
         </div>
 
-        <button onclick="autoArrangeDevices()" class="pixel-btn-purple text-xs px-3 py-1.5">
+        <button onclick="autoArrangeDevices()" class="pixel-btn-purple text-xs px-3 py-1.5 flex items-center gap-1">
           <i class="fa-solid fa-wand-magic-sparkles"></i> 自動排列
         </button>
 
-        <button onclick="toggleWarnings()" class="pixel-btn-orange text-xs px-3 py-1.5" id="warningToggleBtn">
+        <button onclick="toggleWarnings()" class="pixel-btn-orange text-xs px-3 py-1.5 flex items-center gap-1" id="warningToggleBtn">
           <i class="fa-solid fa-triangle-exclamation"></i> 顯示警告
         </button>
 
-        <span class="text-[10px] text-slate-500 ml-auto">💡 點擊設備查看詳情 · 拖曳移動位置</span>
+        <span class="text-[11px] text-slate-300 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-700/60 ml-auto">💡 拖曳設備擺放 · 點擊觸發自然動畫與詳情</span>
       </div>
 
       <!-- Game Canvas -->
       <canvas id="gameCanvas" class="absolute inset-0 w-full h-full"></canvas>
 
       <!-- Device Sprites Layer (HTML over canvas for interactivity) -->
-      <div id="spritesLayer" class="absolute inset-0 pointer-events-none" style="top: 44px;">
+      <div id="spritesLayer" class="absolute inset-0 pointer-events-none" style="top: 50px;">
         <!-- Device sprites rendered by JS -->
       </div>
 
       <!-- Default Map (no image uploaded) -->
-      <div id="defaultMapOverlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none" style="top: 44px;">
-        <div class="text-center opacity-30">
-          <div class="text-8xl mb-4">🏭</div>
-          <p class="pixel-title text-emerald-400 text-xs">點擊上傳您的場地圖</p>
-          <p class="text-slate-500 text-xs mt-2">（支援攤位圖、樓層平面圖）</p>
+      <div id="defaultMapOverlay" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none" style="top: 50px;">
+        <div class="text-center bg-slate-900/80 border-2 border-emerald-500/30 p-6 rounded-2xl backdrop-blur-md max-w-sm pointer-events-auto">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-3xl">
+            🏪
+          </div>
+          <h3 class="font-black text-emerald-400 text-sm mb-1">場景地圖準備就緒！</h3>
+          <p class="text-slate-300 text-xs leading-relaxed mb-3">
+            已載入 <strong class="text-amber-300" id="defaultEquipCount">0</strong> 項盤查設備。<br/>您也可以點擊上方按鈕上傳您攤位或廠區的平面圖！
+          </p>
         </div>
       </div>
 
     </main>
 
     <!-- RIGHT SIDEBAR: Warnings & Stats -->
-    <aside class="right-panel w-72 flex-shrink-0 border-l-2 border-emerald-900 overflow-y-auto p-3 space-y-3">
+    <aside class="right-panel w-80 flex-shrink-0 border-l-2 border-emerald-900/50 overflow-y-auto p-3 space-y-3">
 
       <!-- Emission Summary -->
       <div class="panel-header">
         <i class="fa-solid fa-chart-pie text-emerald-400"></i>
-        <span>排放量總覽</span>
+        <span>全廠碳排放量總覽</span>
       </div>
 
-      <div class="space-y-2" id="emissionSummary">
+      <div class="space-y-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800" id="emissionSummary">
         <div class="stat-row">
-          <span class="text-slate-400">範疇一 (直接)</span>
-          <span id="scope1Val" class="text-amber-400 font-bold">--</span>
+          <span class="text-slate-400">範疇一 (直接排放)</span>
+          <span id="scope1Val" class="text-amber-400 font-bold font-mono">--</span>
         </div>
         <div class="stat-row">
-          <span class="text-slate-400">範疇二 (電力)</span>
-          <span id="scope2Val" class="text-cyan-400 font-bold">--</span>
+          <span class="text-slate-400">範疇二 (外購電力)</span>
+          <span id="scope2Val" class="text-cyan-400 font-bold font-mono">--</span>
         </div>
-        <div class="stat-row border-t border-emerald-900 pt-2 mt-2">
-          <span class="text-white font-bold">合計</span>
-          <span id="totalCO2" class="text-red-400 font-bold text-lg">--</span>
+        <div class="stat-row border-t border-slate-700/80 pt-2 mt-2">
+          <span class="text-white font-bold">全廠合計</span>
+          <span id="totalCO2" class="text-rose-400 font-black text-lg font-mono">--</span>
         </div>
-        <p class="text-[10px] text-slate-500">* 數據為估算值，單位 tCO₂e/年</p>
+        <p class="text-[10px] text-slate-500">* 依據 ISO 14064 係數估算，單位 tCO₂e/年</p>
       </div>
 
       <!-- GWP Warnings -->
       <div class="panel-header mt-4">
-        <i class="fa-solid fa-triangle-exclamation text-red-400"></i>
-        <span class="text-red-300">⚠️ 高排放警告</span>
+        <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
+        <span class="text-rose-300">⚠️ 高 GWP 冷媒/高碳排警告</span>
       </div>
 
       <div id="warningList" class="space-y-2">
@@ -173,34 +200,75 @@
 
       <!-- 5-Year Forecast -->
       <div class="panel-header mt-4">
-        <i class="fa-solid fa-chart-line text-blue-400"></i>
-        <span class="text-blue-300">未來 5 年預估</span>
+        <i class="fa-solid fa-chart-line text-cyan-400"></i>
+        <span class="text-cyan-300">未來 5 年累積碳排預估</span>
       </div>
-      <div id="forecastPanel" class="space-y-1 text-xs">
-        <p class="text-slate-500 text-center py-2">新增設備後自動計算</p>
+      <div id="forecastPanel" class="space-y-1 text-xs bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+        <p class="text-slate-500 text-center py-2">計算中...</p>
       </div>
 
       <!-- Tips -->
       <div class="panel-header mt-4">
-        <i class="fa-solid fa-lightbulb text-yellow-400"></i>
-        <span class="text-yellow-300">減碳小提示</span>
+        <i class="fa-solid fa-lightbulb text-amber-400"></i>
+        <span class="text-amber-300">碳盤小撇步</span>
       </div>
-      <div id="tipBox" class="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-3 text-xs text-yellow-200 leading-relaxed">
-        🌱 嘗試點擊地圖上的設備，系統會告訴你如何減少碳排放量！
+      <div id="tipBox" class="bg-amber-950/30 border border-amber-500/40 rounded-xl p-3 text-xs text-amber-200 leading-relaxed font-medium">
+        🌱 點擊地圖上的設備精靈，碳盤顧問會告訴您如何有效減少碳排放！
       </div>
 
     </aside>
   </div>
 
+  <!-- ===== 💬 碳盤顧問 RPG 對話框 MODAL ===== -->
+  <div id="consultantModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="modal-overlay absolute inset-0 bg-slate-950/80 backdrop-blur-md" onclick="closeConsultantModal()"></div>
+    <div class="rpg-dialogue-card relative z-10 w-full max-w-xl p-6 space-y-4 shadow-2xl">
+      
+      <!-- Dialogue Header: Avatar & Title -->
+      <div class="flex items-center gap-4 border-b border-slate-700/80 pb-4">
+        <div id="consultantAvatar" class="avatar-box w-16 h-16 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-4xl shrink-0 shadow-lg animate-bounce">
+          🍃
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-black text-emerald-400 text-base">碳盤顧問「小碳 (Eco-Pal)」</h3>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-bold">ISO 14064 專家</span>
+          </div>
+          <p id="consultantSubtitle" class="text-xs text-slate-400 mt-0.5">即時模擬設備碳排放評估報告</p>
+        </div>
+        <button onclick="closeConsultantModal()" class="text-slate-400 hover:text-white text-xl ml-auto">✕</button>
+      </div>
+
+      <!-- Speech Bubble Box (RPG Typewriter) -->
+      <div class="speech-bubble-box bg-slate-900/90 border-2 border-emerald-500/40 rounded-2xl p-4 min-h-[100px] relative">
+        <div id="consultantMessage" class="text-slate-100 text-xs md:text-sm font-medium leading-relaxed">
+          <!-- Typewriter message rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Equipment Specs Preview -->
+      <div id="consultantSpecs" class="grid grid-cols-3 gap-2 text-xs">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Interactive Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-2 pt-2" id="consultantActions">
+        <!-- Buttons rendered by JS -->
+      </div>
+    </div>
+  </div>
+
   <!-- ===== DEVICE INFO MODAL ===== -->
-  <div id="deviceModal" class="fixed inset-0 z-50 hidden items-center justify-center">
-    <div class="modal-overlay absolute inset-0 bg-black/70" onclick="closeModal()"></div>
-    <div class="modal-card relative z-10 w-full max-w-lg mx-4 p-6 space-y-4">
-      <div class="flex items-start justify-between">
+  <div id="deviceModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="modal-overlay absolute inset-0 bg-slate-950/80 backdrop-blur-md" onclick="closeModal()"></div>
+    <div class="modal-card relative z-10 w-full max-w-lg p-6 space-y-4 shadow-2xl">
+      <div class="flex items-start justify-between border-b border-slate-700/80 pb-3">
         <div class="flex items-center gap-3">
-          <span id="modalEmoji" class="text-4xl device-bounce">❓</span>
+          <div id="modalVectorIcon" class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-3xl">
+            🏬
+          </div>
           <div>
-            <h2 id="modalName" class="font-bold text-lg text-white"></h2>
+            <h2 id="modalName" class="font-bold text-base text-white"></h2>
             <p id="modalType" class="text-xs text-slate-400"></p>
           </div>
         </div>
@@ -213,36 +281,41 @@
       </div>
 
       <!-- GWP Warning (shown if applicable) -->
-      <div id="modalWarning" class="hidden bg-red-900/40 border-2 border-red-500 rounded-xl p-4">
-        <div class="flex items-center gap-2 text-red-400 font-bold mb-2">
+      <div id="modalWarning" class="hidden bg-rose-950/60 border-2 border-rose-500 rounded-2xl p-4">
+        <div class="flex items-center gap-2 text-rose-400 font-bold mb-2">
           <i class="fa-solid fa-triangle-exclamation text-xl"></i>
-          <span>⚠️ 高 GWP 警告！建議替換</span>
+          <span>⚠️ 高 GWP 冷媒警告！建議替換</span>
         </div>
-        <p id="modalWarningText" class="text-red-200 text-xs leading-relaxed"></p>
+        <p id="modalWarningText" class="text-rose-200 text-xs leading-relaxed"></p>
         <div id="modalAlternatives" class="mt-3 space-y-2"></div>
       </div>
 
       <!-- 5-Year Savings Forecast -->
-      <div id="modalForecast" class="hidden bg-green-900/30 border border-green-700 rounded-xl p-4">
-        <div class="text-green-400 font-bold mb-2">📈 替換後 5 年減排效益估算</div>
+      <div id="modalForecast" class="hidden bg-emerald-950/60 border border-emerald-500/60 rounded-2xl p-4">
+        <div class="text-emerald-400 font-bold mb-2 flex items-center gap-1.5">
+          <i class="fa-solid fa-leaf"></i>
+          <span>替換後 5 年減排效益估算</span>
+        </div>
         <div id="modalForecastContent" class="text-xs space-y-1"></div>
       </div>
 
       <div class="flex gap-2 pt-2">
-        <button onclick="closeModal()" class="pixel-btn-back flex-1 py-2 text-xs">關閉</button>
-        <button onclick="openAlternativeSearch()" id="findAltBtn" class="pixel-btn-green flex-1 py-2 text-xs hidden">
-          🔍 查找替代設備
+        <button onclick="closeModal()" class="pixel-btn-back flex-1 py-2.5 text-xs">關閉</button>
+        <button onclick="openAlternativeSearch()" id="findAltBtn" class="pixel-btn-green flex-1 py-2.5 text-xs hidden flex items-center justify-center gap-1">
+          <i class="fa-solid fa-magnifying-glass"></i> 查找替代設備
         </button>
       </div>
     </div>
   </div>
 
   <!-- ===== ALTERNATIVE SEARCH MODAL ===== -->
-  <div id="altModal" class="fixed inset-0 z-50 hidden items-center justify-center">
-    <div class="modal-overlay absolute inset-0 bg-black/70" onclick="closeAltModal()"></div>
-    <div class="modal-card relative z-10 w-full max-w-xl mx-4 p-6 space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="font-bold text-lg text-emerald-400">🔍 替代設備建議</h2>
+  <div id="altModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="modal-overlay absolute inset-0 bg-slate-950/80 backdrop-blur-md" onclick="closeAltModal()"></div>
+    <div class="modal-card relative z-10 w-full max-w-xl p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-700/80 pb-3">
+        <h2 class="font-bold text-base text-emerald-400 flex items-center gap-2">
+          <i class="fa-solid fa-leaf"></i> 低碳替代設備與冷媒方案
+        </h2>
         <button onclick="closeAltModal()" class="text-slate-400 hover:text-white text-xl">✕</button>
       </div>
       <div id="altContent" class="space-y-3">
@@ -255,6 +328,7 @@
   <script src="Emission-source/materials_data.js"></script>
   <script src="Emission-source/equipments_data.js"></script>
   <script src="Emission-source/mapping_data.js"></script>
+  <script src="game/ods_inventory_data.js"></script>
   <script src="game/game.js"></script>
 </body>
 </html>
