@@ -74,12 +74,17 @@ const VECTOR_SVG_SPRITES = {
     <path d="M32 26C32 26 37 32 32 40C27 32 32 26 32 26Z" fill="#FEF08A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round"/>
   </svg>`,
 
-  // 化糞池 / 污水處理 (Green Pod + Dual Floating Bubbles)
+  // 化糞池 / 污水處理 (馬桶 + 便便 Icon)
   septic: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="14" y="50" width="36" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
-    <rect x="10" y="16" width="44" height="34" rx="12" fill="#84CC16" stroke="#0F172A" stroke-width="3.5"/>
-    <circle cx="22" cy="30" r="5" fill="#ECFCCB" stroke="#0F172A" stroke-width="2.5"/>
-    <circle cx="38" cy="36" r="7" fill="#ECFCCB" stroke="#0F172A" stroke-width="2.5"/>
+    <rect x="14" y="52" width="36" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <!-- 馬桶水箱 -->
+    <rect x="16" y="10" width="32" height="20" rx="6" fill="#F8FAFC" stroke="#0F172A" stroke-width="3.5"/>
+    <rect x="28" y="14" width="8" height="4" rx="2" fill="#94A3B8" stroke="#0F172A" stroke-width="2"/>
+    <!-- 馬桶座底 -->
+    <path d="M14 30H50V38C50 46 42 50 32 50C22 50 14 46 14 38V30Z" fill="#F8FAFC" stroke="#0F172A" stroke-width="3.5"/>
+    <!-- 便便 (Poop Vector) -->
+    <path d="M32 32C34 32 36 33.5 35 35.5C37 36 38 38 36.5 40C38.5 41 38 44 35.5 44.5C34 44.8 28 44.8 26.5 44.5C24 44 23.5 41 25.5 40C24 38 25 36 27 35.5C26 33.5 28 32 32 32Z" fill="#78350F" stroke="#0F172A" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="30" cy="36" r="1" fill="#FFFFFF"/>
   </svg>`,
 
   // 消防設施 / 滅火器 (Red Cylinder + Top Nozzle)
