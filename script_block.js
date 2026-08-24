@@ -120,12 +120,7 @@
     };
 
     // AC-01: 預填示範設備（對應既有 4 筆 records）
-    let emissionSources = [
-      { id: 1, equipId: 'ES-001', name: '營業用開放式冷藏展示櫃', location: '攤位本區',   energy: '外購電力',          quantity: 1 },
-      { id: 2, equipId: 'ES-002', name: '門市冷氣空調 (R-410A)',  location: '攤位本區',   energy: '冷氣冷媒(R-410A)',  quantity: 1 },
-      { id: 3, equipId: 'ES-003', name: '批發載貨小貨車',         location: '對外運輸',   energy: '車用柴油',          quantity: 1 },
-      { id: 4, equipId: 'ES-004', name: '攤位高亮度照明探照燈',   location: '攤位本區',   energy: '外購電力',          quantity: 2 }
-    ];
+    let emissionSources = [];
 
     // 取得某設備的自動判斷結果
     function getESAuto(energy) {
@@ -287,12 +282,7 @@
 
     // =============================================
     // State Store for Form Records
-    let records = [
-      { id: 1, name: "營業用開放式冷藏展示櫃", fuel: "外購電力", scope: "Scope 2 - 外購電力", activity: 12500, unit: "度 (kWh)", factor: 0.495, carbon: 6.19 },
-      { id: 2, name: "門市冷氣空調 (R-410A)", fuel: "冷氣冷媒(R-410A)", scope: "Scope 1 - 逸散排放", activity: 2.5, unit: "kg", factor: 2088, carbon: 5.22 },
-      { id: 3, name: "批發載貨小貨車", fuel: "車用柴油", scope: "Scope 1 - 移動燃燒", activity: 1200, unit: "公升", factor: 2.66, carbon: 3.19 },
-      { id: 4, name: "攤位高亮度照明探照燈", fuel: "外購電力", scope: "Scope 2 - 外購電力", activity: 3800, unit: "度 (kWh)", factor: 0.495, carbon: 1.88 }
-    ];
+    let records = [];
 
     // Factors lookup
     const FACTOR_MAP = {

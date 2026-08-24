@@ -218,7 +218,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 text-xs">
             <div>
               <label class="block text-slate-400 mb-1">① 設備編號 *</label>
-              <input type="text" id="esEquipId" onblur="checkDuplicateEquipId()" placeholder="例如：ES-001" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
+              <input type="text" id="esEquipId" onblur="checkDuplicateEquipId()" onchange="checkDuplicateEquipId()" placeholder="例如：ES-001" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none" />
               <p id="esEquipIdHint" class="hidden text-orange-400 text-[10px] mt-1.5 leading-tight"></p>
             </div>
             <div>
@@ -1011,15 +1011,57 @@
     }
 
     // 排放源清單 (Sheet 3)
-    let emissionSources = [
-      { id: 1, equipId: "ES-001", name: "營業用冷藏展示櫃", location: "1F 門市展售區", energy: "外購電力", quantity: 2 },
-      { id: 2, equipId: "ES-002", name: "大型低溫冷藏庫", location: "1F 後方倉儲區", energy: "冷藏冷媒(R-404A)", quantity: 1 },
-      { id: 3, equipId: "ES-003", name: "3.5噸批發載貨車", location: "公務停車場", energy: "車用柴油", quantity: 1 },
-      { id: 4, equipId: "ES-004", name: "門市分離式冷氣", location: "2F 營運辦公室", energy: "冷氣冷媒(R-410A)", quantity: 3 }
-    ];
+    let emissionSources = [];
 
-    function getESAuto(energy) {
+    function getESAuto(energy, equipName = '') {
       if (!energy) return null;
+
+      // 1. 雙條件查詢：先查原(燃)物料或產品名稱，再查排放型式
+      if (window.CFV_MAPPING && window.CFV_MAPPING.ghg_rules) {
+        const ghgRules = window.CFV_MAPPING.ghg_rules;
+        let matchedMat = ghgRules[energy];
+        
+        if (!matchedMat) {
+          for (const matKey in ghgRules) {
+            if (energy.includes(matKey)) {
+              matchedMat = ghgRules[matKey];
+              break;
+            }
+          }
+        }
+
+        if (matchedMat) {
+          // 判斷排放型式
+          let emissionType = "固定燃燒"; // 預設
+          if (equipName.includes('車') || equipName.includes('堆高機') || equipName.includes('機車') || equipName.includes('船舶')) {
+            emissionType = "移動燃燒";
+          }
+          if (equipName.includes('發電機') || equipName.includes('鍋爐')) {
+            emissionType = "固定燃燒";
+          }
+
+          if (matchedMat[emissionType]) {
+            return { scope: "範疇一 (" + emissionType + ")", ghg: matchedMat[emissionType] };
+          }
+        }
+      }
+
+      // 2. 特殊攔截規則
+      if (energy.includes('電')) {
+        return { scope: "範疇二 (外購電力)", ghg: ["CO2"] };
+      }
+      if (energy.includes('冷媒') || energy.includes('R-')) {
+        return { scope: "範疇一 (逸散排放)", ghg: ["HFCs", "PFCs", "SF6"] };
+      }
+      if (energy.includes('柴油') || energy.includes('汽油')) {
+        if (equipName.includes('車') || equipName.includes('堆高機')) {
+          return { scope: "範疇一 (移動燃燒)", ghg: ["CO2", "CH4", "N2O"] };
+        } else {
+          return { scope: "範疇一 (固定燃燒)", ghg: ["CO2", "CH4", "N2O"] };
+        }
+      }
+
+      // 3. 預設退回：原本字典檔查表邏輯
       if (window.CFV_MAPPING && window.CFV_MAPPING.materials) {
         const materials = window.CFV_MAPPING.materials;
         const match = Object.values(materials).find(item => item.name === energy);
@@ -1028,18 +1070,22 @@
           if (item.name && energy.includes(item.name) && item.scope) return item;
         }
       }
-      // Fallback lookup
+      
+      // 4. 防呆預設值 (Fallback)
       if (energy.includes("電力")) return { scope: "範疇二 (能源間接)", ghg: ["CO2"] };
       if (energy.includes("柴油") || energy.includes("汽油")) return { scope: "範疇一 (移動燃燒)", ghg: ["CO2", "CH4", "N2O"] };
       if (energy.includes("冷媒") || energy.includes("410") || energy.includes("404")) return { scope: "範疇一 (逸散排放)", ghg: ["HFCs"] };
-      return { scope: "範疇一 (直接排放)", ghg: ["CO2", "CH4", "N2O"] };
+      
+      return { scope: "非主要排放源", ghg: ["無"] };
     }
 
     function updateESPreview() {
       const energyEl = document.getElementById('esEnergy');
+      const equipNameEl = document.getElementById('esEquipName');
       if (!energyEl) return;
       const energy = energyEl.value.trim();
-      const auto = getESAuto(energy);
+      const equipName = equipNameEl ? equipNameEl.value.trim() : '';
+      const auto = getESAuto(energy, equipName);
       const scopeBadge = document.getElementById('esPreviewScope');
       const ghgContainer = document.getElementById('esPreviewGHG');
       if (!scopeBadge || !ghgContainer) return;
@@ -1052,7 +1098,10 @@
       }
 
       const isScope2 = auto.scope.includes('二');
-      const scopeColor = isScope2 ? 'text-white bg-cyan-600 border-cyan-500' : 'text-white bg-orange-500 border-orange-400';
+      const isFallback = auto.scope === '非主要排放源';
+      const scopeColor = isFallback
+        ? 'text-slate-100 bg-slate-600 border-slate-500'
+        : (isScope2 ? 'text-white bg-cyan-600 border-cyan-500' : 'text-white bg-orange-500 border-orange-400');
       scopeBadge.className = `px-2 py-0.5 rounded border text-[11px] font-semibold ${scopeColor}`;
       scopeBadge.textContent = auto.scope;
       ghgContainer.innerHTML = auto.ghg.map(g => `<span class="px-1.5 py-0.5 rounded bg-slate-700 border border-slate-600 text-slate-200 text-[10px] font-mono">${g}</span>`).join('');
@@ -1064,7 +1113,7 @@
       if (!equipId) { if (hintEl) hintEl.classList.add('hidden'); return; }
       const existing = emissionSources.find(e => e.equipId === equipId);
       if (existing && hintEl) {
-        hintEl.textContent = '您已建立過此設備編號，系統已為您自動帶入該設備名稱與位置。';
+        hintEl.textContent = '您已建立過此設備編號。若要為同設備新增另一種原(燃)物料，系統將為您自動帶入該設備的名稱與位置。';
         hintEl.classList.remove('hidden');
         document.getElementById('esEquipName').value = existing.name;
         document.getElementById('esLocation').value = existing.location;
@@ -1147,12 +1196,15 @@
 
       filtered.forEach((es, filteredIdx) => {
         const realIdx = emissionSources.indexOf(es);
-        const auto = getESAuto(es.energy);
+        const auto = getESAuto(es.energy, es.name);
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-900/40 transition-colors';
         const ghgTags = auto ? auto.ghg.map(g => `<span class="px-1.5 py-0.5 rounded bg-slate-700 border border-slate-600 text-slate-200 text-[10px] font-mono">${g}</span>`).join(' ') : `<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]">待確認</span>`;
         const isScope2 = auto ? auto.scope.includes('二') : false;
-        const scopeColor = auto ? (isScope2 ? 'text-white bg-cyan-600 border-cyan-500' : 'text-white bg-orange-500 border-orange-400') : 'text-slate-100 bg-slate-600 border-slate-500';
+        const isFallback = auto ? auto.scope === '非主要排放源' : false;
+        const scopeColor = auto 
+          ? (isFallback ? 'text-slate-100 bg-slate-600 border-slate-500' : (isScope2 ? 'text-white bg-cyan-600 border-cyan-500' : 'text-white bg-orange-500 border-orange-400')) 
+          : 'text-slate-100 bg-slate-600 border-slate-500';
         const scopeText = auto ? auto.scope : '待確認';
         const scopeBadge = `<span class="px-2 py-0.5 rounded border text-[10px] font-semibold whitespace-nowrap ${scopeColor}">${scopeText}</span>`;
 
@@ -1183,144 +1235,7 @@
 
     const ACTIVITY_STORAGE_KEY = 'cfv_activity_records_v1';
 
-    // 預設 5 筆示範活動數據（包含完整 24 欄位）
-    const DEFAULT_ACTIVITY_RECORDS = [
-      {
-        id: 1,
-        equipNo: "EQ-001",
-        equipCode: "REF-C01",
-        equipName: "營業用開放式冷藏展示櫃",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "營運部",
-        location: "1F 展售區 A08",
-        quantity: 2,
-        materialCode: "EL0001",
-        materialName: "外購電力",
-        scopeType: "間接排放 (Scope 2)",
-        emissionType: "外購電力使用",
-        inUse: "是",
-        activityData: 25000,
-        ratio: 100,
-        unit: "度 (kWh)",
-        dataSource: "電費單/台電發票",
-        custodyUnit: "會計部",
-        measurementFrequency: "雙月 (每期)",
-        measurementInstrument: "台電數位電子電表",
-        calorificValueSource: "經濟部能源署常用熱值表",
-        netCalorificValue: "860",
-        netCalorificValueUnit: "kcal/度",
-        carbonContent: ""
-      },
-      {
-        id: 2,
-        equipNo: "EQ-002",
-        equipCode: "COLD-02",
-        equipName: "大型低溫冷藏庫",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "倉儲部",
-        location: "1F 後方倉儲",
-        quantity: 1,
-        materialCode: "190240",
-        materialName: "冷藏冷媒(R-404A)",
-        scopeType: "直接排放 (Scope 1)",
-        emissionType: "逸散排放",
-        inUse: "是",
-        activityData: 3.5,
-        ratio: 100,
-        unit: "kg",
-        dataSource: "冷媒填充原廠維護工單",
-        custodyUnit: "廠務部",
-        measurementFrequency: "每年",
-        measurementInstrument: "冷媒電子電子磅秤",
-        calorificValueSource: "IPCC GWP 報告",
-        netCalorificValue: "",
-        netCalorificValueUnit: "",
-        carbonContent: ""
-      },
-      {
-        id: 3,
-        equipNo: "EQ-003",
-        equipCode: "VEH-01",
-        equipName: "3.5噸批發載貨柴油小貨車",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "物流部",
-        location: "公務停車場",
-        quantity: 1,
-        materialCode: "170006",
-        materialName: "車用柴油",
-        scopeType: "直接排放 (Scope 1)",
-        emissionType: "移動燃燒",
-        inUse: "是",
-        activityData: 1200,
-        ratio: 100,
-        unit: "公升 (L)",
-        dataSource: "中油車隊卡加油發票",
-        custodyUnit: "物流部",
-        measurementFrequency: "每月",
-        measurementInstrument: "加油機計量器 / 行車里程表",
-        calorificValueSource: "經濟部能源署常用熱值表",
-        netCalorificValue: "8400",
-        netCalorificValueUnit: "kcal/L",
-        carbonContent: "86.1"
-      },
-      {
-        id: 4,
-        equipNo: "EQ-004",
-        equipCode: "AC-01",
-        equipName: "門市分離式冷氣空調 (R-410A)",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "行政部",
-        location: "2F 辦公室",
-        quantity: 3,
-        materialCode: "190239",
-        materialName: "冷氣冷媒(R-410A)",
-        scopeType: "直接排放 (Scope 1)",
-        emissionType: "逸散排放",
-        inUse: "是",
-        activityData: 2.0,
-        ratio: 100,
-        unit: "kg",
-        dataSource: "冷氣保養維修保證紀錄",
-        custodyUnit: "總務部",
-        measurementFrequency: "每年",
-        measurementInstrument: "壓力磅秤儀器",
-        calorificValueSource: "IPCC GWP 報告",
-        netCalorificValue: "",
-        netCalorificValueUnit: "",
-        carbonContent: ""
-      },
-      {
-        id: 5,
-        equipNo: "EQ-005",
-        equipCode: "LGT-01",
-        equipName: "攤位高亮度照明探照燈",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "廠務部",
-        location: "1F 全場照明",
-        quantity: 2,
-        materialCode: "EL0001",
-        materialName: "外購電力",
-        scopeType: "間接排放 (Scope 2)",
-        emissionType: "外購電力使用",
-        inUse: "是",
-        activityData: 8600,
-        ratio: 100,
-        unit: "度 (kWh)",
-        dataSource: "電費單/台電發票",
-        custodyUnit: "會計部",
-        measurementFrequency: "雙月 (每期)",
-        measurementInstrument: "台電數位電子電表",
-        calorificValueSource: "經濟部能源署常用熱值表",
-        netCalorificValue: "860",
-        netCalorificValueUnit: "kcal/度",
-        carbonContent: ""
-      }
-    ];
+    const DEFAULT_ACTIVITY_RECORDS = [];
 
     let activityRecords = loadActivityRecords();
 
@@ -1383,7 +1298,9 @@
       }
 
       // 查範疇與型式
-      const auto = getESAuto(materialName);
+      const equipNameEl = document.getElementById('actEquipName');
+      const equipName = equipNameEl ? equipNameEl.value.trim() : '';
+      const auto = getESAuto(materialName, equipName);
       if (auto) {
         const isScope2 = auto.scope && auto.scope.includes('二');
         document.getElementById('actScopeType').value = isScope2 ? '間接排放 (Scope 2)' : '直接排放 (Scope 1)';
@@ -1665,7 +1582,7 @@
 
       emissionSources.forEach(es => {
         const existingIdx = activityRecords.findIndex(r => r.equipNo === es.equipId || r.equipName === es.name);
-        const auto = getESAuto(es.energy);
+        const auto = getESAuto(es.energy, es.name);
         const isScope2 = auto && auto.scope && auto.scope.includes('二');
         const scopeStr = isScope2 ? '間接排放 (Scope 2)' : '直接排放 (Scope 1)';
 
