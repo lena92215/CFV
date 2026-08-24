@@ -10,87 +10,91 @@
 // =============================================
 
 const VECTOR_SVG_SPRITES = {
-  // 冷氣 / 空調
+  // 冷氣 / 空調 (Squorcle + Capsule Vent + Pill Shadow)
   ac: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="6" y="16" width="52" height="32" rx="8" fill="#38BDF8" stroke="#0284C7" stroke-width="4"/>
-    <rect x="12" y="24" width="40" height="8" rx="4" fill="#E0F2FE"/>
-    <circle cx="20" cy="38" r="4" fill="#0284C7"/>
-    <circle cx="32" cy="38" r="4" fill="#0284C7"/>
-    <circle cx="44" cy="38" r="4" fill="#0284C7"/>
-    <path d="M16 42C16 42 20 46 24 42" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+    <rect x="14" y="52" width="36" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="8" y="16" width="48" height="32" rx="10" fill="#38BDF8" stroke="#0F172A" stroke-width="3.5"/>
+    <rect x="14" y="24" width="36" height="8" rx="4" fill="#E0F2FE" stroke="#0F172A" stroke-width="2.5"/>
+    <circle cx="20" cy="38" r="3" fill="#0284C7"/>
+    <circle cx="32" cy="38" r="3" fill="#0284C7"/>
+    <circle cx="44" cy="38" r="3" fill="#0284C7"/>
   </svg>`,
 
-  // 中大型冷藏 / 冷庫裝備
+  // 中大型冷藏 / 冷庫裝備 (Vertical Capsule + Dual Handles + Pill Shadow)
   fridge: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="12" y="8" width="40" height="48" rx="8" fill="#7DD3FC" stroke="#0284C7" stroke-width="4"/>
-    <line x1="12" y1="28" x2="52" y2="28" stroke="#0284C7" stroke-width="4"/>
-    <rect x="42" y="16" width="4" height="8" rx="2" fill="#0284C7"/>
-    <rect x="42" y="36" width="4" height="12" rx="2" fill="#0284C7"/>
-    <path d="M22 18L32 18" stroke="#BAE6FD" stroke-width="3" stroke-linecap="round"/>
-    <path d="M22 38L32 38" stroke="#BAE6FD" stroke-width="3" stroke-linecap="round"/>
+    <rect x="16" y="54" width="32" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="14" y="8" width="36" height="46" rx="12" fill="#7DD3FC" stroke="#0F172A" stroke-width="3.5"/>
+    <line x1="14" y1="28" x2="50" y2="28" stroke="#0F172A" stroke-width="3"/>
+    <rect x="40" y="16" width="4" height="8" rx="2" fill="#0284C7" stroke="#0F172A" stroke-width="2"/>
+    <rect x="40" y="34" width="4" height="12" rx="2" fill="#0284C7" stroke="#0F172A" stroke-width="2"/>
   </svg>`,
 
-  // 小貨車 / 載貨車輛
+  // 小貨車 / 載貨車輛 (Rounded Cabin + Pill Wheels + Pill Shadow)
   car: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="8" y="24" width="48" height="20" rx="6" fill="#FB923C" stroke="#C2410C" stroke-width="4"/>
-    <path d="M36 14H48L56 24H36V14Z" fill="#FDBA74" stroke="#C2410C" stroke-width="4"/>
-    <circle cx="20" cy="46" r="7" fill="#334155" stroke="#0F172A" stroke-width="4"/>
-    <circle cx="44" cy="46" r="7" fill="#334155" stroke="#0F172A" stroke-width="4"/>
-    <circle cx="20" cy="46" r="2" fill="#F8FAFC"/>
-    <circle cx="44" cy="46" r="2" fill="#F8FAFC"/>
+    <rect x="12" y="50" width="40" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="8" y="24" width="48" height="20" rx="8" fill="#FB923C" stroke="#0F172A" stroke-width="3.5"/>
+    <path d="M34 14H46C49 14 52 16 54 20L56 24H34V14Z" fill="#FDBA74" stroke="#0F172A" stroke-width="3.5" stroke-linejoin="round"/>
+    <circle cx="20" cy="46" r="7" fill="#334155" stroke="#0F172A" stroke-width="3.5"/>
+    <circle cx="44" cy="46" r="7" fill="#334155" stroke="#0F172A" stroke-width="3.5"/>
+    <circle cx="20" cy="46" r="2.5" fill="#FFFFFF"/>
+    <circle cx="44" cy="46" r="2.5" fill="#FFFFFF"/>
   </svg>`,
 
-  // 大卡車 / 冷藏車
+  // 大卡車 / 冷藏車 (Squorcle Box + Curved Cabin + Pill Shadow)
   truck: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="6" y="16" width="34" height="28" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="4"/>
-    <path d="M40 24H52L58 32V44H40V24Z" fill="#38BDF8" stroke="#0284C7" stroke-width="4"/>
-    <circle cx="18" cy="46" r="7" fill="#334155" stroke="#0F172A" stroke-width="4"/>
-    <circle cx="48" cy="46" r="7" fill="#334155" stroke="#0F172A" stroke-width="4"/>
-    <path d="M16 26L26 26" stroke="#94A3B8" stroke-width="3"/>
+    <rect x="10" y="52" width="44" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="6" y="14" width="34" height="30" rx="8" fill="#F8FAFC" stroke="#0F172A" stroke-width="3.5"/>
+    <path d="M40 22H50C53 22 56 25 57 29L58 32V44H40V22Z" fill="#38BDF8" stroke="#0F172A" stroke-width="3.5" stroke-linejoin="round"/>
+    <circle cx="18" cy="46" r="7" fill="#334155" stroke="#0F172A" stroke-width="3.5"/>
+    <circle cx="48" cy="46" r="7" fill="#334155" stroke="#0F172A" stroke-width="3.5"/>
   </svg>`,
 
-  // 柴油發電機
+  // 柴油發電機 (Box Frame + Gear Circle + Top Valve)
   generator: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="10" y="14" width="44" height="38" rx="8" fill="#C084FC" stroke="#7E22CE" stroke-width="4"/>
-    <circle cx="32" cy="33" r="10" fill="#E9D5FF" stroke="#7E22CE" stroke-width="3"/>
-    <path d="M32 23V43M22 33H42" stroke="#7E22CE" stroke-width="3" stroke-linecap="round"/>
-    <rect x="18" y="8" width="8" height="6" rx="2" fill="#7E22CE"/>
+    <rect x="14" y="52" width="36" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="10" y="16" width="44" height="36" rx="10" fill="#C084FC" stroke="#0F172A" stroke-width="3.5"/>
+    <circle cx="32" cy="34" r="10" fill="#E9D5FF" stroke="#0F172A" stroke-width="3"/>
+    <path d="M32 24V44M22 34H42" stroke="#0F172A" stroke-width="3" stroke-linecap="round"/>
+    <rect x="22" y="10" width="8" height="6" rx="3" fill="#7E22CE" stroke="#0F172A" stroke-width="2"/>
   </svg>`,
 
-  // 電錶 / 外購電力
+  // 電錶 / 外購電力 (Rounded Yellow Capsule + Bolt)
   electricity: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="12" y="10" width="40" height="44" rx="10" fill="#FACC15" stroke="#CA8A04" stroke-width="4"/>
-    <circle cx="32" cy="32" r="14" fill="#FEF08A" stroke="#CA8A04" stroke-width="3"/>
-    <path d="M34 22L26 34H34L30 42" stroke="#CA8A04" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="16" y="52" width="32" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="12" y="10" width="40" height="42" rx="12" fill="#FACC15" stroke="#0F172A" stroke-width="3.5"/>
+    <circle cx="32" cy="31" r="13" fill="#FEF08A" stroke="#0F172A" stroke-width="3"/>
+    <path d="M34 21L26 33H34L30 41" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`,
 
-  // 瓦斯 / 燃氣
+  // 瓦斯 / 燃氣 (Capsule Tank + Rounded Valve)
   gas: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="18" y="18" width="28" height="38" rx="8" fill="#F97316" stroke="#C2410C" stroke-width="4"/>
-    <path d="M26 10H38V18H26V10Z" fill="#CBD5E1" stroke="#C2410C" stroke-width="3"/>
-    <path d="M32 28C32 28 38 34 32 42C26 34 32 28 32 28Z" fill="#FEF08A"/>
+    <rect x="20" y="52" width="24" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="18" y="18" width="28" height="34" rx="10" fill="#F97316" stroke="#0F172A" stroke-width="3.5"/>
+    <rect x="26" y="10" width="12" height="8" rx="3" fill="#CBD5E1" stroke="#0F172A" stroke-width="3"/>
+    <path d="M32 26C32 26 37 32 32 40C27 32 32 26 32 26Z" fill="#FEF08A" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round"/>
   </svg>`,
 
-  // 化糞池 / 污水處理
+  // 化糞池 / 污水處理 (Green Pod + Dual Floating Bubbles)
   septic: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="10" y="16" width="44" height="36" rx="10" fill="#84CC16" stroke="#3F6212" stroke-width="4"/>
-    <circle cx="22" cy="30" r="5" fill="#ECFCCB"/>
-    <circle cx="38" cy="38" r="7" fill="#ECFCCB"/>
-    <path d="M16 44C24 40 40 48 48 44" stroke="#3F6212" stroke-width="3"/>
+    <rect x="14" y="50" width="36" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="10" y="16" width="44" height="34" rx="12" fill="#84CC16" stroke="#0F172A" stroke-width="3.5"/>
+    <circle cx="22" cy="30" r="5" fill="#ECFCCB" stroke="#0F172A" stroke-width="2.5"/>
+    <circle cx="38" cy="36" r="7" fill="#ECFCCB" stroke="#0F172A" stroke-width="2.5"/>
   </svg>`,
 
-  // 消防設施 / 滅火器
+  // 消防設施 / 滅火器 (Red Cylinder + Top Nozzle)
   fire: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="20" y="20" width="24" height="36" rx="8" fill="#F43F5E" stroke="#9F1239" stroke-width="4"/>
-    <path d="M28 10H36V20H28V10Z" fill="#CBD5E1" stroke="#9F1239" stroke-width="3"/>
-    <path d="M36 14H46V22H42" stroke="#9F1239" stroke-width="3" stroke-linecap="round"/>
-    <rect x="26" y="32" width="12" height="12" rx="3" fill="#FFFFFF"/>
+    <rect x="22" y="52" width="20" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="20" y="20" width="24" height="32" rx="9" fill="#F43F5E" stroke="#0F172A" stroke-width="3.5"/>
+    <rect x="28" y="10" width="8" height="10" rx="3" fill="#CBD5E1" stroke="#0F172A" stroke-width="3"/>
+    <rect x="26" y="30" width="12" height="12" rx="3" fill="#FFFFFF" stroke="#0F172A" stroke-width="2"/>
   </svg>`,
 
-  // 其他 / 預設
+  // 其他 / 預設 (Grey Rounded Box)
   other: `<svg class="vector-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="10" y="14" width="44" height="40" rx="10" fill="#94A3B8" stroke="#334155" stroke-width="4"/>
-    <path d="M22 28H42M22 38H34" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+    <rect x="14" y="52" width="36" height="6" rx="3" fill="rgba(0,0,0,0.18)"/>
+    <rect x="10" y="14" width="44" height="38" rx="12" fill="#94A3B8" stroke="#0F172A" stroke-width="3.5"/>
+    <path d="M22 28H42M22 38H34" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round"/>
   </svg>`
 };
 
