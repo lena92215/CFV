@@ -36,7 +36,7 @@ def determine_ghg_scope(name):
         return '範疇一 (移動燃燒)', ['CO₂', 'CH₄', 'N₂O']
     elif re.search(r'電力|電', name):
         return '範疇二 (外購電力)', ['CO₂']
-    elif re.search(r'冷媒|r-\d+|滅火|六氟化硫|全氟', name):
+    elif re.search(r'冷媒|r-\d+|滅火|六氟化硫|全氟|hfc', name):
         return '範疇一 (逸散排放)', ['HFCs']
     elif re.search(r'天然氣|瓦斯|煤|氣|油|柴|燃', name):
         return '範疇一 (固定燃燒)', ['CO₂', 'CH₄', 'N₂O']
