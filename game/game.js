@@ -260,9 +260,12 @@ function loadODSDemoDevices() {
     { equipName: '住宅及商業建築冷氣機', material: '冷媒－R410a', process: '冷暖氣' },
     { equipName: '運輸作業車輛', material: '98無鉛汽油', process: '交通運輸' },
     { equipName: '發電機', material: '柴油', process: '發電' },
+    { equipName: '化糞池', material: '水肥', process: '污水處理' },
+    { equipName: '消防設施', material: '乾粉滅火藥劑', process: '消防活動' },
+    { equipName: '電錶(計算電力用)', material: '外購電力', process: '電力設施' }
   ];
 
-  gameState.devices = odsData.slice(0, 5).map((s, i) => ({
+  gameState.devices = odsData.map((s, i) => ({
     id: `dev_${i}`,
     name: s.equipName,
     energy: s.material,
@@ -270,8 +273,8 @@ function loadODSDemoDevices() {
     quantity: 1,
     location: s.process || '主要場域',
     scope: s.scope || getScope(s.material),
-    x: 90 + (i % 4) * 140,
-    y: 100 + Math.floor(i / 4) * 140,
+    x: 70 + (i % 4) * 145,
+    y: 80 + Math.floor(i / 4) * 135,
     isSim: false,
     isUpgraded: false
   }));
@@ -281,9 +284,18 @@ function loadODSDemoDevices() {
 // 5. 工具函式
 // =============================================
 function getDeviceConfig(energy) {
+  if (!energy) return { ...DEFAULT_CONFIG };
   for (const [key, cfg] of Object.entries(DEVICE_CONFIGS)) {
-    if (energy && (energy.includes(key) || key.includes(energy))) return cfg;
+    if (energy.includes(key) || key.includes(energy)) return cfg;
   }
+  if (energy.includes('冷藏') || energy.includes('冷凍') || energy.includes('展示櫃')) return DEVICE_CONFIGS['冷藏冷媒(R-404A)'];
+  if (energy.includes('冷氣') || energy.includes('空調') || energy.includes('R-410')) return DEVICE_CONFIGS['冷氣冷媒(R-410A)'];
+  if (energy.includes('車') || energy.includes('運') || energy.includes('汽油') || energy.includes('柴油')) return DEVICE_CONFIGS['車用柴油'];
+  if (energy.includes('發電') || energy.includes('引擎')) return DEVICE_CONFIGS['發電機'];
+  if (energy.includes('電') || energy.includes('燈') || energy.includes('照明')) return DEVICE_CONFIGS['外購電力'];
+  if (energy.includes('池') || energy.includes('水') || energy.includes('肥')) return DEVICE_CONFIGS['化糞池'];
+  if (energy.includes('消防') || energy.includes('滅火')) return DEVICE_CONFIGS['消防設施'];
+  if (energy.includes('瓦斯') || energy.includes('氣')) return DEVICE_CONFIGS['天然氣'];
   return { ...DEFAULT_CONFIG };
 }
 
