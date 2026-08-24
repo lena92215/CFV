@@ -165,7 +165,9 @@ let gameState = {
   totalXP: 0,
   companyName: '我的場域',
   simDeviceCounter: 0,
-  currentSkin: 'market' // 'market' | 'factory' | 'office'
+  currentSkin: 'market', // 'market' | 'factory' | 'office'
+  activeLocation: 'all', // 目前選取的區域/樓層
+  customLocations: []
 };
 
 let canvas, ctx, spritesLayer, isDragging = false;
@@ -215,15 +217,16 @@ function loadGameData() {
     if (devicesRaw) {
       const sources = JSON.parse(devicesRaw);
       gameState.devices = sources.map((s, i) => {
+        const name = s.name || s.equipName || `設備 ${i+1}`;
         const energy = s.energy || s.material || '';
-        const config = getDeviceConfig(energy);
+        const config = getDeviceConfig(name, energy);
         return {
           id: `dev_${i}`,
-          name: s.name || s.equipName || `設備 ${i+1}`,
+          name: name,
           energy: energy,
           config: config,
           quantity: parseInt(s.quantity) || 1,
-          location: s.location || '',
+          location: s.location || s.process || '主要場域',
           scope: s.scope || getScope(energy),
           x: 80 + (i % 5) * 130,
           y: 80 + Math.floor(i / 5) * 130,
@@ -260,20 +263,23 @@ function loadGameData() {
 
 function loadODSDemoDevices() {
   const odsData = window.ODS_INVENTORY_DATA || [
-    { equipName: '中、大型冷凍、冷藏裝備', material: '冷媒－R404a', process: '冷凍冷藏' },
-    { equipName: '住宅及商業建築冷氣機', material: '冷媒－R410a', process: '冷暖氣' },
-    { equipName: '運輸作業車輛', material: '98無鉛汽油', process: '交通運輸' },
-    { equipName: '發電機', material: '柴油', process: '發電' },
-    { equipName: '化糞池', material: '水肥', process: '污水處理' },
+    { equipName: '中、大型冷凍、冷藏裝備', material: '冷媒－R404a, R125/143a/134a', process: '冷凍冷藏倉儲服務作業程序' },
+    { equipName: '中、大型冷凍、冷藏裝備', material: '冷媒－R408a, R125/R143a/22', process: '冷凍冷藏倉儲服務作業程序' },
+    { equipName: '中、大型冷凍、冷藏裝備', material: '冷媒－R417a, R125/134a/600a', process: '冷凍冷藏倉儲服務作業程序' },
+    { equipName: '住宅及商業建築冷氣機', material: '冷媒－R410a, R32/125', process: '冷暖氣供應作業程序' },
+    { equipName: '運輸作業車輛', material: '98無鉛汽油', process: '交通運輸活動' },
+    { equipName: '運輸作業車輛', material: 'HFC-134a/R-134a, CH2FCF3', process: '交通運輸活動' },
+    { equipName: '發電機', material: '柴油', process: '引擎發電程序' },
+    { equipName: '化糞池', material: '水肥', process: '水肥清除作業程序' },
     { equipName: '消防設施', material: '乾粉滅火藥劑', process: '消防活動' },
-    { equipName: '電錶(計算電力用)', material: '外購電力', process: '電力設施' }
+    { equipName: '電錶(計算電力用)', material: '外購電力', process: '外購電力程序' }
   ];
 
   gameState.devices = odsData.map((s, i) => ({
     id: `dev_${i}`,
     name: s.equipName,
     energy: s.material,
-    config: getDeviceConfig(s.material || s.equipName),
+    config: getDeviceConfig(s.equipName, s.material),
     quantity: 1,
     location: s.process || '主要場域',
     scope: s.scope || getScope(s.material),
@@ -287,19 +293,34 @@ function loadODSDemoDevices() {
 // =============================================
 // 5. 工具函式
 // =============================================
-function getDeviceConfig(energy) {
-  if (!energy) return { ...DEFAULT_CONFIG };
-  for (const [key, cfg] of Object.entries(DEVICE_CONFIGS)) {
-    if (energy.includes(key) || key.includes(energy)) return cfg;
+function getDeviceConfig(name, energy) {
+  const targetStr = ((name || '') + ' ' + (energy || '')).toLowerCase();
+  
+  if (targetStr.includes('冷藏') || targetStr.includes('冷凍') || targetStr.includes('r404') || targetStr.includes('r408') || targetStr.includes('r417') || targetStr.includes('展示櫃')) {
+    return { type: 'fridge', vectorKey: 'fridge', label: '大型冷藏庫', gwpFactor: 0, gwpWarning: { refrigerant: 'R-404A', gwp: 3922 } };
   }
-  if (energy.includes('冷藏') || energy.includes('冷凍') || energy.includes('展示櫃')) return DEVICE_CONFIGS['冷藏冷媒(R-404A)'];
-  if (energy.includes('冷氣') || energy.includes('空調') || energy.includes('R-410')) return DEVICE_CONFIGS['冷氣冷媒(R-410A)'];
-  if (energy.includes('車') || energy.includes('運') || energy.includes('汽油') || energy.includes('柴油')) return DEVICE_CONFIGS['車用柴油'];
-  if (energy.includes('發電') || energy.includes('引擎')) return DEVICE_CONFIGS['發電機'];
-  if (energy.includes('電') || energy.includes('燈') || energy.includes('照明')) return DEVICE_CONFIGS['外購電力'];
-  if (energy.includes('池') || energy.includes('水') || energy.includes('肥')) return DEVICE_CONFIGS['化糞池'];
-  if (energy.includes('消防') || energy.includes('滅火')) return DEVICE_CONFIGS['消防設施'];
-  if (energy.includes('瓦斯') || energy.includes('氣')) return DEVICE_CONFIGS['天然氣'];
+  if (targetStr.includes('冷氣') || targetStr.includes('空調') || targetStr.includes('r410') || targetStr.includes('r32')) {
+    return { type: 'ac', vectorKey: 'ac', label: '門市冷氣', gwpFactor: 0, gwpWarning: { refrigerant: 'R-410A', gwp: 2088 } };
+  }
+  if (targetStr.includes('車') || targetStr.includes('運輸') || targetStr.includes('汽油') || targetStr.includes('134a')) {
+    if (targetStr.includes('汽油') || targetStr.includes('小貨')) return { type: 'car', vectorKey: 'car', label: '汽油車輛', gwpFactor: 2.263 };
+    return { type: 'truck', vectorKey: 'truck', label: '運輸車輛', gwpFactor: 2.606 };
+  }
+  if (targetStr.includes('發電') || targetStr.includes('引擎') || targetStr.includes('柴油')) {
+    return { type: 'generator', vectorKey: 'generator', label: '柴油發電機', gwpFactor: 2.606 };
+  }
+  if (targetStr.includes('化糞池') || targetStr.includes('污水') || targetStr.includes('水肥')) {
+    return { type: 'septic', vectorKey: 'septic', label: '化糞池/污水', gwpFactor: 1.5 };
+  }
+  if (targetStr.includes('消防') || targetStr.includes('滅火') || targetStr.includes('乾粉')) {
+    return { type: 'fire', vectorKey: 'fire', label: '消防設施', gwpFactor: 1.0 };
+  }
+  if (targetStr.includes('電') || targetStr.includes('照明') || targetStr.includes('外購')) {
+    return { type: 'electricity', vectorKey: 'electricity', label: '電力設施', gwpFactor: 0.495 };
+  }
+  if (targetStr.includes('瓦斯') || targetStr.includes('天然氣') || targetStr.includes('lpg')) {
+    return { type: 'gas', vectorKey: 'gas', label: '天然氣/瓦斯', gwpFactor: 2.998 };
+  }
   return { ...DEFAULT_CONFIG };
 }
 
@@ -390,11 +411,73 @@ function redrawCanvas() {
 }
 
 // =============================================
-// 7. 向量精靈圖渲染與自然粒子
+// 7. 動態樓層/區域分頁與向量精靈圖渲染
 // =============================================
+function renderLocationTabs() {
+  const container = document.getElementById('locationTabsContainer');
+  if (!container) return;
+
+  const locSet = new Set(gameState.customLocations);
+  gameState.devices.forEach(d => {
+    if (d.location) locSet.add(d.location);
+  });
+
+  const locations = Array.from(locSet);
+  container.innerHTML = '';
+
+  // 1. 全部區域頁籤
+  const allBtn = document.createElement('button');
+  const isAllActive = gameState.activeLocation === 'all';
+  allBtn.className = `px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+    isAllActive
+      ? 'bg-emerald-500 text-slate-950 shadow-md font-black'
+      : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-700/80'
+  }`;
+  allBtn.innerHTML = `🌐 全部區域 (${gameState.devices.length})`;
+  allBtn.onclick = () => selectLocationTab('all');
+  container.appendChild(allBtn);
+
+  // 2. 各獨立區域/樓層頁籤
+  locations.forEach(loc => {
+    const count = gameState.devices.filter(d => d.location === loc).length;
+    const isActive = gameState.activeLocation === loc;
+    const btn = document.createElement('button');
+    btn.className = `px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+      isActive
+        ? 'bg-emerald-500 text-slate-950 shadow-md font-black'
+        : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-700/80'
+    }`;
+    btn.innerHTML = `📍 ${loc} (${count})`;
+    btn.onclick = () => selectLocationTab(loc);
+    container.appendChild(btn);
+  });
+}
+
+function selectLocationTab(locName) {
+  gameState.activeLocation = locName;
+  renderAll();
+  showToast(locName === 'all' ? '🌐 已切換至【全部區域】視圖' : `📍 已切換至【${locName}】分頁`);
+}
+
+function addNewCustomLocation() {
+  const newLoc = prompt('請輸入新增的區域或樓層名稱（例如：3F 研發中心、B1 停車場、戶外太陽能區）：');
+  if (!newLoc || !newLoc.trim()) return;
+
+  const cleanLoc = newLoc.trim();
+  if (!gameState.customLocations.includes(cleanLoc)) {
+    gameState.customLocations.push(cleanLoc);
+  }
+  selectLocationTab(cleanLoc);
+  showToast(`✨ 成功新增【${cleanLoc}】自訂區域！您可以新增設備並歸類至此分頁。`);
+}
+
 function renderSprites() {
   spritesLayer.innerHTML = '';
-  gameState.devices.forEach(device => {
+  const visibleDevices = gameState.devices.filter(
+    d => gameState.activeLocation === 'all' || d.location === gameState.activeLocation
+  );
+
+  visibleDevices.forEach(device => {
     const el = createSpriteElement(device);
     spritesLayer.appendChild(el);
   });
@@ -697,8 +780,19 @@ function renderForecast(currentTotal) {
 
 function renderDeviceList() {
   const list = document.getElementById('deviceList');
+  if (!list) return;
   list.innerHTML = '';
-  gameState.devices.forEach(device => {
+
+  const visibleDevices = gameState.devices.filter(
+    d => gameState.activeLocation === 'all' || d.location === gameState.activeLocation
+  );
+
+  if (visibleDevices.length === 0) {
+    list.innerHTML = '<p class="text-slate-500 text-xs text-center py-4">此分頁尚無登錄設備</p>';
+    return;
+  }
+
+  visibleDevices.forEach(device => {
     const warning = getGWPWarning(device);
     const card = document.createElement('div');
     card.className = `device-list-card${device.isSim ? ' sim-card' : ''}`;
@@ -711,7 +805,7 @@ function renderDeviceList() {
       </div>
       <div class="flex-1 min-w-0">
         <div class="text-slate-200 truncate font-bold">${device.name}</div>
-        <div class="text-slate-400 text-[10px] truncate">${device.energy || '未設定'}</div>
+        <div class="text-slate-400 text-[10px] truncate">${device.energy || '未設定'} · ${device.location}</div>
       </div>
       ${warning ? '<span class="text-rose-400 font-bold text-sm shrink-0">!</span>' : ''}
       ${device.isUpgraded ? '<span class="text-emerald-400 text-xs shrink-0">✨</span>' : ''}
@@ -873,6 +967,7 @@ function goBack() {
 }
 
 function renderAll() {
+  renderLocationTabs();
   redrawCanvas();
   renderSprites();
   renderDeviceList();
