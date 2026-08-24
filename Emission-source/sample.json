@@ -1,0 +1,24 @@
+{
+  "010002": {
+    "name": "陸稻",
+    "scope": null,
+    "ghg": null
+  },
+  "010004": {
+    "name": "小麥",
+    "scope": null,
+    "ghg": null
+  },
+  "010013": {
+    "name": "毛豆",
+    "scope": null,
+    "ghg": null
+  },
+  "190239": {
+    "name": "冷媒",
+    "scope": "範疇一 (逸散排放)",
+    "ghg": [
+      "HFCs"
+    ]
+  }
+}

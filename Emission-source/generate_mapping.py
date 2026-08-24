@@ -7,8 +7,27 @@ out_js = r'c:\Users\User\OneDrive\桌面\CFV\CFV\Emission-source\mapping_data.js
 
 tree = {
     'materials': {},
-    'equipments': {}
+    'equipments': {},
+    'ghg_rules': {}
 }
+
+ghg_csv = r'c:\Users\User\OneDrive\桌面\CFV\CFV\Emission-source\溫室氣體種類.csv'
+
+with open(ghg_csv, 'r', encoding='utf-8-sig', errors='replace') as f:
+    reader = csv.reader(f)
+    next(reader)
+    for row in reader:
+        if len(row) >= 5:
+            emission_type = row[1].strip()
+            ghg = row[2].strip()
+            mat_name = row[4].strip()
+            if mat_name and emission_type and ghg:
+                if mat_name not in tree['ghg_rules']:
+                    tree['ghg_rules'][mat_name] = {}
+                if emission_type not in tree['ghg_rules'][mat_name]:
+                    tree['ghg_rules'][mat_name][emission_type] = []
+                if ghg not in tree['ghg_rules'][mat_name][emission_type]:
+                    tree['ghg_rules'][mat_name][emission_type].append(ghg)
 
 # 規則定義
 def determine_ghg_scope(name):
