@@ -1016,6 +1016,11 @@
     function getESAuto(energy, equipName = '') {
       if (!energy) return null;
 
+      // 新增：化糞池與水肥判斷
+      if (energy.includes('水肥') || energy.includes('生活污水') || equipName.includes('化糞池')) {
+        return { scope: "範疇一 (逸散排放)", ghg: ["CH₄"] };
+      }
+
       // 1. 雙條件查詢：先查原(燃)物料或產品名稱，再查排放型式
       if (window.CFV_MAPPING && window.CFV_MAPPING.ghg_rules) {
         const ghgRules = window.CFV_MAPPING.ghg_rules;
