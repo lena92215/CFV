@@ -221,6 +221,19 @@ function showAuthToast(msg) {
   setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 2500);
 }
 
+// 訪客一鍵體驗登入
+function handleGuestLogin() {
+  const guestUser = {
+    companyName: '訪客示範場域',
+    email: 'guest@cfv.com',
+    industry: '市場與批發零售業'
+  };
+  setCurrentUser(guestUser);
+  applyUserSession(guestUser);
+  closeAuthModal();
+  showAuthToast('🚀 已以訪客身份進入平台體驗！');
+}
+
 // 頁面初始化驗證
 document.addEventListener('DOMContentLoaded', () => {
   const user = getCurrentUser();
@@ -230,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
     applyUserSession(user);
     closeAuthModal();
   } else {
-    openAuthModal();
+    // 預設關閉強迫彈窗，讓使用者可隨意免費體驗；亦可隨時點擊 Header「登入/註冊」
+    closeAuthModal();
   }
 });
