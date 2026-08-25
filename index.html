@@ -2283,8 +2283,9 @@
       window.MATERIAL_LIST = GHG_MATERIAL_DATABASE.map(f => ({ code: f.code, name: f.name, label: `${f.code} ${f.name}`, seq: 0 }));
     }
 
-    // 排放源清單 (Sheet 3) - 預設維持完全空白，由使用者親自新增或輸入
-    let emissionSources = loadEmissionSources();
+    // 頂層變數宣告 (防止 TDZ ReferenceError)
+    var emissionSources = [];
+    var activityRecords = [];
 
     function loadEmissionSources() {
       try {
@@ -2299,6 +2300,8 @@
       return [];
     }
 
+    emissionSources = loadEmissionSources();
+
     function saveEmissionSources() {
       try {
         localStorage.setItem('cfv_emission_sources_v1', JSON.stringify(emissionSources));
@@ -2308,7 +2311,7 @@
 
     function syncGameDevicesLocalStorage() {
       const devices = [];
-      if (Array.isArray(emissionSources) && emissionSources.length > 0) {
+      if (typeof emissionSources !== 'undefined' && Array.isArray(emissionSources) && emissionSources.length > 0) {
         emissionSources.forEach(es => {
           if (es.name || es.energy) {
             devices.push({
@@ -2321,7 +2324,7 @@
           }
         });
       }
-      if (Array.isArray(activityRecords) && activityRecords.length > 0) {
+      if (typeof activityRecords !== 'undefined' && Array.isArray(activityRecords) && activityRecords.length > 0) {
         activityRecords.forEach(ar => {
           const equipName = ar.equipName || ar.name;
           if (equipName) {
@@ -4350,9 +4353,13 @@
     }
 
     function packageDataAndLaunchGame() {
-      const name = document.getElementById('infoName')?.value || document.getElementById('boundOrgName')?.value || '我的場域';
-      localStorage.setItem('cfv_company_info', JSON.stringify({ name: name }));
-      syncGameDevicesLocalStorage();
+      try {
+        const name = document.getElementById('infoName')?.value || document.getElementById('boundOrgName')?.value || '我的場域';
+        localStorage.setItem('cfv_company_info', JSON.stringify({ name: name }));
+        syncGameDevicesLocalStorage();
+      } catch(e) {
+        console.error('Error packaging data for game:', e);
+      }
       window.location.href = 'game.html';
     }
 
