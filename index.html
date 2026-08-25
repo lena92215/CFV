@@ -737,6 +737,28 @@
             </button>
           </div>
 
+          <!-- Industry Benchmark Quick Extrapolation Banner (一張單據都沒有的備案) -->
+          <div class="p-3 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900/90 to-amber-500/5 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-inner">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/40 whitespace-nowrap">
+                <i class="fa-solid fa-lightbulb"></i> 備案快速估算
+              </span>
+              <span class="text-xs text-slate-200 font-bold">無單據？使用同業設備營運基準值估算：</span>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <select id="industryBenchmarkSelect" onchange="applyIndustryBenchmark()" class="w-full sm:w-auto bg-slate-950 border border-amber-500/40 rounded-xl px-3 py-1.5 text-xs text-amber-200 focus:border-amber-400 focus:outline-none font-medium">
+                <option value="">-- 請選擇同業營運基準情境 --</option>
+                <option value="bench_fresh">小型生鮮冷藏攤位：年用電約 15,000 度 (kWh)</option>
+                <option value="bench_eatery_elec">一般小吃餐飲店 (用電)：年用電約 24,000 度 (kWh)</option>
+                <option value="bench_eatery_gas">一般小吃餐飲店 (瓦斯)：約 24 桶 (20kg / 480 kg)</option>
+                <option value="bench_truck_fuel">外送/載貨小發財車 (1.75噸)：年用柴/汽油約 1,200 公升</option>
+                <option value="bench_scooter_fuel">外送/公務機車 (125cc)：年用汽油約 350 公升</option>
+                <option value="bench_beverage_elec">手搖飲/咖啡輕食店 (用電)：年用電約 18,000 度 (kWh)</option>
+                <option value="bench_office_elec">小型辦公室場域 (用電)：年用電約 6,000 度 (kWh)</option>
+              </select>
+            </div>
+          </div>
+
           <!-- Category Navigation Tabs -->
           <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/90 rounded-2xl border border-slate-800">
             <button type="button" onclick="switchCalcCategory('elec')" id="btn-calc-tab-elec" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
@@ -776,9 +798,14 @@
 
             <!-- Elec Submode A: 6 Bills -->
             <div id="elec-sub-bills" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
-              <div class="flex items-center justify-between">
+              <div class="flex flex-wrap items-center justify-between gap-2">
                 <span class="text-xs font-bold text-slate-300">請依台電雙月電費單輸入 1~6 期計費度數 (kWh)：</span>
-                <button type="button" onclick="clearElecBills()" class="text-[11px] text-slate-400 hover:text-rose-400 transition">清空輸入</button>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="estimateMissingPeriods('elec')" class="px-2.5 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-chart-simple text-amber-400"></i> 📊 以現有單據推估全年（缺漏補齊）
+                  </button>
+                  <button type="button" onclick="clearElecBills()" class="text-[11px] text-slate-400 hover:text-rose-400 transition">清空輸入</button>
+                </div>
               </div>
               <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
                 <div>
@@ -955,9 +982,14 @@
 
             <!-- Mode 4: 12 個月公升數加總 -->
             <div id="fuel-sub-months" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
-              <div class="flex items-center justify-between">
+              <div class="flex flex-wrap items-center justify-between gap-2">
                 <span class="text-xs font-bold text-slate-300">請輸入 1~12 各月份實際加油公升數 (L)：</span>
-                <button type="button" onclick="clearFuelMonths()" class="text-[11px] text-slate-400 hover:text-rose-400 transition">清空輸入</button>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="estimateMissingPeriods('fuel')" class="px-2.5 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-chart-simple text-amber-400"></i> 📊 以現有單據推估全年（缺漏補齊）
+                  </button>
+                  <button type="button" onclick="clearFuelMonths()" class="text-[11px] text-slate-400 hover:text-rose-400 transition">清空輸入</button>
+                </div>
               </div>
               <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                 <div><label class="block text-[10px] text-slate-400">1月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
@@ -1913,6 +1945,159 @@
       if (modal) modal.classList.add('hidden');
     }
 
+    // 同業/設備基準值一鍵帶入 (一張單據都沒有的備案)
+    function applyIndustryBenchmark() {
+      const sel = document.getElementById('industryBenchmarkSelect')?.value;
+      if (!sel) return;
+
+      let val = 0;
+      let unit = '度 (kWh)';
+      let cat = 'elec';
+      let src = '同業營運基準推估值';
+      let formulaText = '';
+
+      if (sel === 'bench_fresh') {
+        val = 15000;
+        unit = '度 (kWh)';
+        cat = 'elec';
+        src = '同業營運基準推估值 (小型生鮮冷藏攤位)';
+        formulaText = '依同業生鮮冷藏攤位年平均用電基準推估：15,000 度 (kWh)';
+      } else if (sel === 'bench_eatery_elec') {
+        val = 24000;
+        unit = '度 (kWh)';
+        cat = 'elec';
+        src = '同業營運基準推估值 (一般小吃餐飲店用電)';
+        formulaText = '依同業小吃餐飲業年平均用電基準推估：24,000 度 (kWh)';
+      } else if (sel === 'bench_eatery_gas') {
+        val = 480;
+        unit = '公斤 (kg)';
+        cat = 'gas';
+        src = '同業營運基準推估值 (小吃餐飲瓦斯 24桶×20kg)';
+        formulaText = '依同業餐飲瓦斯耗用基準推估：24 桶 × 20 kg = 480 kg';
+      } else if (sel === 'bench_truck_fuel') {
+        val = 1200;
+        unit = '公升 (L)';
+        cat = 'fuel';
+        src = '同業營運基準推估值 (1.75噸小發財車年耗油)';
+        formulaText = '依同業 1.75 噸載貨小貨車年平均耗油基準推估：1,200 公升 (L)';
+      } else if (sel === 'bench_scooter_fuel') {
+        val = 350;
+        unit = '公升 (L)';
+        cat = 'fuel';
+        src = '同業營運基準推估值 (125cc外送機車年耗油)';
+        formulaText = '依同業 125cc 外送機車年平均耗油基準推估：350 公升 (L)';
+      } else if (sel === 'bench_beverage_elec') {
+        val = 18000;
+        unit = '度 (kWh)';
+        cat = 'elec';
+        src = '同業營運基準推估值 (手搖飲/咖啡輕食店用電)';
+        formulaText = '依同業飲料輕食店年平均用電基準推估：18,000 度 (kWh)';
+      } else if (sel === 'bench_office_elec') {
+        val = 6000;
+        unit = '度 (kWh)';
+        cat = 'elec';
+        src = '同業營運基準推估值 (小型辦公室場域用電)';
+        formulaText = '依小型辦公空間年平均用電基準推估：6,000 度 (kWh)';
+      }
+
+      switchCalcCategory(cat);
+      currentCalcVal = val;
+      currentCalcUnit = unit;
+      currentCalcSource = src;
+      updateCalcResultUI(val, unit, formulaText);
+
+      showToast(`已成功套用「${src}」：${val.toLocaleString()} ${unit}！`);
+    }
+
+    // 現有單據推估全年（以已知期數平均自動補齊）
+    function estimateMissingPeriods(type) {
+      if (type === 'elec') {
+        let filledCount = 0;
+        let sum = 0;
+        const missingInputs = [];
+
+        for (let i = 1; i <= 6; i++) {
+          const el = document.getElementById(`elecBill${i}`);
+          if (el) {
+            const v = parseFloat(el.value);
+            if (!isNaN(v) && v > 0) {
+              filledCount++;
+              sum += v;
+              el.classList.remove('bg-amber-950/40', 'border-amber-500', 'text-amber-200');
+            } else {
+              missingInputs.push(el);
+            }
+          }
+        }
+
+        if (filledCount === 0) {
+          alert('請至少填寫 1 期已知電費單度數，系統才能為您計算平均並推估全年！');
+          return;
+        }
+
+        if (missingInputs.length === 0) {
+          showToast('6 期電費單度數已完整填寫，無需進行缺漏補齊！');
+          return;
+        }
+
+        const avg = Math.round(sum / filledCount);
+        missingInputs.forEach(el => {
+          el.value = avg;
+          el.classList.add('bg-amber-950/40', 'border-amber-500', 'text-amber-200');
+        });
+
+        const total = sum + avg * missingInputs.length;
+        currentCalcVal = total;
+        currentCalcUnit = '度 (kWh)';
+        currentCalcSource = `電費單（以 ${filledCount} 期推估全年）`;
+
+        const formulaText = `已依據 ${filledCount} 期已知單據（平均 ${avg.toLocaleString()} 度/期），自動補齊剩餘 ${missingInputs.length} 期（淡黃色標記），推估年總度數 = ${total.toLocaleString()} 度 (kWh)`;
+        updateCalcResultUI(total, currentCalcUnit, formulaText);
+        showToast(`已依 ${filledCount} 期實際單據（平均 ${avg} 度/期）推估補齊全年！`);
+
+      } else if (type === 'fuel') {
+        let filledCount = 0;
+        let sum = 0;
+        const missingInputs = [];
+
+        document.querySelectorAll('.fuel-month-in').forEach((el) => {
+          const v = parseFloat(el.value);
+          if (!isNaN(v) && v > 0) {
+            filledCount++;
+            sum += v;
+            el.classList.remove('bg-amber-950/40', 'border-amber-500', 'text-amber-200');
+          } else {
+            missingInputs.push(el);
+          }
+        });
+
+        if (filledCount === 0) {
+          alert('請至少填寫 1 個月份已知加油公升數，系統才能為您計算平均並推估全年！');
+          return;
+        }
+
+        if (missingInputs.length === 0) {
+          showToast('12 個月份加油單已完整填寫，無需進行缺漏補齊！');
+          return;
+        }
+
+        const avg = Math.round((sum / filledCount) * 100) / 100;
+        missingInputs.forEach(el => {
+          el.value = avg;
+          el.classList.add('bg-amber-950/40', 'border-amber-500', 'text-amber-200');
+        });
+
+        const total = Math.round((sum + avg * missingInputs.length) * 100) / 100;
+        currentCalcVal = total;
+        currentCalcUnit = '公升 (L)';
+        currentCalcSource = `車用油單（以 ${filledCount} 個月推估全年）`;
+
+        const formulaText = `已依據 ${filledCount} 個月已知油單（平均 ${avg} L/月），自動補齊剩餘 ${missingInputs.length} 個月（淡黃色標記），推估年總耗油 = ${total.toLocaleString()} 公升 (L)`;
+        updateCalcResultUI(total, currentCalcUnit, formulaText);
+        showToast(`已依 ${filledCount} 個月實際油單（平均 ${avg} L/月）推估補齊全年！`);
+      }
+    }
+
     // 切換物料大類別 (外購電力/車用汽柴油/桶裝瓦斯/冷媒/通用)
     function switchCalcCategory(cat) {
       currentCalcCat = cat;
@@ -1959,7 +2144,10 @@
     function clearElecBills() {
       for (let i = 1; i <= 6; i++) {
         const el = document.getElementById(`elecBill${i}`);
-        if (el) el.value = '';
+        if (el) {
+          el.value = '';
+          el.classList.remove('bg-amber-950/40', 'border-amber-500', 'text-amber-200');
+        }
       }
       calcElectricity();
     }
@@ -1979,7 +2167,9 @@
           }
         }
         formulaText = `已加總 ${count} 期台電電費單度數，年總計 ${total.toLocaleString()} 度 (kWh)`;
-        currentCalcSource = '電費單/台電發票度數加總';
+        if (!currentCalcSource || !currentCalcSource.includes('推估')) {
+          currentCalcSource = '電費單/台電發票度數加總';
+        }
       } else if (mode === 'elec_cost') {
         const cost = parseFloat(document.getElementById('elecTotalCost')?.value) || 0;
         const price = parseFloat(document.getElementById('elecUnitPrice')?.value) || 3.8;
@@ -2045,7 +2235,10 @@
     }
 
     function clearFuelMonths() {
-      document.querySelectorAll('.fuel-month-in').forEach(el => el.value = '');
+      document.querySelectorAll('.fuel-month-in').forEach(el => {
+        el.value = '';
+        el.classList.remove('bg-amber-950/40', 'border-amber-500', 'text-amber-200');
+      });
       calcFuel();
     }
 
@@ -2619,6 +2812,11 @@
         const inUseFactor = r.inUse === '否' ? 0 : 1;
         const effectiveAct = Math.round(actVal * (ratioVal / 100) * inUseFactor * 100) / 100;
 
+        const isEstimated = r.dataSource && (r.dataSource.includes('推估') || r.dataSource.includes('基準') || r.dataSource.includes('估算'));
+        const estimateBadge = isEstimated
+          ? `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold ml-1.5 whitespace-nowrap shadow-sm"><i class="fa-solid fa-triangle-exclamation text-[9px]"></i> 推估值</span>`
+          : '';
+
         const calValStr = r.netCalorificValue ? `${r.netCalorificValue} ${r.netCalorificValueUnit || ''}` : '<span class="text-slate-600">-</span>';
         const carbStr = r.carbonContent ? `${r.carbonContent}%` : '<span class="text-slate-600">-</span>';
 
@@ -2660,7 +2858,7 @@
           <!-- ⑯ 數據單位 -->
           <td class="p-3 text-slate-300 whitespace-nowrap">${r.unit || '-'}</td>
           <!-- ⑰ 數據來源 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.dataSource || '-'}</td>
+          <td class="p-3 text-slate-300 whitespace-nowrap"><div class="flex items-center gap-1"><span>${r.dataSource || '-'}</span>${estimateBadge}</div></td>
           <!-- ⑱ 保存單位 -->
           <td class="p-3 text-slate-300 whitespace-nowrap">${r.custodyUnit || '-'}</td>
           <!-- ⑲ 量測頻率 -->
