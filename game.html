@@ -12,40 +12,47 @@
 <body class="game-bg min-h-screen text-white overflow-x-hidden skin-market">
 
   <!-- ===== HEADER ===== -->
-  <header class="pixel-header flex items-center justify-between px-4 py-3 border-b-4 border-emerald-400">
-    <div class="flex items-center gap-3">
-      <button onclick="goBack()" class="pixel-btn-back text-xs px-3 py-2 flex items-center gap-1">
-        <i class="fa-solid fa-arrow-left"></i> 返回清冊
-      </button>
+  <header class="pixel-header flex flex-col sm:flex-row items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3 border-b-4 border-emerald-400 gap-2">
+    <div class="flex items-center justify-between w-full sm:w-auto">
       <div class="flex items-center gap-2">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-xl font-black text-emerald-300 shadow-md">
-          🌱
-        </div>
-        <div>
-          <h1 class="font-black text-emerald-400 text-sm md:text-base leading-tight tracking-wide" id="gameCompanyName">我的場域</h1>
-          <p class="text-slate-400 text-[10px] flex items-center gap-1">
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            2D 減碳模擬遊戲
-          </p>
+        <button onclick="goBack()" class="pixel-btn-back text-xs px-2.5 py-1.5 sm:px-3 sm:py-2 flex items-center gap-1">
+          <i class="fa-solid fa-arrow-left"></i> 返回
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-lg sm:text-xl font-black text-emerald-300 shadow-md">
+            🌱
+          </div>
+          <div>
+            <h1 class="font-black text-emerald-400 text-xs sm:text-base leading-tight tracking-wide truncate max-w-[130px] sm:max-w-none" id="gameCompanyName">我的場域</h1>
+            <p class="text-slate-400 text-[9px] sm:text-[10px] flex items-center gap-1">
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              2D 減碳模擬遊戲
+            </p>
+          </div>
         </div>
       </div>
+
+      <!-- Mobile Control Toggle Button -->
+      <button onclick="toggleMobileControlPanel()" class="md:hidden bg-slate-900/90 border border-emerald-500/50 px-2.5 py-1 rounded-xl text-emerald-300 text-xs font-bold flex items-center gap-1 shadow-md">
+        <i class="fa-solid fa-sliders"></i> 工具箱
+      </button>
     </div>
 
-    <!-- Stats Bar -->
-    <div class="flex items-center gap-2 md:gap-3 flex-wrap">
-      <div class="stat-chip bg-amber-950/60 border-amber-500/40">
+    <!-- Stats Bar (Horizontal Touch Scroll on Mobile) -->
+    <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto w-full sm:w-auto pb-0.5 sm:pb-0 shrink-0">
+      <div class="stat-chip bg-amber-950/60 border-amber-500/40 text-[10px] sm:text-xs shrink-0 py-1 px-2">
         <span class="text-amber-400">⭐ XP</span>
         <span id="statXP" class="font-bold text-amber-300">0</span>
       </div>
-      <div class="stat-chip bg-rose-950/60 border-rose-500/40">
+      <div class="stat-chip bg-rose-950/60 border-rose-500/40 text-[10px] sm:text-xs shrink-0 py-1 px-2">
         <span class="text-rose-400">💨 CO₂</span>
         <span id="statCO2" class="font-bold text-rose-300">計算中...</span>
       </div>
-      <div class="stat-chip bg-cyan-950/60 border-cyan-500/40">
+      <div class="stat-chip bg-cyan-950/60 border-cyan-500/40 text-[10px] sm:text-xs shrink-0 py-1 px-2">
         <span class="text-cyan-400">🏬 設備</span>
         <span id="statDevices" class="font-bold text-cyan-300">0</span>
       </div>
-      <div class="stat-chip bg-emerald-950/60 border-emerald-500/40">
+      <div class="stat-chip bg-emerald-950/60 border-emerald-500/40 text-[10px] sm:text-xs shrink-0 py-1 px-2">
         <span class="text-emerald-400">🌿 等級</span>
         <span id="statLevel" class="font-bold text-emerald-300">Lv.1</span>
       </div>
@@ -114,26 +121,26 @@
     <main class="flex-1 relative overflow-hidden flex flex-col">
 
       <!-- Map Toolbar -->
-      <div class="map-toolbar absolute top-3 left-3 right-3 z-20 flex flex-col gap-2">
+      <div class="map-toolbar absolute top-2 left-2 right-2 z-20 flex flex-col gap-2 pointer-events-none">
         
-        <!-- Top Control Bar -->
-        <div class="flex items-center gap-2 flex-wrap">
+        <!-- Top Control Bar (Collapsible on mobile) -->
+        <div id="mobileControlPanel" class="hidden md:flex items-center gap-2 flex-wrap pointer-events-auto bg-slate-950/90 border border-slate-700/80 p-2 rounded-2xl shadow-xl">
           <!-- Scene Skin Switcher -->
-          <div class="flex items-center gap-1 bg-slate-900/90 border border-slate-700/80 rounded-xl p-1 text-xs">
-            <span class="text-slate-400 font-bold px-1.5">🎨 場景皮膚：</span>
-            <button onclick="changeSkin('market')" id="skinBtnMarket" class="skin-btn active px-2.5 py-1 rounded-lg text-[11px] font-bold">🛒 市場水果攤</button>
-            <button onclick="changeSkin('factory')" id="skinBtnFactory" class="skin-btn px-2.5 py-1 rounded-lg text-[11px] font-bold">🏭 綠色工廠</button>
-            <button onclick="changeSkin('office')" id="skinBtnOffice" class="skin-btn px-2.5 py-1 rounded-lg text-[11px] font-bold">🏢 商業門市</button>
+          <div class="flex items-center gap-1 bg-slate-900 border border-slate-700/80 rounded-xl p-1 text-xs">
+            <span class="text-slate-400 font-bold px-1.5">🎨 皮膚：</span>
+            <button onclick="changeSkin('market')" id="skinBtnMarket" class="skin-btn active px-2.5 py-1 rounded-lg text-[11px] font-bold">🛒 市場</button>
+            <button onclick="changeSkin('factory')" id="skinBtnFactory" class="skin-btn px-2.5 py-1 rounded-lg text-[11px] font-bold">🏭 工廠</button>
+            <button onclick="changeSkin('office')" id="skinBtnOffice" class="skin-btn px-2.5 py-1 rounded-lg text-[11px] font-bold">🏢 門市</button>
           </div>
 
           <button onclick="document.getElementById('floorPlanUpload').click()" class="pixel-btn-blue text-xs px-3 py-1.5 flex items-center gap-1">
-            <i class="fa-solid fa-cloud-arrow-up"></i> 上傳場地底圖
+            <i class="fa-solid fa-cloud-arrow-up"></i> 上傳底圖
           </button>
           <input type="file" id="floorPlanUpload" accept="image/*" class="hidden" onchange="handleFloorPlanUpload(event)">
 
-          <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-1 text-xs">
-            <span class="text-slate-400">像素化：</span>
-            <input type="range" id="pixelSlider" min="2" max="20" value="6" class="w-16 accent-emerald-500" oninput="applyPixelEffect()">
+          <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-1 text-xs">
+            <span class="text-slate-400">像素：</span>
+            <input type="range" id="pixelSlider" min="2" max="20" value="6" class="w-14 accent-emerald-500" oninput="applyPixelEffect()">
             <span id="pixelVal" class="text-emerald-400 font-mono text-[10px]">6px</span>
           </div>
 
@@ -145,19 +152,19 @@
             <i class="fa-solid fa-triangle-exclamation"></i> 顯示警告
           </button>
 
-          <span class="text-[11px] text-slate-300 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-slate-700/60 ml-auto">💡 拖曳設備擺放 · 點擊觸發自然動畫與詳情</span>
+          <span class="text-[10px] text-slate-300 bg-slate-900 px-2 py-1 rounded-lg border border-slate-700/60 ml-auto hidden xl:inline-block">💡 拖曳設備擺放 · 點擊觸發自然動畫</span>
         </div>
 
         <!-- 🏢 動態樓層/廠區切換列 (Dynamic Location & Floor Switcher Bar) -->
-        <div class="flex items-center gap-1.5 bg-slate-950/90 border border-emerald-500/40 rounded-xl p-1.5 text-xs overflow-x-auto" id="locationTabsBar">
+        <div class="flex items-center gap-1.5 bg-slate-950/90 border border-emerald-500/40 rounded-xl p-1.5 text-xs overflow-x-auto pointer-events-auto shadow-lg" id="locationTabsBar">
           <span class="text-emerald-400 font-black px-2 flex items-center gap-1 shrink-0">
-            <i class="fa-solid fa-layer-group"></i> 樓層/廠區分頁：
+            <i class="fa-solid fa-layer-group"></i> 樓層分頁：
           </span>
           <div id="locationTabsContainer" class="flex items-center gap-1 shrink-0">
             <!-- Dynamic tabs rendered by JS -->
           </div>
-          <button onclick="addNewCustomLocation()" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-400/60 text-emerald-300 font-bold text-[11px] shrink-0 transition-all">
-            ＋ 新增自訂區域/樓層
+          <button onclick="addNewCustomLocation()" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-400/60 text-emerald-300 font-bold text-[10px] shrink-0 transition-all">
+            ＋ 新增樓層
           </button>
         </div>
 

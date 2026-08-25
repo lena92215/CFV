@@ -627,6 +627,13 @@ function toggleMobileDrawer(side) {
   }
 }
 
+function toggleMobileControlPanel() {
+  const panel = document.getElementById('mobileControlPanel');
+  if (panel) {
+    panel.classList.toggle('hidden');
+  }
+}
+
 function closeMobileDrawers() {
   const leftPanel = document.getElementById('leftPanel');
   const rightPanel = document.getElementById('rightPanel');
