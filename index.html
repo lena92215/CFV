@@ -1052,11 +1052,18 @@
       }
 
       // 2. 特殊攔截規則
+      if (energy.includes('乾粉') && energy.includes('滅火')) {
+        return { scope: "範疇一 (逸散排放)", ghg: ["無"] };
+      }
+      if (energy.includes('污泥')) {
+        return { scope: "範疇一 (逸散排放)", ghg: ["無"] };
+      }
       if (energy.includes('電')) {
         return { scope: "範疇二 (外購電力)", ghg: ["CO2"] };
       }
-      if (energy.includes('冷媒') || energy.includes('R-')) {
-        return { scope: "範疇一 (逸散排放)", ghg: ["HFCs", "PFCs", "SF6"] };
+      let energyLower = energy.toLowerCase();
+      if (energyLower.includes('冷媒') || energyLower.includes('r-') || energyLower.includes('滅火') || energyLower.includes('六氟化硫') || energyLower.includes('全氟') || energyLower.includes('hfc')) {
+        return { scope: "範疇一 (逸散排放)", ghg: ["HFCs"] };
       }
       if (energy.includes('柴油') || energy.includes('汽油')) {
         if (equipName.includes('車') || equipName.includes('堆高機')) {
