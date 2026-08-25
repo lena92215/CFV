@@ -597,8 +597,44 @@ function createSpriteElement(device) {
   // Events
   div.addEventListener('click', (e) => { e.stopPropagation(); showDeviceModal(device.id); });
   div.addEventListener('mousedown', (e) => startDrag(e, div, device));
+  div.addEventListener('touchstart', (e) => startTouchDrag(e, div, device), { passive: false });
 
   return div;
+}
+
+// =============================================
+// 行動裝置 Drawer 滑出式選單切換
+// =============================================
+function toggleMobileDrawer(side) {
+  const leftPanel = document.getElementById('leftPanel');
+  const rightPanel = document.getElementById('rightPanel');
+  const backdrop = document.getElementById('mobileDrawerBackdrop');
+
+  if (side === 'left') {
+    const isOpen = leftPanel.classList.contains('drawer-open');
+    closeMobileDrawers();
+    if (!isOpen) {
+      leftPanel.classList.add('drawer-open');
+      backdrop.classList.remove('hidden');
+    }
+  } else if (side === 'right') {
+    const isOpen = rightPanel.classList.contains('drawer-open');
+    closeMobileDrawers();
+    if (!isOpen) {
+      rightPanel.classList.add('drawer-open');
+      backdrop.classList.remove('hidden');
+    }
+  }
+}
+
+function closeMobileDrawers() {
+  const leftPanel = document.getElementById('leftPanel');
+  const rightPanel = document.getElementById('rightPanel');
+  const backdrop = document.getElementById('mobileDrawerBackdrop');
+
+  if (leftPanel) leftPanel.classList.remove('drawer-open');
+  if (rightPanel) rightPanel.classList.remove('drawer-open');
+  if (backdrop) backdrop.classList.add('hidden');
 }
 
 // 自然粒子生成引擎
@@ -632,7 +668,7 @@ function startParticleEngine() {
 }
 
 // =============================================
-// 8. 拖曳
+// 8. 拖曳 (滑鼠 & 行動裝置觸控)
 // =============================================
 function startDrag(e, el, device) {
   e.preventDefault();
@@ -667,6 +703,44 @@ function onDragEnd() {
   dragTarget = null;
   document.removeEventListener('mousemove', onDragMove);
   document.removeEventListener('mouseup', onDragEnd);
+}
+
+function startTouchDrag(e, el, device) {
+  if (e.touches.length !== 1) return;
+  isDragging = true;
+  dragTarget = { el, device };
+  const touch = e.touches[0];
+  const rect = el.getBoundingClientRect();
+  dragOffsetX = touch.clientX - rect.left;
+  dragOffsetY = touch.clientY - rect.top;
+
+  el.classList.add('dragging');
+  document.addEventListener('touchmove', onTouchMove, { passive: false });
+  document.addEventListener('touchend', onTouchEnd);
+}
+
+function onTouchMove(e) {
+  if (!isDragging || !dragTarget || e.touches.length !== 1) return;
+  e.preventDefault();
+  const touch = e.touches[0];
+  const layerRect = spritesLayer.getBoundingClientRect();
+  let x = touch.clientX - layerRect.left - dragOffsetX;
+  let y = touch.clientY - layerRect.top - dragOffsetY;
+  x = Math.max(0, Math.min(x, spritesLayer.clientWidth - 70));
+  y = Math.max(0, Math.min(y, spritesLayer.clientHeight - 70));
+  dragTarget.el.style.left = x + 'px';
+  dragTarget.el.style.top = y + 'px';
+  dragTarget.device.x = x;
+  dragTarget.device.y = y;
+}
+
+function onTouchEnd() {
+  if (!isDragging) return;
+  isDragging = false;
+  if (dragTarget) dragTarget.el.classList.remove('dragging');
+  dragTarget = null;
+  document.removeEventListener('touchmove', onTouchMove);
+  document.removeEventListener('touchend', onTouchEnd);
 }
 
 // =============================================
