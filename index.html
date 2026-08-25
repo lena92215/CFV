@@ -849,66 +849,129 @@
             </div>
           </div>
 
-          <!-- Category 2: 車用汽柴油 -->
+          <!-- Category 2: 車用汽柴油 (4 大專屬模式) -->
           <div id="calc-panel-fuel" class="calc-panel space-y-4 hidden">
             <!-- Submode Radios -->
-            <div class="flex flex-wrap gap-2">
-              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
                 <input type="radio" name="fuelSubMode" value="fuel_cost" checked onchange="switchCalcSubMode('fuel', 'fuel_cost')" class="accent-emerald-500" />
-                <span class="text-slate-200 font-bold">模式 A：加油發票金額反推公升數</span>
+                <span class="text-slate-200 font-bold">1. 發票金額反推</span>
               </label>
-              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="fuelSubMode" value="fuel_mileage" onchange="switchCalcSubMode('fuel', 'fuel_mileage')" class="accent-emerald-500" />
+                <span class="text-slate-200 font-bold">2. 外送/採買里程</span>
+              </label>
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="fuelSubMode" value="fuel_habit" onchange="switchCalcSubMode('fuel', 'fuel_habit')" class="accent-emerald-500" />
+                <span class="text-slate-200 font-bold">3. 定期加油習慣</span>
+              </label>
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
                 <input type="radio" name="fuelSubMode" value="fuel_months" onchange="switchCalcSubMode('fuel', 'fuel_months')" class="accent-emerald-500" />
-                <span class="text-slate-200 font-bold">模式 B：12 個月加油公升數加總</span>
+                <span class="text-slate-200 font-bold">4. 12個月加總</span>
               </label>
             </div>
 
-            <!-- Fuel Submode A: Cost -->
+            <!-- Mode 1: 發票金額反推 -->
             <div id="fuel-sub-cost" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div>
-                  <label class="block text-xs text-slate-300 font-medium mb-1">年度加油發票總金額 (NTD)</label>
-                  <input type="number" step="any" id="fuelTotalCost" oninput="calcFuel()" placeholder="例如：33000" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
-                </div>
-                <div>
-                  <label class="block text-xs text-slate-300 font-medium mb-1">油品種類基準</label>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">油品種類基準 <span class="text-rose-400">*</span></label>
                   <select id="fuelTypeSelect" onchange="onFuelTypeChange()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none text-xs">
-                    <option value="27.5">超級柴油 (預設 27.5 元/L)</option>
-                    <option value="31.0">95 無鉛汽油 (預設 31.0 元/L)</option>
-                    <option value="29.5">92 無鉛汽油 (預設 29.5 元/L)</option>
-                    <option value="33.0">98 無鉛汽油 (預設 33.0 元/L)</option>
-                    <option value="custom">自訂平均油價</option>
+                    <option value="31.0" selected>95 無鉛汽油 (31.0 元/L)</option>
+                    <option value="29.5">92 無鉛汽油 (29.5 元/L)</option>
+                    <option value="33.0">98 無鉛汽油 (33.0 元/L)</option>
+                    <option value="27.5">超級柴油 (27.5 元/L)</option>
+                    <option value="custom">自訂每公升單價</option>
                   </select>
                 </div>
                 <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">年度加油發票總金額 (NTD) <span class="text-rose-400">*</span></label>
+                  <input type="number" step="any" id="fuelTotalCost" oninput="calcFuel()" placeholder="例如：33000" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
                   <label class="block text-xs text-slate-300 font-medium mb-1">平均每公升油價 (元/L)</label>
-                  <input type="number" step="any" id="fuelUnitPrice" value="27.5" oninput="calcFuel()" placeholder="例如：27.5" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                  <input type="number" step="any" id="fuelUnitPrice" value="31.0" oninput="calcFuel()" placeholder="例如：31.0" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
                 </div>
               </div>
               <div class="text-[10px] text-slate-500">
-                公式：年使用量 (L) = 加油總金額 (NTD) ÷ 平均每公升油價 (元/L)
+                公式：年公升數 (L) = 年度發票總金額 (NTD) ÷ 每公升單價 (元/L)
               </div>
             </div>
 
-            <!-- Fuel Submode B: 12 Months -->
+            <!-- Mode 2: 外送/採買里程推算（免單據） -->
+            <div id="fuel-sub-mileage" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">車種預設油耗基準</label>
+                  <select id="mileageVehicleType" onchange="onMileageVehicleChange()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none text-xs">
+                    <option value="35">外送/公務機車 (35 km/L)</option>
+                    <option value="10">小發財車 / 輕型小貨車 (10 km/L)</option>
+                    <option value="12">自用 / 商務小轎車 (12 km/L)</option>
+                    <option value="8.5">箱型車 / 載貨休旅車 (8.5 km/L)</option>
+                    <option value="custom">自訂油耗 (km/L)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">車輛平均油耗 (km/L)</label>
+                  <input type="number" step="any" id="mileageFuelEconomy" value="35" oninput="calcFuel()" placeholder="例如：35" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">每日平均行駛里程 (km/天)</label>
+                  <input type="number" step="any" id="mileageDailyKm" oninput="calcFuel()" placeholder="例如：25" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">每年營業/用車天數 (天/年)</label>
+                  <input type="number" step="any" id="mileageAnnualDays" value="300" oninput="calcFuel()" placeholder="例如：300" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+              </div>
+              <div class="text-[10px] text-slate-500">
+                公式：年總公升數 (L) = (每日平均里程 km × 每年營業天數) ÷ 車輛平均油耗 (km/L)
+              </div>
+            </div>
+
+            <!-- Mode 3: 定期加油習慣 -->
+            <div id="fuel-sub-habit" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">加油計量習慣模式</label>
+                  <select id="habitModeSelect" onchange="onHabitModeChange()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none text-xs">
+                    <option value="amount">每週固定加油金額 (NTD/週)</option>
+                    <option value="liters">每週固定加油公升數 (L/週)</option>
+                  </select>
+                </div>
+                <div>
+                  <label id="habitValLabel" class="block text-xs text-slate-300 font-medium mb-1">每週固定加油金額 (NTD/週)</label>
+                  <input type="number" step="any" id="habitWeeklyValue" oninput="calcFuel()" placeholder="例如：500" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">每年加油週數 (預設 52 週)</label>
+                  <input type="number" step="any" id="habitAnnualWeeks" value="52" oninput="calcFuel()" placeholder="例如：52" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+              </div>
+              <div class="text-[10px] text-slate-500" id="habitFormulaText">
+                公式：年公升數 (L) = (每週加油金額 NTD × 52 週) ÷ 每公升單價 31.0 元
+              </div>
+            </div>
+
+            <!-- Mode 4: 12 個月公升數加總 -->
             <div id="fuel-sub-months" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-300">請輸入各月份加油公升數 (L)：</span>
+                <span class="text-xs font-bold text-slate-300">請輸入 1~12 各月份實際加油公升數 (L)：</span>
                 <button type="button" onclick="clearFuelMonths()" class="text-[11px] text-slate-400 hover:text-rose-400 transition">清空輸入</button>
               </div>
               <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                <div><label class="block text-[10px] text-slate-400">1月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">2月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">3月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">4月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">5月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">6月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">7月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">8月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">9月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">10月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">11月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
-                <div><label class="block text-[10px] text-slate-400">12月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">1月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">2月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">3月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">4月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">5月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">6月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">7月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">8月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">9月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">10月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">11月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">12月 (L)</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
               </div>
             </div>
           </div>
@@ -1876,7 +1939,7 @@
       else if (cat === 'custom') calcCustom();
     }
 
-    // 切換子模式 (例如 6期電費單 / 金額反推 / 時數估算)
+    // 切換子模式 (例如 6期電費單 / 金額反推 / 時數估算 / 車用燃油 4 大模式)
     function switchCalcSubMode(cat, mode) {
       if (cat === 'elec') {
         document.getElementById('elec-sub-bills').classList.toggle('hidden', mode !== 'elec_bills');
@@ -1885,6 +1948,8 @@
         calcElectricity();
       } else if (cat === 'fuel') {
         document.getElementById('fuel-sub-cost').classList.toggle('hidden', mode !== 'fuel_cost');
+        document.getElementById('fuel-sub-mileage').classList.toggle('hidden', mode !== 'fuel_mileage');
+        document.getElementById('fuel-sub-habit').classList.toggle('hidden', mode !== 'fuel_habit');
         document.getElementById('fuel-sub-months').classList.toggle('hidden', mode !== 'fuel_months');
         calcFuel();
       }
@@ -1944,13 +2009,37 @@
       updateCalcResultUI(total, currentCalcUnit, formulaText);
     }
 
-    // 2. 【車用汽柴油】計算邏輯
+    // 2. 【車用汽柴油】計算邏輯 (4 大專屬模式)
     function onFuelTypeChange() {
       const sel = document.getElementById('fuelTypeSelect')?.value;
       const unitIn = document.getElementById('fuelUnitPrice');
       if (!unitIn) return;
       if (sel !== 'custom') {
         unitIn.value = sel;
+      }
+      calcFuel();
+    }
+
+    function onMileageVehicleChange() {
+      const sel = document.getElementById('mileageVehicleType')?.value;
+      const econIn = document.getElementById('mileageFuelEconomy');
+      if (!econIn) return;
+      if (sel !== 'custom') {
+        econIn.value = sel;
+      }
+      calcFuel();
+    }
+
+    function onHabitModeChange() {
+      const mode = document.getElementById('habitModeSelect')?.value;
+      const label = document.getElementById('habitValLabel');
+      const input = document.getElementById('habitWeeklyValue');
+      if (mode === 'amount') {
+        if (label) label.innerText = '每週固定加油金額 (NTD/週)';
+        if (input) input.placeholder = '例如：500';
+      } else {
+        if (label) label.innerText = '每週固定加油公升數 (L/週)';
+        if (input) input.placeholder = '例如：20';
       }
       calcFuel();
     }
@@ -1964,18 +2053,63 @@
       const mode = document.querySelector('input[name="fuelSubMode"]:checked')?.value || 'fuel_cost';
       let total = 0;
       let formulaText = '';
+      const price = parseFloat(document.getElementById('fuelUnitPrice')?.value) || 31.0;
 
+      // 1. 【發票金額反推】
       if (mode === 'fuel_cost') {
         const cost = parseFloat(document.getElementById('fuelTotalCost')?.value) || 0;
-        const price = parseFloat(document.getElementById('fuelUnitPrice')?.value) || 27.5;
         if (cost > 0 && price > 0) {
           total = Math.round((cost / price) * 100) / 100;
-          formulaText = `加油總額 NT$ ${cost.toLocaleString()} ÷ 平均油價 ${price} 元/L = ${total.toLocaleString()} 公升 (L)`;
-          currentCalcSource = '中油車隊卡/加油發票金額換算';
+          formulaText = `年度加油發票 NT$ ${cost.toLocaleString()} ÷ 單價 ${price} 元/L = ${total.toLocaleString()} 公升 (L)`;
+          currentCalcSource = '加油發票總金額換算公升數';
         } else {
           formulaText = '請輸入年度加油發票總金額 (例如：33,000)';
         }
-      } else if (mode === 'fuel_months') {
+      }
+      // 2. 【外送/採買里程推算（免單據）】
+      else if (mode === 'fuel_mileage') {
+        const dailyKm = parseFloat(document.getElementById('mileageDailyKm')?.value) || 0;
+        const days = parseFloat(document.getElementById('mileageAnnualDays')?.value) || 300;
+        const econ = parseFloat(document.getElementById('mileageFuelEconomy')?.value) || 35.0;
+        if (dailyKm > 0 && econ > 0) {
+          const annualKm = Math.round(dailyKm * days * 100) / 100;
+          total = Math.round((annualKm / econ) * 100) / 100;
+          formulaText = `(每日 ${dailyKm} km × 每年 ${days} 天 = 年里程 ${annualKm.toLocaleString()} km) ÷ 油耗 ${econ} km/L = ${total.toLocaleString()} 公升 (L)`;
+          currentCalcSource = '車輛行駛里程與油耗推算 (免單據)';
+        } else {
+          formulaText = '請輸入每日平均行駛里程 (km/天)';
+        }
+      }
+      // 3. 【定期加油習慣】
+      else if (mode === 'fuel_habit') {
+        const habitMode = document.getElementById('habitModeSelect')?.value || 'amount';
+        const weeklyVal = parseFloat(document.getElementById('habitWeeklyValue')?.value) || 0;
+        const weeks = parseFloat(document.getElementById('habitAnnualWeeks')?.value) || 52;
+        const formulaNote = document.getElementById('habitFormulaText');
+
+        if (habitMode === 'amount') {
+          if (weeklyVal > 0 && price > 0) {
+            const annualCost = Math.round(weeklyVal * weeks * 100) / 100;
+            total = Math.round((annualCost / price) * 100) / 100;
+            formulaText = `(每週 NT$ ${weeklyVal.toLocaleString()} × ${weeks} 週 = 年花費 NT$ ${annualCost.toLocaleString()}) ÷ 油價 ${price} 元/L = ${total.toLocaleString()} 公升 (L)`;
+            if (formulaNote) formulaNote.innerText = formulaText;
+            currentCalcSource = '每週固定加油金額習慣推算';
+          } else {
+            formulaText = '請輸入每週固定加油金額 (NTD/週)';
+          }
+        } else {
+          if (weeklyVal > 0) {
+            total = Math.round((weeklyVal * weeks) * 100) / 100;
+            formulaText = `每週 ${weeklyVal} 公升 × 每年 ${weeks} 週 = 年總計 ${total.toLocaleString()} 公升 (L)`;
+            if (formulaNote) formulaNote.innerText = formulaText;
+            currentCalcSource = '每週固定加油公升數習慣推算';
+          } else {
+            formulaText = '請輸入每週固定加油公升數 (L/週)';
+          }
+        }
+      }
+      // 4. 【12 個月公升數加總】
+      else if (mode === 'fuel_months') {
         let count = 0;
         document.querySelectorAll('.fuel-month-in').forEach(el => {
           const val = parseFloat(el.value);
@@ -1985,8 +2119,8 @@
           }
         });
         total = Math.round(total * 100) / 100;
-        formulaText = `已加總 ${count} 個月份加油量，年總計 ${total.toLocaleString()} 公升 (L)`;
-        currentCalcSource = '每月油單加油公升數加總';
+        formulaText = `已加總 ${count} 個月份加油單據，年總計 ${total.toLocaleString()} 公升 (L)`;
+        currentCalcSource = '12 個月加油單公升數加總';
       }
 
       currentCalcVal = total;
@@ -2114,7 +2248,7 @@
 
       if (actDataIn) actDataIn.value = currentCalcVal;
       if (unitIn && currentCalcUnit) unitIn.value = currentCalcUnit;
-      if (srcIn && currentCalcSource && (!srcIn.value || srcIn.value.includes('電費單') || srcIn.value.includes('加油卡'))) {
+      if (srcIn && currentCalcSource) {
         srcIn.value = currentCalcSource;
       }
 
