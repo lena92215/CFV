@@ -2283,13 +2283,8 @@
       window.MATERIAL_LIST = GHG_MATERIAL_DATABASE.map(f => ({ code: f.code, name: f.name, label: `${f.code} ${f.name}`, seq: 0 }));
     }
 
-    // 排放源清單 (Sheet 3)
-    let emissionSources = [
-      { id: 1, equipId: "ES-001", name: "營業用冷藏展示櫃", location: "1F 門市展售區", energy: "外購電力", quantity: 2 },
-      { id: 2, equipId: "ES-002", name: "大型低溫冷藏庫", location: "1F 後方倉儲區", energy: "冷媒 (R-404A)", quantity: 1 },
-      { id: 3, equipId: "ES-003", name: "3.5噸批發載貨車", location: "公務停車場", energy: "車用柴油 (超級柴油)", quantity: 1 },
-      { id: 4, equipId: "ES-004", name: "門市分離式冷氣", location: "2F 營運辦公室", energy: "冷媒 (R-410A)", quantity: 3 }
-    ];
+    // 排放源清單 (Sheet 3) - 預設維持完全空白，由使用者親自新增或輸入
+    let emissionSources = [];
 
     function getESAuto(energy, equipName = '') {
       if (!energy) return null;
@@ -2476,144 +2471,8 @@
 
     const ACTIVITY_STORAGE_KEY = 'cfv_activity_records_v1';
 
-    // 預設 5 筆示範活動數據（包含完整 24 欄位）
-    const DEFAULT_ACTIVITY_RECORDS = [
-      {
-        id: 1,
-        equipNo: "EQ-001",
-        equipCode: "REF-C01",
-        equipName: "營業用開放式冷藏展示櫃",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "營運部",
-        location: "1F 展售區 A08",
-        quantity: 2,
-        materialCode: "EL0001",
-        materialName: "外購電力",
-        scopeType: "間接排放 (Scope 2)",
-        emissionType: "外購電力使用",
-        inUse: "是",
-        activityData: 25000,
-        ratio: 100,
-        unit: "度 (kWh)",
-        dataSource: "電費單/台電發票",
-        custodyUnit: "會計部",
-        measurementFrequency: "雙月 (每期)",
-        measurementInstrument: "台電數位電子電表",
-        calorificValueSource: "經濟部能源署常用熱值表",
-        netCalorificValue: "860",
-        netCalorificValueUnit: "kcal/度",
-        carbonContent: ""
-      },
-      {
-        id: 2,
-        equipNo: "EQ-002",
-        equipCode: "COLD-02",
-        equipName: "大型低溫冷藏庫",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "倉儲部",
-        location: "1F 後方倉儲",
-        quantity: 1,
-        materialCode: "190240",
-        materialName: "冷藏冷媒(R-404A)",
-        scopeType: "直接排放 (Scope 1)",
-        emissionType: "逸散排放",
-        inUse: "是",
-        activityData: 3.5,
-        ratio: 100,
-        unit: "kg",
-        dataSource: "冷媒填充原廠維護工單",
-        custodyUnit: "廠務部",
-        measurementFrequency: "每年",
-        measurementInstrument: "冷媒電子電子磅秤",
-        calorificValueSource: "IPCC GWP 報告",
-        netCalorificValue: "",
-        netCalorificValueUnit: "",
-        carbonContent: ""
-      },
-      {
-        id: 3,
-        equipNo: "EQ-003",
-        equipCode: "VEH-01",
-        equipName: "3.5噸批發載貨柴油小貨車",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "物流部",
-        location: "公務停車場",
-        quantity: 1,
-        materialCode: "170006",
-        materialName: "車用柴油",
-        scopeType: "直接排放 (Scope 1)",
-        emissionType: "移動燃燒",
-        inUse: "是",
-        activityData: 1200,
-        ratio: 100,
-        unit: "公升 (L)",
-        dataSource: "中油車隊卡加油發票",
-        custodyUnit: "物流部",
-        measurementFrequency: "每月",
-        measurementInstrument: "加油機計量器 / 行車里程表",
-        calorificValueSource: "經濟部能源署常用熱值表",
-        netCalorificValue: "8400",
-        netCalorificValueUnit: "kcal/L",
-        carbonContent: "86.1"
-      },
-      {
-        id: 4,
-        equipNo: "EQ-004",
-        equipCode: "AC-01",
-        equipName: "門市分離式冷氣空調 (R-410A)",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "行政部",
-        location: "2F 辦公室",
-        quantity: 3,
-        materialCode: "190239",
-        materialName: "冷氣冷媒(R-410A)",
-        scopeType: "直接排放 (Scope 1)",
-        emissionType: "逸散排放",
-        inUse: "是",
-        activityData: 2.0,
-        ratio: 100,
-        unit: "kg",
-        dataSource: "冷氣保養維修保證紀錄",
-        custodyUnit: "總務部",
-        measurementFrequency: "每年",
-        measurementInstrument: "壓力磅秤儀器",
-        calorificValueSource: "IPCC GWP 報告",
-        netCalorificValue: "",
-        netCalorificValueUnit: "",
-        carbonContent: ""
-      },
-      {
-        id: 5,
-        equipNo: "EQ-005",
-        equipCode: "LGT-01",
-        equipName: "攤位高亮度照明探照燈",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "廠務部",
-        location: "1F 全場照明",
-        quantity: 2,
-        materialCode: "EL0001",
-        materialName: "外購電力",
-        scopeType: "間接排放 (Scope 2)",
-        emissionType: "外購電力使用",
-        inUse: "是",
-        activityData: 8600,
-        ratio: 100,
-        unit: "度 (kWh)",
-        dataSource: "電費單/台電發票",
-        custodyUnit: "會計部",
-        measurementFrequency: "雙月 (每期)",
-        measurementInstrument: "台電數位電子電表",
-        calorificValueSource: "經濟部能源署常用熱值表",
-        netCalorificValue: "860",
-        netCalorificValueUnit: "kcal/度",
-        carbonContent: ""
-      }
-    ];
+    // 活動數據清單 (Sheet 4) - 預設維持完全空白，由使用者親自新增或輸入
+    const DEFAULT_ACTIVITY_RECORDS = [];
 
     let activityRecords = loadActivityRecords();
 
