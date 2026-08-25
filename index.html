@@ -408,8 +408,8 @@
               <span>批次匯入/帶入 Step 3 設備清單</span>
             </button>
             <button onclick="resetActivityDemoData()" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl transition flex items-center gap-1">
-              <i class="fa-solid fa-rotate-left"></i>
-              <span>重置示範資料</span>
+              <i class="fa-solid fa-trash-can text-rose-400"></i>
+              <span>清空所有數據紀錄</span>
             </button>
           </div>
 
@@ -2469,7 +2469,7 @@
     // 四、活動數據填報 (Activity Data Reporting) 核心邏輯
     // =============================================
 
-    const ACTIVITY_STORAGE_KEY = 'cfv_activity_records_v1';
+    const ACTIVITY_STORAGE_KEY = 'cfv_activity_records_v3';
 
     // 活動數據清單 (Sheet 4) - 預設維持完全空白，由使用者親自新增或輸入
     const DEFAULT_ACTIVITY_RECORDS = [];
@@ -2479,15 +2479,23 @@
     // LocalStorage 讀取與儲存
     function loadActivityRecords() {
       try {
+        // 清理舊版本快取的 Demo 數據
+        localStorage.removeItem('cfv_activity_records_v1');
+        localStorage.removeItem('cfv_activity_records_v2');
+        
         const raw = localStorage.getItem(ACTIVITY_STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) {
+            // 過濾舊 demo 資料
+            const clean = parsed.filter(r => r.orgId !== '88889999' && !r.equipName?.includes('阿文') && !r.orgName?.includes('阿文'));
+            return clean;
+          }
         }
       } catch (e) {
         console.error('Failed to load activity records from LocalStorage:', e);
       }
-      return [...DEFAULT_ACTIVITY_RECORDS];
+      return [];
     }
 
     function saveActivityRecords() {
@@ -3864,14 +3872,14 @@
       showToast(`成功自 Step 3 帶入設備清單！(新增 ${importedCount} 筆，同步 ${updatedCount} 筆)`);
     }
 
-    // 重置為預設示範資料
+    // 清空所有活動數據紀錄
     function resetActivityDemoData() {
-      if (confirm('確定要將活動數據填報紀錄重置為預設示範資料嗎？現有自訂修改將會被覆蓋。')) {
-        activityRecords = [...DEFAULT_ACTIVITY_RECORDS];
+      if (confirm('確定要清空所有活動數據填報紀錄嗎？')) {
+        activityRecords = [];
         saveActivityRecords();
         renderActivityTable();
         renderStep3Itemized();
-        showToast('已重置為預設活動數據填報紀錄！');
+        showToast('已成功清空所有活動數據填報紀錄！');
       }
     }
 
@@ -4552,6 +4560,10 @@
 
     // Init
     window.addEventListener('DOMContentLoaded', () => {
+      try {
+        localStorage.removeItem('cfv_activity_records_v1');
+        localStorage.removeItem('cfv_activity_records_v2');
+      } catch(e){}
       try { loadMaterialsFromCSV(); } catch (e) { console.error('Error in loadMaterialsFromCSV:', e); }
       try { loadEquipmentsFromCSV(); } catch (e) { console.error('Error in loadEquipmentsFromCSV:', e); }
       try { renderEmissionSourceTable(); } catch (e) { console.error('Error in renderEmissionSourceTable:', e); }
