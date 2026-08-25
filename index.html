@@ -574,12 +574,19 @@
 
             <!-- SECTION 3: 原(燃)物料與排放範疇特性 (必填) -->
             <div class="bg-slate-900/70 border border-slate-700/80 rounded-2xl p-4 space-y-3">
-              <div class="text-amber-400 font-bold text-xs flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                <i class="fa-solid fa-fire-flame-curved text-amber-400"></i> 【區塊三】原(燃)物料與排放範疇特性 (必填)
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                <div class="text-amber-400 font-bold text-xs flex items-center gap-1.5">
+                  <i class="fa-solid fa-fire-flame-curved text-amber-400"></i> 【區塊三】原(燃)物料與排放範疇特性 (必填)
+                </div>
+                <button type="button" onclick="openDocGuideModal()" class="px-2.5 py-1 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                  <i class="fa-solid fa-circle-question text-indigo-400"></i> ❓ 單據/銘牌怎麼看？
+                </button>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑩ 原(燃)物料名稱 <span class="text-rose-400">*</span></label>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-slate-300 font-medium">⑩ 原(燃)物料名稱 <span class="text-rose-400">*</span></label>
+                  </div>
                   <input type="text" id="actMaterialName" list="materialsList" oninput="onActivityMaterialChange()" onchange="onActivityMaterialChange()" placeholder="輸入關鍵字選擇物料…" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
                 <div>
@@ -614,9 +621,14 @@
                 <div class="text-cyan-400 font-bold text-xs flex items-center gap-1.5">
                   <i class="fa-solid fa-receipt text-cyan-400"></i> 【區塊四】活動數據計量與憑證管理 (必填)
                 </div>
-                <button type="button" onclick="openActivityCalculator()" class="px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-500/40 hover:to-teal-500/40 text-emerald-300 border border-emerald-500/50 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-                  <i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> 💡 智慧輔助計算（免手算）
-                </button>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="openDocGuideModal()" class="px-2.5 py-1 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-circle-question text-indigo-400"></i> ❓ 單據/銘牌怎麼看？
+                  </button>
+                  <button type="button" onclick="openActivityCalculator()" class="px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-500/40 hover:to-teal-500/40 text-emerald-300 border border-emerald-500/50 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> 💡 智慧輔助計算（免手算）
+                  </button>
+                </div>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
                 <div>
@@ -732,9 +744,14 @@
                 <p class="text-xs text-slate-400">依據單據發票、電表抄表或設備運轉規格，快速自動換算年總使用量</p>
               </div>
             </div>
-            <button onclick="closeActivityCalculator()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition flex items-center justify-center">
-              <i class="fa-solid fa-xmark text-sm"></i>
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="openDocGuideModal()" class="px-2.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-circle-question text-indigo-400"></i> ❓ 單據/銘牌怎麼看？
+              </button>
+              <button onclick="closeActivityCalculator()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-sm"></i>
+              </button>
+            </div>
           </div>
 
           <!-- Industry Benchmark Quick Extrapolation Banner (一張單據都沒有的備案) -->
@@ -761,20 +778,23 @@
 
           <!-- Category Navigation Tabs -->
           <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/90 rounded-2xl border border-slate-800">
-            <button type="button" onclick="switchCalcCategory('elec')" id="btn-calc-tab-elec" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+            <button type="button" onclick="switchCalcCategory('elec')" id="btn-calc-tab-elec" class="calc-cat-btn flex-1 min-w-[110px] py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
               <i class="fa-solid fa-bolt text-amber-400"></i> 外購電力
             </button>
-            <button type="button" onclick="switchCalcCategory('fuel')" id="btn-calc-tab-fuel" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+            <button type="button" onclick="switchCalcCategory('fuel')" id="btn-calc-tab-fuel" class="calc-cat-btn flex-1 min-w-[110px] py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
               <i class="fa-solid fa-gas-pump text-rose-400"></i> 車用汽柴油
             </button>
-            <button type="button" onclick="switchCalcCategory('gas')" id="btn-calc-tab-gas" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-fire-burner text-orange-400"></i> 桶裝瓦斯 (LPG)
+            <button type="button" onclick="switchCalcCategory('gas')" id="btn-calc-tab-gas" class="calc-cat-btn flex-1 min-w-[110px] py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-fire-burner text-orange-400"></i> 桶裝瓦斯
             </button>
-            <button type="button" onclick="switchCalcCategory('refrig')" id="btn-calc-tab-refrig" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-snowflake text-cyan-400"></i> 冷媒填充
+            <button type="button" onclick="switchCalcCategory('refrig')" id="btn-calc-tab-refrig" class="calc-cat-btn flex-1 min-w-[110px] py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-snowflake text-cyan-400"></i> 冷媒逸散
             </button>
-            <button type="button" onclick="switchCalcCategory('custom')" id="btn-calc-tab-custom" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-calculator text-slate-300"></i> 通用累加/乘法
+            <button type="button" onclick="switchCalcCategory('fire')" id="btn-calc-tab-fire" class="calc-cat-btn flex-1 min-w-[110px] py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-fire-extinguisher text-rose-400"></i> 滅火器
+            </button>
+            <button type="button" onclick="switchCalcCategory('custom')" id="btn-calc-tab-custom" class="calc-cat-btn flex-1 min-w-[110px] py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-calculator text-slate-300"></i> 通用累加
             </button>
           </div>
 
@@ -1133,9 +1153,22 @@
             </div>
           </div>
 
-          <!-- Category 4: 冷媒填充 -->
+          <!-- Category 4: 冷媒逸散 (回補法 + 銘牌逸散率法) -->
           <div id="calc-panel-refrig" class="calc-panel space-y-4 hidden">
-            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+            <!-- Submode Radios -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="refrigSubMode" value="refrig_repair" checked onchange="switchRefrigSubMode('refrig_repair')" class="accent-cyan-500" />
+                <span class="text-slate-200 font-bold">模式 A：維修回補法 (工單實測)</span>
+              </label>
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="refrigSubMode" value="refrig_escape" onchange="switchRefrigSubMode('refrig_escape')" class="accent-cyan-500" />
+                <span class="text-slate-200 font-bold">模式 B：銘牌冷媒量 × 逸散率推算 (免單據)</span>
+              </label>
+            </div>
+
+            <!-- Submode A: 維修回補法 -->
+            <div id="refrig-sub-repair" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-300">保養維護/灌冷媒紀錄清單（逸散活動數據以年度回充量計算）：</span>
                 <button type="button" onclick="addRefrigRow()" class="px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1">
@@ -1157,6 +1190,136 @@
                   </button>
                 </div>
               </div>
+            </div>
+
+            <!-- Submode B: 銘牌冷媒量 × 逸散率推算 -->
+            <div id="refrig-sub-escape" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">設備種類 (自動帶入預設逸散率)</label>
+                  <select id="refrigEquipType" onchange="onRefrigEquipTypeChange()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none text-xs">
+                    <option value="10.0" selected>商用冰箱/冷凍冷藏展示櫃 (10.0%)</option>
+                    <option value="1.0">分離式/窗型冷氣機 (1.0%)</option>
+                    <option value="0.5">冰溫熱開飲機/飲水機 (0.5%)</option>
+                    <option value="5.0">小型商用冷藏設備 (5.0%)</option>
+                    <option value="custom">自訂設備逸散率</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">銘牌標記單台冷媒充填量</label>
+                  <div class="flex items-center gap-1.5">
+                    <input type="number" step="any" id="refrigChargeVal" value="180" oninput="calcRefrigerant()" placeholder="例如：180" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                    <select id="refrigChargeUnit" onchange="calcRefrigerant()" class="bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 text-xs">
+                      <option value="g" selected>公克 (g)</option>
+                      <option value="kg">公斤 (kg)</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">設備數量 (台)</label>
+                  <input type="number" step="any" id="refrigEquipQty" value="1" min="1" oninput="calcRefrigerant()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">年逸散率 (%)</label>
+                  <input type="number" step="any" id="refrigEscapeRate" value="10.0" oninput="calcRefrigerant()" placeholder="例如：10" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                </div>
+              </div>
+              <div class="text-[10px] text-slate-500" id="refrigEscapeFormulaNote">
+                公式：年逸散量 (kg) = 單台冷媒量 (kg) × 台數 × 逸散率 (%)
+              </div>
+            </div>
+          </div>
+
+          <!-- Category: 滅火器逸散 (白話問答防呆模式) -->
+          <div id="calc-panel-fire" class="calc-panel space-y-4 hidden">
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <!-- Question 1: 滅火器種類 -->
+              <div class="space-y-2">
+                <div class="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                  <i class="fa-solid fa-circle-question text-rose-400"></i> 第一關：請問瓶身上的標籤，這支是哪一種滅火器？
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button type="button" onclick="selectFireType('abc')" id="btn-fire-abc" class="fire-type-btn p-3.5 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-amber-500/80 text-left transition flex items-center justify-between">
+                    <div>
+                      <div class="font-bold text-slate-100 text-xs">🅰️ 乾粉滅火器 (ABC型)</div>
+                      <div class="text-[11px] text-slate-400 mt-0.5">最常見紅色鋼瓶、指針壓力表、含白色乾粉</div>
+                    </div>
+                    <i class="fa-solid fa-circle-check text-slate-600 fire-check-icon"></i>
+                  </button>
+                  <button type="button" onclick="selectFireType('co2')" id="btn-fire-co2" class="fire-type-btn p-3.5 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-rose-500/80 text-left transition flex items-center justify-between">
+                    <div>
+                      <div class="font-bold text-rose-300 text-xs">🅱️ 二氧化碳 (CO2) 滅火器</div>
+                      <div class="text-[11px] text-slate-400 mt-0.5">大型喇叭噴嘴、無壓力表、重金屬鋼瓶</div>
+                    </div>
+                    <i class="fa-solid fa-circle-check text-slate-600 fire-check-icon"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- ABC Result Callout (乾粉滅火器不需盤查) -->
+              <div id="fire-abc-result" class="p-4 rounded-xl bg-emerald-950/50 border border-emerald-500/40 space-y-2 hidden">
+                <div class="flex items-center gap-2 text-emerald-300 font-bold text-xs">
+                  <i class="fa-solid fa-circle-check text-base"></i> ✅ 乾粉滅火器不含溫室氣體，不需要進行碳盤查！
+                </div>
+                <p class="text-[11px] text-slate-300 leading-relaxed">
+                  乾粉滅火器主要成分為磷酸二氫銨（NH₄H₂PO₄）或碳酸氫鈉，不屬於 ISO 14064 規範之 7 大溫室氣體（GHG）。<br />
+                  <strong>建議處理：</strong>請直接刪除此筆設備紀錄，或活動數據填入 <code class="text-emerald-300 font-bold">0 kg</code> 即可。
+                </p>
+                <div class="pt-1">
+                  <button type="button" onclick="applyFireZeroResult('乾粉滅火器（不屬溫室氣體，不計入盤查）')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition">
+                    將活動數據設為 0 kg 並套用
+                  </button>
+                </div>
+              </div>
+
+              <!-- Question 2: CO2 滅火器使用狀態 (限 CO2) -->
+              <div id="fire-co2-section" class="space-y-4 pt-2 border-t border-slate-800 hidden">
+                <div class="space-y-2">
+                  <div class="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-question text-rose-400"></i> 第二關：過去一年內，這支滅火器有被『拔插梢噴射』或『送回廠商重新充填』嗎？
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button type="button" onclick="selectFireUsage('no')" id="btn-fire-usage-no" class="fire-usage-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-emerald-500 text-left transition flex items-center justify-between">
+                      <div>
+                        <div class="font-bold text-emerald-300 text-xs">🟢 否，整年掛在牆上都沒動</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">插梢完整、鉛封未拆、過去一年未曾噴射或重灌</div>
+                      </div>
+                      <i class="fa-solid fa-circle-check text-slate-600 fire-usage-icon"></i>
+                    </button>
+                    <button type="button" onclick="selectFireUsage('yes')" id="btn-fire-usage-yes" class="fire-usage-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-rose-500 text-left transition flex items-center justify-between">
+                      <div>
+                        <div class="font-bold text-rose-300 text-xs">🔴 是，有噴射使用或送廠重灌</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">曾發生火警演練、實際滅火或檢驗重灌藥劑</div>
+                      </div>
+                      <i class="fa-solid fa-circle-check text-slate-600 fire-usage-icon"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- CO2 未使用提示 -->
+                <div id="fire-co2-unused-msg" class="p-3.5 rounded-xl bg-slate-950 border border-emerald-500/30 text-xs text-slate-300 hidden">
+                  <span class="text-emerald-400 font-bold">✨ 判定結果：</span> 全年未噴射使用，溫室氣體逸散量為 <span class="font-mono font-bold text-emerald-300">0.00 kg</span>。
+                </div>
+
+                <!-- CO2 有使用輸入表單 -->
+                <div id="fire-co2-inputs" class="p-4 rounded-xl bg-slate-950/80 border border-rose-500/30 space-y-3 hidden">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                      <label class="block text-xs text-slate-300 font-medium mb-1">瓶身標註之「藥劑重量/充填量」 (kg) <span class="text-rose-400">*</span></label>
+                      <input type="number" step="any" id="fireCapacityKg" value="5.0" oninput="calcFireExtinguisher()" placeholder="例如：5.0 (10型) 或 3.5 (5型)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-rose-500 focus:outline-none font-mono text-xs" />
+                      <span class="text-[10px] text-slate-500 mt-1 block">常見規格：5型約 3.5kg、10型約 5.0kg、15型約 6.8kg</span>
+                    </div>
+                    <div>
+                      <label class="block text-xs text-slate-300 font-medium mb-1">年度使用 / 重灌瓶數 (支) <span class="text-rose-400">*</span></label>
+                      <input type="number" step="any" id="fireUsedQty" value="1" min="1" oninput="calcFireExtinguisher()" placeholder="例如：1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-rose-500 focus:outline-none font-mono text-xs" />
+                    </div>
+                  </div>
+                  <div class="text-[10px] text-slate-500">
+                    公式：年逸散量 (kg) = 藥劑重量 (kg) × 噴射重灌瓶數
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -1198,6 +1361,409 @@
             <button type="button" onclick="applyCalculatorResult()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 whitespace-nowrap">
               <i class="fa-solid fa-check text-sm"></i>
               <span>套用計算結果至表單 ⑭ 欄位</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- MODAL: 實體單據與設備機身銘牌視覺對照指南 (❓ 單據/銘牌怎麼看？)              -->
+      <!-- ========================================================================= -->
+      <div id="docGuideModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[70] flex items-center justify-center p-3 sm:p-5 hidden">
+        <div class="glass-panel w-full max-w-4xl rounded-3xl border border-indigo-500/40 p-5 sm:p-6 shadow-2xl space-y-5 max-h-[94vh] overflow-y-auto">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shadow-md">
+                <i class="fa-solid fa-file-invoice text-lg"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-slate-100 flex items-center gap-2">
+                  <span>實體單據與設備銘牌視覺對照指南</span>
+                  <span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-500/30">視覺指引</span>
+                </h3>
+                <p class="text-xs text-slate-400">依據下方擬真單據與金屬銘牌【🔴 紅框標記】，快速對照抄錄活動數據與冷媒規格</p>
+              </div>
+            </div>
+            <button onclick="closeDocGuideModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition flex items-center justify-center">
+              <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+          </div>
+
+          <!-- Tab Selection (Grouped: 常用單據 / 機身銘牌) -->
+          <div class="space-y-2">
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-receipt text-indigo-400"></i> 【實體發票與繳費單據】
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button type="button" onclick="switchDocGuideTab('elec')" id="btn-doc-tab-elec" class="doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-indigo-600 text-white border-indigo-400 shadow-md">
+                <i class="fa-solid fa-bolt text-amber-300"></i> 1. 台電電費通知單
+              </button>
+              <button type="button" onclick="switchDocGuideTab('fuel')" id="btn-doc-tab-fuel" class="doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200">
+                <i class="fa-solid fa-gas-pump text-rose-400"></i> 2. 加油發票/簽單
+              </button>
+              <button type="button" onclick="switchDocGuideTab('gas')" id="btn-doc-tab-gas" class="doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200">
+                <i class="fa-solid fa-fire-burner text-orange-400"></i> 3. 桶裝瓦斯送貨單
+              </button>
+              <button type="button" onclick="switchDocGuideTab('refrig')" id="btn-doc-tab-refrig" class="doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200">
+                <i class="fa-solid fa-wrench text-cyan-400"></i> 4. 冷氣維修保養單
+              </button>
+            </div>
+
+            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 pt-2">
+              <i class="fa-solid fa-id-card text-emerald-400"></i> 【設備機身金屬銘牌（聚焦冷媒型號與充填量）】
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button type="button" onclick="switchDocGuideTab('fridge')" id="btn-doc-tab-fridge" class="doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200">
+                <i class="fa-solid fa-box text-emerald-400"></i> 5. 商用冰箱/展示櫃
+              </button>
+              <button type="button" onclick="switchDocGuideTab('ac')" id="btn-doc-tab-ac" class="doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200">
+                <i class="fa-solid fa-wind text-teal-400"></i> 6. 分離式/窗型冷氣
+              </button>
+              <button type="button" onclick="switchDocGuideTab('dispenser')" id="btn-doc-tab-dispenser" class="doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200">
+                <i class="fa-solid fa-faucet-drip text-blue-400"></i> 7. 開飲機/飲水機
+              </button>
+              <button type="button" onclick="switchDocGuideTab('extinguisher')" id="btn-doc-tab-extinguisher" class="doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200">
+                <i class="fa-solid fa-fire-extinguisher text-rose-500"></i> 8. CO2 滅火器標籤
+              </button>
+            </div>
+          </div>
+
+          <!-- Document View 1: 台電電費通知單 -->
+          <div id="doc-view-elec" class="doc-view-card space-y-3">
+            <div class="bg-slate-100 text-slate-900 rounded-2xl p-5 shadow-xl font-sans border-4 border-slate-300 relative overflow-hidden">
+              <div class="flex items-center justify-between border-b-2 border-slate-300 pb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-red-600 text-white font-black text-xs flex items-center justify-center">TPC</div>
+                  <div>
+                    <div class="font-black text-base tracking-wider text-slate-900">台灣電力公司 電費通知及收據</div>
+                    <div class="text-[10px] text-slate-600">TAIWAN POWER COMPANY ELECTRICITY BILL</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-xs font-bold text-slate-700">收據號碼：11308-A987654</span>
+                  <div class="text-[10px] text-slate-500 font-mono">113年07月~08月份 (第4期)</div>
+                </div>
+              </div>
+
+              <!-- Bill Grid Mockup -->
+              <div class="grid grid-cols-3 gap-3 my-4 text-xs">
+                <div class="bg-slate-200/80 p-2.5 rounded-lg">
+                  <span class="text-[10px] text-slate-500 block">用戶戶名</span>
+                  <strong class="text-slate-900 text-xs">阿文優質水果行</strong>
+                </div>
+                <div class="bg-slate-200/80 p-2.5 rounded-lg">
+                  <span class="text-[10px] text-slate-500 block">電號</span>
+                  <strong class="font-mono text-slate-900">01-23-4567-89-0</strong>
+                </div>
+                <div class="bg-slate-200/80 p-2.5 rounded-lg">
+                  <span class="text-[10px] text-slate-500 block">用電種類</span>
+                  <strong class="text-slate-900">非營業用 (低壓)</strong>
+                </div>
+              </div>
+
+              <!-- Key Red Highlight Box (計費度數) -->
+              <div class="my-4 p-4 rounded-xl bg-rose-50 border-2 border-rose-500 shadow-md relative">
+                <div class="absolute -top-3 left-4 bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <i class="fa-solid fa-arrow-down"></i> 🔴 盤查活動數據請抄這格！
+                </div>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div>
+                    <div class="text-xs font-bold text-slate-700">本期計費度數 (kWh)：</div>
+                    <div class="flex items-baseline gap-2 mt-1">
+                      <span class="text-3xl font-black text-rose-600 font-mono bg-amber-200 px-2 py-0.5 rounded border border-amber-400">4,850</span>
+                      <span class="text-sm font-bold text-slate-800">度 (kWh)</span>
+                    </div>
+                  </div>
+                  <div class="text-right sm:border-l sm:border-rose-200 sm:pl-4">
+                    <span class="text-xs text-slate-600 block">應繳總金額：</span>
+                    <strong class="text-lg font-black text-slate-900 font-mono">NT$ 18,430 元</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-[11px] text-slate-500 bg-slate-200 p-2.5 rounded-lg">
+                <strong>💡 填報技巧：</strong> 請直接看帳單右上方的「<strong>計費度數</strong>」，將 1~6 期度數填入智慧計算器模式 A，系統將自動為您完成整年加總。
+              </div>
+            </div>
+          </div>
+
+          <!-- Document View 2: 加油發票 / 車隊卡簽單 -->
+          <div id="doc-view-fuel" class="doc-view-card space-y-3 hidden">
+            <div class="bg-white text-slate-900 rounded-2xl p-5 shadow-xl font-mono border-4 border-slate-300 max-w-lg mx-auto relative">
+              <div class="text-center border-b-2 border-dashed border-slate-300 pb-3">
+                <div class="font-black text-sm text-slate-900">台灣中油股份有限公司</div>
+                <div class="text-xs text-slate-600">電子發票證明聯</div>
+                <div class="text-sm font-bold text-slate-900 mt-1">113年 07-08 月份</div>
+                <div class="text-base font-black tracking-widest text-slate-900 mt-1">AB-88996633</div>
+              </div>
+
+              <div class="py-3 text-xs border-b-2 border-dashed border-slate-300 space-y-1.5">
+                <div class="flex justify-between text-slate-600 text-[11px]">
+                  <span>品名</span>
+                  <span>數量</span>
+                  <span>單價</span>
+                  <span>金額</span>
+                </div>
+                
+                <!-- Red Highlight for Gasoline -->
+                <div class="p-2.5 rounded-lg bg-rose-50 border-2 border-rose-500 space-y-1">
+                  <div class="flex justify-between items-center font-bold">
+                    <span class="text-slate-900">95無鉛汽油</span>
+                    <span class="text-rose-600 font-black bg-amber-200 px-1.5 py-0.5 rounded border border-amber-300 text-sm">35.50 L</span>
+                    <span class="text-slate-700">31.0</span>
+                    <span class="text-slate-900">1,100</span>
+                  </div>
+                  <div class="text-[10px] text-rose-600 font-sans font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-up"></i> 🔴 首選：請直接抄錄此處「公升數 (L)」
+                  </div>
+                </div>
+
+                <div class="flex justify-between text-slate-800 pt-2 font-bold">
+                  <span>總計 (Total)：</span>
+                  <span class="text-base text-rose-600 font-black">NT$ 1,100</span>
+                </div>
+              </div>
+
+              <div class="mt-3 text-[11px] font-sans text-slate-600 bg-slate-100 p-2.5 rounded-lg space-y-1">
+                <div><strong>💡 填報技巧：</strong></div>
+                <div>1. 若發票/簽單有印出「<strong>數量 (L)</strong>」，請直接抄錄公升數填入 ⑭ 欄位。</div>
+                <div>2. 若手邊只有發票總金額（例如整年發票合計 $33,000），可點開智慧計算器切換至「<strong>模式 1：發票金額反推</strong>」，系統會自動依油價換算為公升。</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document View 3: 桶裝瓦斯送貨簽單 -->
+          <div id="doc-view-gas" class="doc-view-card space-y-3 hidden">
+            <div class="bg-amber-50 text-slate-900 rounded-2xl p-5 shadow-xl font-sans border-4 border-amber-200 max-w-xl mx-auto">
+              <div class="flex items-center justify-between border-b-2 border-amber-300 pb-2.5">
+                <div>
+                  <div class="font-black text-base text-amber-950">萬安液化石油氣行 - 送貨簽收聯 (客戶存根)</div>
+                  <div class="text-[10px] text-amber-800">LPG GAS DELIVERY INVOICE</div>
+                </div>
+                <span class="text-xs font-mono font-bold text-amber-900">NO. 008892</span>
+              </div>
+
+              <div class="my-4 p-4 rounded-xl bg-rose-50 border-2 border-rose-500 shadow-md space-y-2">
+                <div class="text-[10px] font-bold text-rose-600 flex items-center gap-1">
+                  <i class="fa-solid fa-arrow-down"></i> 🔴 瓦斯盤查只需看這兩個欄位：
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <span class="text-slate-600 block text-[11px]">瓦斯規格 (公斤/桶)：</span>
+                    <strong class="text-base font-black text-rose-600 bg-amber-200 px-1.5 py-0.5 rounded border border-amber-300">20 kg</strong>
+                  </div>
+                  <div>
+                    <span class="text-slate-600 block text-[11px]">叫貨數量 (桶數)：</span>
+                    <strong class="text-base font-black text-rose-600 bg-amber-200 px-1.5 py-0.5 rounded border border-amber-300">2 桶</strong>
+                  </div>
+                  <div>
+                    <span class="text-slate-600 block text-[11px]">本期總重量：</span>
+                    <strong class="text-base font-black text-slate-900">40 kg</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-[11px] text-slate-600 bg-amber-100/80 p-2.5 rounded-lg space-y-1">
+                <strong>💡 填報技巧：</strong> 桶裝瓦斯活動數據單位為「<strong>公斤 (kg)</strong>」。若每月固定叫貨 4 桶（20kg規格），年總使用量即為 4 桶 × 12 月 × 20 kg = <code class="font-bold text-amber-900">960 kg</code>。
+              </div>
+            </div>
+          </div>
+
+          <!-- Document View 4: 冷氣/冷凍冷媒保養維修單 -->
+          <div id="doc-view-refrig" class="doc-view-card space-y-3 hidden">
+            <div class="bg-slate-100 text-slate-900 rounded-2xl p-5 shadow-xl font-sans border-4 border-slate-300 max-w-xl mx-auto">
+              <div class="flex items-center justify-between border-b-2 border-slate-300 pb-2.5">
+                <div>
+                  <div class="font-black text-base text-slate-900">大同空調冷凍工程 - 維修保養工單</div>
+                  <div class="text-[10px] text-slate-600">HVAC MAINTENANCE WORK ORDER</div>
+                </div>
+                <span class="text-xs font-mono font-bold text-slate-700">工單編號：2024-0615-01</span>
+              </div>
+
+              <div class="my-4 p-4 rounded-xl bg-rose-50 border-2 border-rose-500 shadow-md space-y-2">
+                <div class="text-[10px] font-bold text-rose-600 flex items-center gap-1">
+                  <i class="fa-solid fa-arrow-down"></i> 🔴 檢查維修保養單上的冷媒填充量（回灌量）：
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span class="text-slate-600 block text-[11px]">填充冷媒種類：</span>
+                    <strong class="text-base font-black text-rose-600 bg-amber-200 px-1.5 py-0.5 rounded border border-amber-300">R-410A (或 R-134a、R-32)</strong>
+                  </div>
+                  <div>
+                    <span class="text-slate-600 block text-[11px]">本期補充灌注重量 (kg)：</span>
+                    <strong class="text-base font-black text-rose-600 bg-amber-200 px-1.5 py-0.5 rounded border border-amber-300">2.0 kg</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-[11px] text-slate-600 bg-slate-200 p-2.5 rounded-lg">
+                <strong>💡 填報技巧：</strong> 冷媒逸散盤查的活動數據是「<strong>全年度維修補充灌注的公斤數 (kg)</strong>」。若整年設備皆正常運作無漏冷媒、無灌冷媒，活動數據填 <code class="font-bold text-slate-900">0 kg</code> 即可。
+              </div>
+            </div>
+          </div>
+
+          <!-- Document View 5: 商用冰箱/展示櫃銘牌 (聚焦冷媒) -->
+          <div id="doc-view-fridge" class="doc-view-card space-y-3 hidden">
+            <div class="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 text-slate-100 rounded-2xl p-5 shadow-2xl font-mono border-4 border-slate-500 relative max-w-xl mx-auto">
+              <div class="flex items-center justify-between border-b border-slate-500 pb-2">
+                <div class="font-black text-sm text-slate-200 tracking-wider">★ 商用四門冷凍冷藏展示櫃 規格銘牌</div>
+                <span class="text-[10px] text-slate-400">MADE IN TAIWAN</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 my-3 text-xs">
+                <div>機型：<span class="text-slate-300">CR-1200F</span></div>
+                <div>製造號碼：<span class="text-slate-300">2023-8890</span></div>
+                <div>電源：<span class="text-slate-300">單相 220V / 60Hz</span></div>
+                <div>額定容積：<span class="text-slate-300">1,050 公升</span></div>
+              </div>
+
+              <!-- Key Red Highlight Box (聚焦冷媒) -->
+              <div class="p-3.5 rounded-xl bg-rose-950/70 border-2 border-rose-500 shadow-md space-y-2">
+                <div class="text-[10px] font-bold text-rose-300 flex items-center gap-1 font-sans">
+                  <i class="fa-solid fa-arrow-down"></i> 🔴 盤查冷媒看這裡！只需記錄冷媒型號與充填重量：
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span class="text-slate-400 block text-[10px]">冷媒種類 (Refrigerant)：</span>
+                    <strong class="text-base font-black text-rose-300 bg-amber-500/20 border border-amber-500/50 px-2 py-0.5 rounded">R-134a (或 R-404A)</strong>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10px]">冷媒充填量 (Charge)：</span>
+                    <strong class="text-base font-black text-rose-300 bg-amber-500/20 border border-amber-500/50 px-2 py-0.5 rounded">180 g (0.18 kg)</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 text-[11px] font-sans text-slate-300 bg-slate-900/80 p-2.5 rounded-lg border border-slate-700">
+                <strong>💡 盤查指引：</strong> 原物料名稱請選「<strong>R-134a</strong>」或「<strong>R-404A</strong>」。若無維修單據，可點計算器選擇「<strong>模式 B：銘牌逸散率推算</strong>」，輸入 180g (0.18kg) 與商用冰箱逸散率 10%，自動算出年逸散量為 <code class="text-emerald-400 font-bold">0.018 kg</code>！
+              </div>
+            </div>
+          </div>
+
+          <!-- Document View 6: 分離式/窗型冷氣銘牌 (聚焦冷媒) -->
+          <div id="doc-view-ac" class="doc-view-card space-y-3 hidden">
+            <div class="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 text-slate-100 rounded-2xl p-5 shadow-2xl font-mono border-4 border-slate-500 relative max-w-xl mx-auto">
+              <div class="flex items-center justify-between border-b border-slate-500 pb-2">
+                <div class="font-black text-sm text-slate-200 tracking-wider">★ 變頻分離式冷氣 室外機銘牌 (Outdoor Unit)</div>
+                <span class="text-[10px] text-slate-400">IPX4 防水等級</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 my-3 text-xs">
+                <div>型號：<span class="text-slate-300">CU-RX50GHA2</span></div>
+                <div>冷房能力：<span class="text-slate-300">5.0 kW</span></div>
+                <div>電源：<span class="text-slate-300">單相 220V 60Hz</span></div>
+                <div>運轉電流：<span class="text-slate-300">5.8 A</span></div>
+              </div>
+
+              <!-- Key Red Highlight Box (聚焦冷媒) -->
+              <div class="p-3.5 rounded-xl bg-rose-950/70 border-2 border-rose-500 shadow-md space-y-2">
+                <div class="text-[10px] font-bold text-rose-300 flex items-center gap-1 font-sans">
+                  <i class="fa-solid fa-arrow-down"></i> 🔴 填報冷媒代碼與設備原始冷媒總量看這格：
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span class="text-slate-400 block text-[10px]">冷媒名稱 (Refrigerant)：</span>
+                    <strong class="text-base font-black text-rose-300 bg-amber-500/20 border border-amber-500/50 px-2 py-0.5 rounded">R-410A (或 R-32)</strong>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10px]">冷媒填充量 (Charge)：</span>
+                    <strong class="text-base font-black text-rose-300 bg-amber-500/20 border border-amber-500/50 px-2 py-0.5 rounded">1.20 kg</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 text-[11px] font-sans text-slate-300 bg-slate-900/80 p-2.5 rounded-lg border border-slate-700">
+                <strong>💡 盤查指引：</strong> 原(燃)物料請選「<strong>R-410A</strong>」或「<strong>R-32</strong>」。無維修單據時，點計算器選「<strong>銘牌逸散率推算</strong>」，輸入 1.2kg 與冷氣逸散率 1%，年逸散量為 <code class="text-emerald-400 font-bold">0.012 kg</code>。
+              </div>
+            </div>
+          </div>
+
+          <!-- Document View 7: 飲水機/開飲機銘牌 (聚焦冷媒) -->
+          <div id="doc-view-dispenser" class="doc-view-card space-y-3 hidden">
+            <div class="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 text-slate-100 rounded-2xl p-5 shadow-2xl font-mono border-4 border-slate-500 relative max-w-xl mx-auto">
+              <div class="flex items-center justify-between border-b border-slate-500 pb-2">
+                <div class="font-black text-sm text-slate-200 tracking-wider">★ 冰溫熱三溫開飲機 機身銘牌</div>
+                <span class="text-[10px] text-slate-400">CNS 檢驗合格</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 my-3 text-xs">
+                <div>型號：<span class="text-slate-300">YS-8260BW</span></div>
+                <div>熱水容量：<span class="text-slate-300">5.0 公升</span></div>
+                <div>冰水容量：<span class="text-slate-300">1.8 公升</span></div>
+                <div>電壓：<span class="text-slate-300">110V / 60Hz</span></div>
+              </div>
+
+              <!-- Key Red Highlight Box (聚焦冷媒) -->
+              <div class="p-3.5 rounded-xl bg-rose-950/70 border-2 border-rose-500 shadow-md space-y-2">
+                <div class="text-[10px] font-bold text-rose-300 flex items-center gap-1 font-sans">
+                  <i class="fa-solid fa-arrow-down"></i> 🔴 有冰水功能的飲水機內含小型壓縮機冷媒：
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span class="text-slate-400 block text-[10px]">冷媒種類：</span>
+                    <strong class="text-base font-black text-rose-300 bg-amber-500/20 border border-amber-500/50 px-2 py-0.5 rounded">R-134a</strong>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10px]">冷媒充填量：</span>
+                    <strong class="text-base font-black text-rose-300 bg-amber-500/20 border border-amber-500/50 px-2 py-0.5 rounded">45 g (0.045 kg)</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 text-[11px] font-sans text-slate-300 bg-slate-900/80 p-2.5 rounded-lg border border-slate-700">
+                <strong>💡 盤查指引：</strong> 只有具備「<strong>製冰水</strong>」功能的飲水機才有冷媒逸散。整年正常使用無漏氣，活動數據填 <code class="text-emerald-400 font-bold">0 kg</code> 即可。
+              </div>
+            </div>
+          </div>
+
+          <!-- Document View 8: 二氧化碳 (CO2) 滅火器標籤 -->
+          <div id="doc-view-extinguisher" class="doc-view-card space-y-3 hidden">
+            <div class="bg-gradient-to-br from-rose-900 via-rose-950 to-slate-950 text-slate-100 rounded-2xl p-5 shadow-2xl font-sans border-4 border-rose-600 relative max-w-xl mx-auto">
+              <div class="flex items-center justify-between border-b border-rose-500/50 pb-2.5">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-fire-extinguisher text-2xl text-rose-400"></i>
+                  <div>
+                    <div class="font-black text-base text-rose-200">二氧化碳滅火器 (CO2 FIRE EXTINGUISHER)</div>
+                    <div class="text-[10px] text-rose-300/80">型式認可品 內政部消防署審核認可</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Key Red Highlight Box -->
+              <div class="my-4 p-4 rounded-xl bg-slate-950/90 border-2 border-rose-400 shadow-md space-y-3">
+                <div class="text-[10px] font-bold text-rose-300 flex items-center gap-1 font-sans">
+                  <i class="fa-solid fa-arrow-down"></i> 🔴 滅火器盤查判斷關鍵：
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+                  <div>
+                    <span class="text-slate-400 block text-[10px] font-sans">滅火劑種類 (Agent)：</span>
+                    <strong class="text-base font-black text-rose-300 bg-rose-900/60 border border-rose-400 px-2 py-0.5 rounded">二氧化碳 (CO2)</strong>
+                    <span class="text-[10px] text-slate-400 block mt-1 font-sans">※ 乾粉滅火器不屬溫室氣體，不需盤查！</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10px] font-sans">藥劑重量 / 充填量：</span>
+                    <strong class="text-base font-black text-rose-300 bg-rose-900/60 border border-rose-400 px-2 py-0.5 rounded">5.0 kg (10型)</strong>
+                    <span class="text-[10px] text-slate-400 block mt-1 font-sans">※ 常見規格：5型約3.5kg、10型約5kg</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-[11px] text-slate-300 bg-slate-900/80 p-3 rounded-lg border border-slate-700 space-y-1">
+                <div><strong>💡 白話問答防呆指引：</strong></div>
+                <div>1. <strong>整年掛在牆上沒動過（未噴射/未重灌）：</strong>活動數據請填 <code class="text-emerald-400 font-bold">0 kg</code>，數據來源標記「年度無使用/無充填」。</div>
+                <div>2. <strong>過去一年曾噴射使用或送廠重灌：</strong>請以「<strong>藥劑重量 (5kg) × 噴射瓶數</strong>」計算實際逸散量。</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Action Buttons -->
+          <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-xs text-slate-400">💡 點選上方分類標籤可隨時切換不同單據與設備銘牌</span>
+            <button type="button" onclick="closeDocGuideModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg transition flex items-center gap-1.5">
+              <i class="fa-solid fa-check"></i> 我知道了，返回填寫
             </button>
           </div>
 
@@ -1992,6 +2558,61 @@
     }
 
     // =============================================
+    // 實體單據與設備銘牌視覺對照指南 (❓ 單據/銘牌怎麼看？)
+    // =============================================
+    function openDocGuideModal(targetTab = null) {
+      const modal = document.getElementById('docGuideModal');
+      if (!modal) return;
+
+      if (!targetTab) {
+        const matName = (document.getElementById('actMaterialName')?.value || '').trim();
+        const equipName = (document.getElementById('actEquipName')?.value || '').trim();
+
+        if (matName.includes('滅火') || equipName.includes('滅火') || matName.includes('二氧化碳') || equipName.includes('CO2')) {
+          targetTab = 'extinguisher';
+        } else if (equipName.includes('冰箱') || equipName.includes('冷凍') || equipName.includes('冷藏') || equipName.includes('展示櫃')) {
+          targetTab = 'fridge';
+        } else if (equipName.includes('冷氣') || equipName.includes('空調') || matName.includes('410') || matName.includes('R-32')) {
+          targetTab = 'ac';
+        } else if (equipName.includes('飲水') || equipName.includes('開飲')) {
+          targetTab = 'dispenser';
+        } else if (matName.includes('電力') || matName.includes('電費') || equipName.includes('電')) {
+          targetTab = 'elec';
+        } else if (matName.includes('柴油') || matName.includes('汽油') || equipName.includes('車') || equipName.includes('貨車')) {
+          targetTab = 'fuel';
+        } else if (matName.includes('瓦斯') || matName.includes('LPG') || equipName.includes('瓦斯')) {
+          targetTab = 'gas';
+        } else if (matName.includes('冷媒')) {
+          targetTab = 'refrig';
+        } else {
+          targetTab = 'elec';
+        }
+      }
+
+      switchDocGuideTab(targetTab);
+      modal.classList.remove('hidden');
+    }
+
+    function closeDocGuideModal() {
+      const modal = document.getElementById('docGuideModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function switchDocGuideTab(tabKey) {
+      document.querySelectorAll('.doc-tab-btn').forEach(btn => {
+        btn.className = 'doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200';
+      });
+      const activeBtn = document.getElementById(`btn-doc-tab-${tabKey}`);
+      if (activeBtn) {
+        activeBtn.className = 'doc-tab-btn p-2.5 rounded-xl border text-xs font-bold transition text-left flex items-center gap-2 bg-indigo-600 text-white border-indigo-400 shadow-md';
+      }
+
+      document.querySelectorAll('.doc-view-card').forEach(card => card.classList.add('hidden'));
+      const activeCard = document.getElementById(`doc-view-${tabKey}`);
+      if (activeCard) activeCard.classList.remove('hidden');
+    }
+
+    // =============================================
     // 智慧輔助計算器 (Smart Activity Calculator) 核心邏輯
     // =============================================
 
@@ -2006,25 +2627,30 @@
       if (!modal) return;
 
       const matName = (document.getElementById('actMaterialName')?.value || '').trim();
+      const equipName = (document.getElementById('actEquipName')?.value || '').trim();
       const currentUnit = (document.getElementById('actUnit')?.value || '').trim();
       const currentQty = parseInt(document.getElementById('actQuantity')?.value) || 1;
 
       // 依目前選取的物料自動切換計算模式
-      if (matName.includes('電力') || currentUnit.includes('度') || currentUnit.includes('kWh')) {
+      if (matName.includes('滅火') || equipName.includes('滅火') || matName.includes('二氧化碳') || equipName.includes('CO2')) {
+        switchCalcCategory('fire');
+      } else if (matName.includes('電力') || currentUnit.includes('度') || currentUnit.includes('kWh')) {
         switchCalcCategory('elec');
       } else if (matName.includes('柴油') || matName.includes('汽油') || currentUnit.includes('L') || currentUnit.includes('公升')) {
         switchCalcCategory('fuel');
       } else if (matName.includes('瓦斯') || matName.includes('LPG') || matName.includes('LNG')) {
         switchCalcCategory('gas');
-      } else if (matName.includes('冷媒') || matName.includes('410') || matName.includes('404') || matName.includes('134')) {
+      } else if (matName.includes('冷媒') || matName.includes('410') || matName.includes('404') || matName.includes('134') || equipName.includes('冷氣') || equipName.includes('冰箱')) {
         switchCalcCategory('refrig');
       } else {
         switchCalcCategory('elec');
       }
 
-      // 同步電力模式 C 的設備數量
+      // 同步電力模式 C 與冷媒逸散的設備數量
       const eqCountInput = document.getElementById('elecEquipCount');
       if (eqCountInput) eqCountInput.value = currentQty;
+      const refrigQtyInput = document.getElementById('refrigEquipQty');
+      if (refrigQtyInput) refrigQtyInput.value = currentQty;
 
       modal.classList.remove('hidden');
     }
@@ -2188,17 +2814,17 @@
       }
     }
 
-    // 切換物料大類別 (外購電力/車用汽柴油/桶裝瓦斯/冷媒/通用)
+    // 切換物料大類別 (外購電力/車用汽柴油/桶裝瓦斯/冷媒/滅火器/通用)
     function switchCalcCategory(cat) {
       currentCalcCat = cat;
 
       // 導覽按鈕樣式更新
       document.querySelectorAll('.calc-cat-btn').forEach(b => {
-        b.className = 'calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800';
+        b.className = 'calc-cat-btn flex-1 min-w-[110px] py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800';
       });
       const activeBtn = document.getElementById(`btn-calc-tab-${cat}`);
       if (activeBtn) {
-        activeBtn.className = 'calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-md border border-emerald-500';
+        activeBtn.className = 'calc-cat-btn flex-1 min-w-[110px] py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-md border border-emerald-500';
       }
 
       // 面板顯示切換
@@ -2211,6 +2837,7 @@
       else if (cat === 'fuel') calcFuel();
       else if (cat === 'gas') calcLPG();
       else if (cat === 'refrig') calcRefrigerant();
+      else if (cat === 'fire') calcFireExtinguisher();
       else if (cat === 'custom') calcCustom();
     }
 
@@ -2507,7 +3134,22 @@
       updateCalcResultUI(total, currentCalcUnit, formulaText);
     }
 
-    // 4. 【冷媒填充】計算邏輯
+    // 4. 【冷媒逸散】計算邏輯 (支援回補法與銘牌逸散率法)
+    function switchRefrigSubMode(mode) {
+      document.getElementById('refrig-sub-repair').classList.toggle('hidden', mode !== 'refrig_repair');
+      document.getElementById('refrig-sub-escape').classList.toggle('hidden', mode !== 'refrig_escape');
+      calcRefrigerant();
+    }
+
+    function onRefrigEquipTypeChange() {
+      const sel = document.getElementById('refrigEquipType')?.value;
+      const rateIn = document.getElementById('refrigEscapeRate');
+      if (rateIn && sel !== 'custom') {
+        rateIn.value = sel;
+      }
+      calcRefrigerant();
+    }
+
     function addRefrigRow() {
       const container = document.getElementById('refrigRowsContainer');
       if (!container) return;
@@ -2537,21 +3179,130 @@
     }
 
     function calcRefrigerant() {
+      const mode = document.querySelector('input[name="refrigSubMode"]:checked')?.value || 'refrig_repair';
       let total = 0;
-      let count = 0;
-      document.querySelectorAll('.refrig-kg').forEach(el => {
-        const val = parseFloat(el.value);
-        if (!isNaN(val) && val > 0) {
-          total += val;
-          count++;
-        }
-      });
-      total = Math.round(total * 100) / 100;
-      const formulaText = `已加總 ${count} 筆冷媒維護灌注紀錄，年總灌注量 = ${total} kg`;
-      currentCalcSource = '冷媒填充/原廠維修保養工單紀錄';
+      let formulaText = '';
+
+      if (mode === 'refrig_repair') {
+        let count = 0;
+        document.querySelectorAll('.refrig-kg').forEach(el => {
+          const val = parseFloat(el.value);
+          if (!isNaN(val) && val > 0) {
+            total += val;
+            count++;
+          }
+        });
+        total = Math.round(total * 1000) / 1000;
+        formulaText = `已加總 ${count} 筆冷媒維護灌注紀錄，年總回補量 = ${total} kg`;
+        currentCalcSource = '冷媒填充/原廠維修保養工單紀錄';
+      } else if (mode === 'refrig_escape') {
+        const chargeVal = parseFloat(document.getElementById('refrigChargeVal')?.value) || 0;
+        const unit = document.getElementById('refrigChargeUnit')?.value || 'g';
+        const qty = parseFloat(document.getElementById('refrigEquipQty')?.value) || 1;
+        const rate = parseFloat(document.getElementById('refrigEscapeRate')?.value) || 10.0;
+
+        const chargeKg = unit === 'g' ? (chargeVal / 1000) : chargeVal;
+        total = Math.round((chargeKg * qty * (rate / 100)) * 10000) / 10000;
+        
+        formulaText = `(單台冷媒 ${chargeVal}${unit} = ${chargeKg} kg) × ${qty} 台 × 年逸散率 ${rate}% = 年逸散量 ${total} kg`;
+        currentCalcSource = `銘牌冷媒量依逸散率推估 (年逸散率 ${rate}%)`;
+      }
+
       currentCalcVal = total;
       currentCalcUnit = 'kg';
       updateCalcResultUI(total, currentCalcUnit, formulaText);
+    }
+
+    // 5. 【滅火器逸散】計算邏輯 (白話問答防呆模式)
+    let currentFireType = 'co2';
+    let currentFireUsage = 'no';
+
+    function selectFireType(type) {
+      currentFireType = type;
+      const btnAbc = document.getElementById('btn-fire-abc');
+      const btnCo2 = document.getElementById('btn-fire-co2');
+      const abcResult = document.getElementById('fire-abc-result');
+      const co2Section = document.getElementById('fire-co2-section');
+
+      if (type === 'abc') {
+        if (btnAbc) btnAbc.className = 'fire-type-btn p-3.5 rounded-xl border border-amber-500 bg-amber-950/40 text-left transition flex items-center justify-between shadow-md';
+        if (btnCo2) btnCo2.className = 'fire-type-btn p-3.5 rounded-xl border border-slate-700 bg-slate-950/80 text-left transition flex items-center justify-between';
+        if (abcResult) abcResult.classList.remove('hidden');
+        if (co2Section) co2Section.classList.add('hidden');
+
+        currentCalcVal = 0;
+        currentCalcUnit = '公斤 (kg)';
+        currentCalcSource = '乾粉滅火器（不屬溫室氣體，不計入盤查）';
+        updateCalcResultUI(0, currentCalcUnit, '乾粉滅火器不屬溫室氣體，盤查逸散量為 0 kg。');
+      } else {
+        if (btnAbc) btnAbc.className = 'fire-type-btn p-3.5 rounded-xl border border-slate-700 bg-slate-950/80 text-left transition flex items-center justify-between';
+        if (btnCo2) btnCo2.className = 'fire-type-btn p-3.5 rounded-xl border border-rose-500 bg-rose-950/40 text-left transition flex items-center justify-between shadow-md';
+        if (abcResult) abcResult.classList.add('hidden');
+        if (co2Section) co2Section.classList.remove('hidden');
+
+        selectFireUsage(currentFireUsage);
+      }
+    }
+
+    function selectFireUsage(usage) {
+      currentFireUsage = usage;
+      const btnNo = document.getElementById('btn-fire-usage-no');
+      const btnYes = document.getElementById('btn-fire-usage-yes');
+      const unusedMsg = document.getElementById('fire-co2-unused-msg');
+      const inputs = document.getElementById('fire-co2-inputs');
+
+      if (usage === 'no') {
+        if (btnNo) btnNo.className = 'fire-usage-btn p-3 rounded-xl border border-emerald-500 bg-emerald-950/40 text-left transition flex items-center justify-between shadow-md';
+        if (btnYes) btnYes.className = 'fire-usage-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 text-left transition flex items-center justify-between';
+        if (unusedMsg) unusedMsg.classList.remove('hidden');
+        if (inputs) inputs.classList.add('hidden');
+
+        currentCalcVal = 0;
+        currentCalcUnit = '公斤 (kg)';
+        currentCalcSource = '滅火器年度無使用/無充填';
+        updateCalcResultUI(0, currentCalcUnit, '全年未噴射使用，溫室氣體逸散量為 0.00 kg。');
+      } else {
+        if (btnNo) btnNo.className = 'fire-usage-btn p-3 rounded-xl border border-slate-700 bg-slate-950/80 text-left transition flex items-center justify-between';
+        if (btnYes) btnYes.className = 'fire-usage-btn p-3 rounded-xl border border-rose-500 bg-rose-950/40 text-left transition flex items-center justify-between shadow-md';
+        if (unusedMsg) unusedMsg.classList.add('hidden');
+        if (inputs) inputs.classList.remove('hidden');
+
+        calcFireExtinguisher();
+      }
+    }
+
+    function calcFireExtinguisher() {
+      if (currentFireType === 'abc') return;
+      if (currentFireUsage === 'no') {
+        currentCalcVal = 0;
+        currentCalcUnit = '公斤 (kg)';
+        currentCalcSource = '滅火器年度無使用/無充填';
+        updateCalcResultUI(0, currentCalcUnit, '全年未噴射使用，溫室氣體逸散量為 0.00 kg。');
+        return;
+      }
+
+      const cap = parseFloat(document.getElementById('fireCapacityKg')?.value) || 0;
+      const qty = parseFloat(document.getElementById('fireUsedQty')?.value) || 1;
+      const total = Math.round((cap * qty) * 100) / 100;
+
+      const formulaText = `藥劑充填量 ${cap} kg × 噴射重灌 ${qty} 支 = 全年實際逸散量 ${total} kg`;
+      currentCalcSource = `保養/充填紀錄（年度實際使用量 ${qty} 支共 ${total} kg）`;
+      currentCalcVal = total;
+      currentCalcUnit = '公斤 (kg)';
+      updateCalcResultUI(total, currentCalcUnit, formulaText);
+    }
+
+    function applyFireZeroResult(sourceText) {
+      const actDataIn = document.getElementById('actActivityData');
+      const unitIn = document.getElementById('actUnit');
+      const srcIn = document.getElementById('actDataSource');
+
+      if (actDataIn) actDataIn.value = '0';
+      if (unitIn) unitIn.value = '公斤 (kg)';
+      if (srcIn) srcIn.value = sourceText || '乾粉滅火器（不屬溫室氣體，不計入盤查）';
+
+      closeActivityCalculator();
+      showToast('已成功設定活動數據為 0 kg！');
     }
 
     // 5. 【通用累加/乘法】計算邏輯
