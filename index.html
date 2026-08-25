@@ -542,6 +542,22 @@
 
           <input type="hidden" id="actEditIndex" value="-1" />
 
+          <!-- 避免電力重複計算防呆警告 (Electricity Duplicate Warning) -->
+          <div id="actElecDuplicateWarning" class="hidden p-4 rounded-2xl bg-gradient-to-r from-amber-950/80 via-orange-950/70 to-slate-900 border-l-4 border-amber-500 text-amber-200 text-xs flex items-start gap-3 shadow-xl transition-all">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-base shrink-0 mt-0.5 shadow-sm">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="flex-1 space-y-1">
+              <div class="font-bold text-amber-300 text-xs sm:text-sm flex items-center gap-1.5">
+                <span>⚠️ 避免重複計算提醒：</span>
+              </div>
+              <div class="leading-relaxed text-amber-200/90 text-xs font-normal">
+                我們強烈建議「外購電力」只需填寫一筆<strong class="text-amber-100 font-bold underline decoration-amber-400">【整家店的台電總電費單】</strong>度數即可。<br />
+                請勿將個別設備（如照明、冷氣、冰箱）的推估耗電量分開填入，這將導致與總電表重複計算，使碳排量嚴重暴增！
+              </div>
+            </div>
+          </div>
+
           <!-- Form Content (Grouped into 5 logical sections) -->
           <div class="space-y-4 text-xs">
 
@@ -2734,6 +2750,10 @@
           setScopeEmissionLock(false);
         }
       }
+
+      // 即時觸發極端值檢核與電力重複計算提醒
+      checkActivityDataSanity();
+      checkElectricityDuplicate();
     }
 
     function setScopeEmissionLock(isLocked) {
@@ -2764,6 +2784,41 @@
       }
       if (scopeLockTag) scopeLockTag.classList.toggle('hidden', !isLocked);
       if (emissionLockTag) emissionLockTag.classList.toggle('hidden', !isLocked);
+    }
+
+    // =============================================
+    // 避免電力重複計算防呆提醒 (Electricity Duplicate Warning)
+    // =============================================
+    function checkElectricityDuplicate() {
+      const warnEl = document.getElementById('actElecDuplicateWarning');
+      if (!warnEl) return;
+
+      const matName = (document.getElementById('actMaterialName')?.value || '').trim();
+      const matCode = (document.getElementById('actMaterialCode')?.value || '').trim();
+      const scopeType = (document.getElementById('actScopeType')?.value || '').trim();
+      const editIndex = parseInt(document.getElementById('actEditIndex')?.value ?? -1);
+
+      const isElec = matName.includes('電力') || matName.includes('台電') || matCode === 'EL0001' || scopeType.includes('Scope 2') || scopeType.includes('間接');
+
+      if (!isElec) {
+        warnEl.classList.add('hidden');
+        return;
+      }
+
+      // 檢查清冊中是否存在「其他」外購電力紀錄（排除當前正在編輯的紀錄）
+      const hasOtherElecRecord = activityRecords.some((r, idx) => {
+        if (editIndex >= 0 && idx === editIndex) return false;
+        const rName = r.materialName || '';
+        const rCode = r.materialCode || '';
+        const rScope = r.scopeType || '';
+        return rName.includes('電力') || rCode === 'EL0001' || rScope.includes('Scope 2') || rScope.includes('間接');
+      });
+
+      if (hasOtherElecRecord) {
+        warnEl.classList.remove('hidden');
+      } else {
+        warnEl.classList.add('hidden');
+      }
     }
 
     // =============================================
@@ -2927,8 +2982,9 @@
         document.getElementById('actCarbonContent').value = r.carbonContent || '';
       }
 
-      // 觸發常理極端值防雷檢核
+      // 觸發常理極端值防雷檢核與電力重複計算提醒
       checkActivityDataSanity();
+      checkElectricityDuplicate();
 
       modal.classList.remove('hidden');
     }
@@ -2936,6 +2992,8 @@
     function closeActivityModal() {
       const modal = document.getElementById('activityRecordModal');
       if (modal) modal.classList.add('hidden');
+      const elecWarn = document.getElementById('actElecDuplicateWarning');
+      if (elecWarn) elecWarn.classList.add('hidden');
     }
 
     // =============================================
