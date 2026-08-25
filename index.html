@@ -426,36 +426,6 @@
           </div>
         </div>
 
-        <!-- Gamified Progress Dashboard / 填報完成度進度條與即時正向回饋 -->
-        <div id="actProgressDashboard" class="glass-panel rounded-2xl p-4 sm:p-5 border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 via-slate-900/60 to-slate-900/80 shadow-lg space-y-3">
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-lg shadow-inner">
-                <i id="actProgressIcon" class="fa-solid fa-flag-checkered"></i>
-              </div>
-              <div>
-                <div class="text-[11px] text-emerald-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                  <span>填報進度儀表板 (Progress)</span>
-                  <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">即時連動</span>
-                </div>
-                <div id="actProgressMsg" class="text-xs sm:text-sm font-semibold text-slate-100 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                  <span>⏳ 填報進度：已完成 0 / 4 項設備。</span>
-                  <span class="text-emerald-300/90 font-normal">還剩 4 項尚未填報，再撐一下就完成囉！</span>
-                </div>
-              </div>
-            </div>
-            <div class="flex items-baseline gap-1.5">
-              <span id="actProgressPercentText" class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">0%</span>
-              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">COMPLETED</span>
-            </div>
-          </div>
-
-          <!-- Visual Progress Bar -->
-          <div class="w-full bg-slate-800/90 rounded-full h-3.5 overflow-hidden border border-slate-700/80 p-0.5 shadow-inner">
-            <div id="actProgressBar" class="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 h-full rounded-full transition-all duration-500 shadow-md shadow-emerald-500/30" style="width: 0%;"></div>
-          </div>
-        </div>
-
         <!-- 24-Field Horizontally Scrollable Preview Table -->
         <div class="glass-panel rounded-2xl p-5 space-y-4">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-700 pb-3">
@@ -2869,39 +2839,6 @@
       }
     }
 
-    // =============================================
-    // 填報完成度進度條與即時正向回饋 (Gamified Progress Dashboard)
-    // =============================================
-    function updateActivityProgress() {
-      const msgEl = document.getElementById('actProgressMsg');
-      const barEl = document.getElementById('actProgressBar');
-      const textEl = document.getElementById('actProgressPercentText');
-      const iconEl = document.getElementById('actProgressIcon');
-
-      if (!msgEl || !barEl || !textEl) return;
-
-      // 總應填報設備數（優先抓 Step 3 排放源鑑別清單數量，若無則依 activityRecords 計算）
-      const step3Total = (window.emissionSources && Array.isArray(window.emissionSources)) ? window.emissionSources.length : 0;
-      const totalCount = Math.max(step3Total, activityRecords.length, 1);
-      const completedCount = activityRecords.length;
-      const percent = Math.min(100, Math.round((completedCount / totalCount) * 100));
-
-      barEl.style.width = `${percent}%`;
-      textEl.innerText = `${percent}%`;
-
-      if (completedCount === 0) {
-        msgEl.innerHTML = `<span>🚀 開始建立您的第一筆活動數據吧！</span>`;
-        if (iconEl) iconEl.className = 'fa-solid fa-rocket text-amber-400 text-lg';
-      } else if (completedCount < totalCount) {
-        const remaining = totalCount - completedCount;
-        msgEl.innerHTML = `<span>⏳ 填報進度：已完成 <strong class="text-emerald-400 font-mono font-bold">${completedCount}</strong> / <strong class="text-slate-300 font-mono">${totalCount}</strong> 項設備。</span><span class="text-emerald-300 font-normal ml-1">還剩 ${remaining} 項尚未填報，再撐一下就完成囉！</span>`;
-        if (iconEl) iconEl.className = 'fa-solid fa-hourglass-half text-cyan-400 animate-pulse text-lg';
-      } else {
-        msgEl.innerHTML = `<span>🎉 太棒了！所有設備數據皆已填報完成！</span><span class="text-emerald-400 font-mono font-bold ml-1">(${completedCount} / ${totalCount} 項全數就緒)</span>`;
-        if (iconEl) iconEl.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
-      }
-    }
-
     // 開啟活動數據 Modal (新增或編輯)
     function openActivityModal(index = null) {
       const modal = document.getElementById('activityRecordModal');
@@ -4104,9 +4041,6 @@
       if (statInUsePctEl) statInUsePctEl.innerText = totalCount > 0 ? `${Math.round((inUseCount / totalCount) * 100)}%` : '100%';
       if (statS1El) statS1El.innerText = scope1Count;
       if (statS2El) statS2El.innerText = scope2Count;
-
-      // 即時同步填報進度儀表板
-      updateActivityProgress();
 
       // 篩選
       const filtered = activityRecords.filter(r => {
