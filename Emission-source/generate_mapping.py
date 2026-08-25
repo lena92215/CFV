@@ -3,11 +3,13 @@ import os
 
 materials_csv = r'c:\Users\User\OneDrive\桌面\CFV\CFV\Emission-source\原(燃)物料種類.csv'
 equipments_csv = r'c:\Users\User\OneDrive\桌面\CFV\CFV\Emission-source\設備名稱.csv'
+processes_csv = r'c:\Users\User\OneDrive\桌面\CFV\CFV\Emission-source\製程.csv'
 out_js = r'c:\Users\User\OneDrive\桌面\CFV\CFV\Emission-source\mapping_data.js'
 
 tree = {
     'materials': {},
     'equipments': {},
+    'processes': {},
     'ghg_rules': {}
 }
 
@@ -71,13 +73,23 @@ with open(equipments_csv, 'r', encoding='big5', errors='replace') as f:
             if code and name:
                 tree['equipments'][code] = { 'name': name }
 
+# 讀取製程
+with open(processes_csv, 'r', encoding='big5', errors='replace') as f:
+    reader = csv.reader(f)
+    next(reader)
+    for row in reader:
+        if len(row) >= 3:
+            code, name = row[1].strip(), row[2].strip()
+            if code and name:
+                tree['processes'][code] = { 'name': name }
+
 # 產生 JS
 with open(out_js, 'w', encoding='utf-8') as f:
     f.write('window.CFV_MAPPING = ')
     json.dump(tree, f, ensure_ascii=False, separators=(',', ':'))
     f.write(';\n')
 
-print(f"Processed {len(tree['materials'])} materials and {len(tree['equipments'])} equipments.")
+print(f"Processed {len(tree['materials'])} materials, {len(tree['equipments'])} equipments, and {len(tree['processes'])} processes.")
 
 # Print a small sample for the user
 sample_keys = ['010002', '010004', 'EL0001', '010013', '190239']
