@@ -2476,17 +2476,17 @@
 
     const ACTIVITY_STORAGE_KEY = 'cfv_activity_records_v1';
 
-    // 預設 5 筆示範活動數據（包含完整 24 欄位）
+    // 預設 4 筆示範活動數據（與 Step 3 排放源鑑別預設設備完全對應）
     const DEFAULT_ACTIVITY_RECORDS = [
       {
         id: 1,
-        equipNo: "EQ-001",
-        equipCode: "REF-C01",
-        equipName: "營業用開放式冷藏展示櫃",
+        equipNo: "ES-001",
+        equipCode: "EQ-001",
+        equipName: "營業用冷藏展示櫃",
         orgId: "88889999",
         orgName: "阿文優質水果攤 - 本店場域",
         dept: "營運部",
-        location: "1F 展售區 A08",
+        location: "1F 門市展售區",
         quantity: 2,
         materialCode: "EL0001",
         materialName: "外購電力",
@@ -2507,16 +2507,16 @@
       },
       {
         id: 2,
-        equipNo: "EQ-002",
-        equipCode: "COLD-02",
+        equipNo: "ES-002",
+        equipCode: "EQ-002",
         equipName: "大型低溫冷藏庫",
         orgId: "88889999",
         orgName: "阿文優質水果攤 - 本店場域",
         dept: "倉儲部",
-        location: "1F 後方倉儲",
+        location: "1F 後方倉儲區",
         quantity: 1,
-        materialCode: "190240",
-        materialName: "冷藏冷媒(R-404A)",
+        materialCode: "190404",
+        materialName: "冷媒 (R-404A)",
         scopeType: "直接排放 (Scope 1)",
         emissionType: "逸散排放",
         inUse: "是",
@@ -2526,7 +2526,7 @@
         dataSource: "冷媒填充原廠維護工單",
         custodyUnit: "廠務部",
         measurementFrequency: "每年",
-        measurementInstrument: "冷媒電子電子磅秤",
+        measurementInstrument: "冷媒電子磅秤",
         calorificValueSource: "IPCC GWP 報告",
         netCalorificValue: "",
         netCalorificValueUnit: "",
@@ -2534,16 +2534,16 @@
       },
       {
         id: 3,
-        equipNo: "EQ-003",
-        equipCode: "VEH-01",
-        equipName: "3.5噸批發載貨柴油小貨車",
+        equipNo: "ES-003",
+        equipCode: "EQ-003",
+        equipName: "3.5噸批發載貨車",
         orgId: "88889999",
         orgName: "阿文優質水果攤 - 本店場域",
         dept: "物流部",
         location: "公務停車場",
         quantity: 1,
         materialCode: "170006",
-        materialName: "車用柴油",
+        materialName: "車用柴油 (超級柴油)",
         scopeType: "直接排放 (Scope 1)",
         emissionType: "移動燃燒",
         inUse: "是",
@@ -2561,16 +2561,16 @@
       },
       {
         id: 4,
-        equipNo: "EQ-004",
-        equipCode: "AC-01",
-        equipName: "門市分離式冷氣空調 (R-410A)",
+        equipNo: "ES-004",
+        equipCode: "EQ-004",
+        equipName: "門市分離式冷氣",
         orgId: "88889999",
         orgName: "阿文優質水果攤 - 本店場域",
         dept: "行政部",
-        location: "2F 辦公室",
+        location: "2F 營運辦公室",
         quantity: 3,
-        materialCode: "190239",
-        materialName: "冷氣冷媒(R-410A)",
+        materialCode: "190410",
+        materialName: "冷媒 (R-410A)",
         scopeType: "直接排放 (Scope 1)",
         emissionType: "逸散排放",
         inUse: "是",
@@ -2584,33 +2584,6 @@
         calorificValueSource: "IPCC GWP 報告",
         netCalorificValue: "",
         netCalorificValueUnit: "",
-        carbonContent: ""
-      },
-      {
-        id: 5,
-        equipNo: "EQ-005",
-        equipCode: "LGT-01",
-        equipName: "攤位高亮度照明探照燈",
-        orgId: "88889999",
-        orgName: "阿文優質水果攤 - 本店場域",
-        dept: "廠務部",
-        location: "1F 全場照明",
-        quantity: 2,
-        materialCode: "EL0001",
-        materialName: "外購電力",
-        scopeType: "間接排放 (Scope 2)",
-        emissionType: "外購電力使用",
-        inUse: "是",
-        activityData: 8600,
-        ratio: 100,
-        unit: "度 (kWh)",
-        dataSource: "電費單/台電發票",
-        custodyUnit: "會計部",
-        measurementFrequency: "雙月 (每期)",
-        measurementInstrument: "台電數位電子電表",
-        calorificValueSource: "經濟部能源署常用熱值表",
-        netCalorificValue: "860",
-        netCalorificValueUnit: "kcal/度",
         carbonContent: ""
       }
     ];
@@ -3905,7 +3878,7 @@
       showToast(`已成功刪除「${r.equipName}」填報紀錄！`, 'success');
     }
 
-    // 批次匯入 / 帶入 Step 3 設備清單
+    // 批次匯入 / 帶入 Step 3 設備清單（嚴格 1-to-1 精準全量同步）
     function batchImportFromStep3() {
       if (!emissionSources || emissionSources.length === 0) {
         alert('目前 Step 3 (三、排放源鑑別) 中尚無設備資料，請先至 Step 3 新增排放源設備！');
@@ -3915,24 +3888,31 @@
       const defaultOrgId   = document.getElementById('infoTaxId')?.value || '88889999';
       const defaultOrgName = document.getElementById('boundOrgName')?.value || document.getElementById('infoName')?.value || '阿文優質水果攤 - 本店場域';
 
-      let importedCount = 0;
-      let updatedCount = 0;
+      // 嚴格依照 Step 3 清單 1-to-1 精準建立/對齊 Step 4 清冊
+      const newRecords = emissionSources.map((es, idx) => {
+        // 尋找既有 activityRecords 中是否已有該設備（比對設備編號、代碼或名稱）
+        const existing = activityRecords.find(r =>
+          (r.equipNo && r.equipNo === es.equipId) ||
+          (r.equipCode && es.equipId && r.equipCode === es.equipId.replace('ES-', 'EQ-')) ||
+          (r.equipName && (r.equipName === es.name || r.equipName.includes(es.name) || es.name.includes(r.equipName)))
+        );
 
-      emissionSources.forEach(es => {
-        const existingIdx = activityRecords.findIndex(r => r.equipNo === es.equipId || r.equipName === es.name);
-        const auto = getESAuto(es.energy);
+        const auto = getESAuto(es.energy, es.name);
         const isScope2 = auto && auto.scope && auto.scope.includes('二');
         const scopeStr = isScope2 ? '間接排放 (Scope 2)' : '直接排放 (Scope 1)';
 
         // 決定原物料代碼
         let matCode = 'EL0001';
-        if (window.MATERIAL_LIST && window.MATERIAL_LIST.length > 0) {
-          const mMatch = window.MATERIAL_LIST.find(m => m.name === es.energy);
+        if (window.GHG_MATERIAL_DATABASE && window.GHG_MATERIAL_DATABASE.length > 0) {
+          const mMatch = window.GHG_MATERIAL_DATABASE.find(m =>
+            m.name === es.energy ||
+            m.aliases.some(a => a.toLowerCase() === es.energy.trim().toLowerCase() || es.energy.trim().toLowerCase().includes(a.toLowerCase()))
+          );
           if (mMatch && mMatch.code) matCode = mMatch.code;
         } else if (es.energy.includes('柴油')) matCode = '170006';
         else if (es.energy.includes('汽油')) matCode = '170001';
-        else if (es.energy.includes('410')) matCode = '190239';
-        else if (es.energy.includes('404')) matCode = '190240';
+        else if (es.energy.includes('410')) matCode = '190410';
+        else if (es.energy.includes('404')) matCode = '190404';
 
         // 決定排放型式
         let emType = isScope2 ? '外購電力使用' : '固定燃燒';
@@ -3957,52 +3937,45 @@
 
         // 決定部門
         let dStr = '營運部';
-        if (es.location.includes('辦公')) dStr = '行政部';
-        else if (es.location.includes('倉儲')) dStr = '倉儲部';
-        else if (es.location.includes('運輸') || es.location.includes('車')) dStr = '物流部';
-        else if (es.location.includes('全場') || es.location.includes('照明')) dStr = '廠務部';
+        if (es.location && es.location.includes('辦公')) dStr = '行政部';
+        else if (es.location && es.location.includes('倉儲')) dStr = '倉儲部';
+        else if (es.location && (es.location.includes('運輸') || es.location.includes('車') || es.location.includes('停車'))) dStr = '物流部';
+        else if (es.location && (es.location.includes('全場') || es.location.includes('照明'))) dStr = '廠務部';
 
-        const newRec = {
-          id: existingIdx >= 0 ? activityRecords[existingIdx].id : Date.now() + Math.random(),
-          equipNo: es.equipId || `EQ-00${existingIdx >= 0 ? existingIdx + 1 : activityRecords.length + 1}`,
-          equipCode: es.equipId ? es.equipId.replace('ES-', 'EQ-') : `EQ-CODE-${Date.now()}`,
+        return {
+          id: existing ? existing.id : (Date.now() + idx),
+          equipNo: es.equipId || `ES-00${idx + 1}`,
+          equipCode: es.equipId ? es.equipId.replace('ES-', 'EQ-') : `EQ-00${idx + 1}`,
           equipName: es.name,
           orgId: defaultOrgId,
           orgName: defaultOrgName,
-          dept: dStr,
-          location: es.location,
+          dept: existing?.dept || dStr,
+          location: es.location || existing?.location || '本店場域',
           quantity: es.quantity || 1,
           materialCode: matCode,
           materialName: es.energy,
           scopeType: scopeStr,
           emissionType: emType,
-          inUse: '是',
-          activityData: existingIdx >= 0 ? activityRecords[existingIdx].activityData : actVal,
-          ratio: existingIdx >= 0 ? activityRecords[existingIdx].ratio : 100,
-          unit: existingIdx >= 0 ? activityRecords[existingIdx].unit : uStr,
-          dataSource: existingIdx >= 0 ? activityRecords[existingIdx].dataSource : srcStr,
-          custodyUnit: existingIdx >= 0 ? activityRecords[existingIdx].custodyUnit : custStr,
+          inUse: existing?.inUse || '是',
+          activityData: existing ? existing.activityData : actVal,
+          ratio: existing ? existing.ratio : 100,
+          unit: existing ? existing.unit : uStr,
+          dataSource: existing ? existing.dataSource : srcStr,
+          custodyUnit: existing ? existing.custodyUnit : custStr,
           measurementFrequency: isScope2 ? '雙月 (每期)' : '每月',
           measurementInstrument: isScope2 ? '台電數位電子電表' : '標準計量儀表',
           calorificValueSource: '經濟部能源署常用熱值表',
-          netCalorificValue: '',
-          netCalorificValueUnit: '',
-          carbonContent: ''
+          netCalorificValue: existing?.netCalorificValue || (isScope2 ? '860' : (es.energy.includes('柴油') ? '8400' : '')),
+          netCalorificValueUnit: existing?.netCalorificValueUnit || (isScope2 ? 'kcal/度' : (es.energy.includes('柴油') ? 'kcal/L' : '')),
+          carbonContent: existing?.carbonContent || (es.energy.includes('柴油') ? '86.1' : '')
         };
-
-        if (existingIdx >= 0) {
-          activityRecords[existingIdx] = { ...activityRecords[existingIdx], ...newRec };
-          updatedCount++;
-        } else {
-          activityRecords.push(newRec);
-          importedCount++;
-        }
       });
 
+      activityRecords = newRecords;
       saveActivityRecords();
       renderActivityTable();
       renderStep3Itemized();
-      showToast(`成功自 Step 3 帶入設備清單！(新增 ${importedCount} 筆，同步 ${updatedCount} 筆)`);
+      showToast(`已成功將 Step 4 活動數據清單精準對齊 Step 3（共 ${activityRecords.length} 筆設備）！`);
     }
 
     // 重置為預設示範資料
