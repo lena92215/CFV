@@ -299,9 +299,9 @@ function loadGameData() {
     }
   } catch(e) { /* ignore */ }
 
-  // 若無資料，載入 (舊)盤查清冊.ods 的預設真實設備
-  if (gameState.devices.length === 0) {
-    loadODSDemoDevices();
+  // 若使用者未在【清冊填報】新增排放源，則維持完全空白 (無系統自動生成預設設備)
+  if (!gameState.devices) {
+    gameState.devices = [];
   }
 
   // 3. 場地圖
