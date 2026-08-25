@@ -2035,7 +2035,7 @@
         </div>
 
         <div class="glass-panel rounded-2xl p-5 space-y-3">
-          <div class="text-3xl">❄️</div>
+            <div class="text-3xl">❄️</div>
           <h3 class="font-bold text-slate-100 text-sm">環保低 GWP 冷媒</h3>
           <p class="text-xs text-slate-400">降低冷藏/冷氣逸散碳排 35%！</p>
           <div class="flex justify-between items-center text-xs pt-2">
@@ -2284,81 +2284,61 @@
     }
 
     // 排放源清單 (Sheet 3) - 預設維持完全空白，由使用者親自新增或輸入
-    let emissionSources = [];
+    let emissionSources = loadEmissionSources();
 
-    function getESAuto(energy, equipName = '') {
-      if (!energy) return null;
-      const clean = energy.trim().toLowerCase();
-
-      // 特殊：化糞池與水肥判斷
-      if (clean.includes('水肥') || clean.includes('生活污水') || equipName.includes('化糞池')) {
-        return { scope: "範疇一 (逸散排放)", ghg: ["CH₄"] };
-      }
-
-      // 先從專屬 GHG 資料庫尋找
-      const found = GHG_MATERIAL_DATABASE.find(m =>
-        m.name === energy ||
-        m.aliases.some(a => a.toLowerCase() === clean || clean.includes(a.toLowerCase())) ||
-        clean.includes(m.name.toLowerCase())
-      );
-
-      if (found) {
-        const isScope2 = found.scopeType.includes('2');
-        let ghg = ["CO2", "CH4", "N2O"];
-        if (isScope2) ghg = ["CO2"];
-        else if (found.emissionType === '逸散排放') {
-          ghg = found.name.includes('二氧化碳') ? ["CO2"] : ["HFCs"];
+    function loadEmissionSources() {
+      try {
+        const raw = localStorage.getItem('cfv_emission_sources_v1');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            return parsed.filter(e => e.orgId !== '88889999' && !e.name?.includes('阿文'));
+          }
         }
-        return {
-          scope: isScope2 ? "範疇二 (能源間接)" : `範疇一 (${found.emissionType})`,
-          ghg: ghg
-        };
-      }
-
-      // 啟發式備用判定
-      if (clean.includes("電力")) return { scope: "範疇二 (能源間接)", ghg: ["CO2"] };
-      if (clean.includes("柴油") || clean.includes("汽油")) return { scope: "範疇一 (移動燃燒)", ghg: ["CO2", "CH4", "N2O"] };
-      if (clean.includes("瓦斯") || clean.includes("天然氣") || clean.includes("lpg")) return { scope: "範疇一 (固定燃燒)", ghg: ["CO2", "CH4", "N2O"] };
-      if (clean.includes("冷媒") || clean.includes("滅火") || clean.includes("co2") || clean.includes("410") || clean.includes("404")) return { scope: "範疇一 (逸散排放)", ghg: ["HFCs"] };
-      return { scope: "範疇一 (直接排放)", ghg: ["CO2", "CH4", "N2O"] };
+      } catch(e){}
+      return [];
     }
 
-    function updateESPreview() {
-      const energyEl = document.getElementById('esEnergy');
-      if (!energyEl) return;
-      const energy = energyEl.value.trim();
-      const auto = getESAuto(energy);
-      const scopeBadge = document.getElementById('esPreviewScope');
-      const ghgContainer = document.getElementById('esPreviewGHG');
-      if (!scopeBadge || !ghgContainer) return;
-
-      if (!auto) {
-        scopeBadge.className = 'px-2 py-0.5 rounded border text-[11px] font-semibold text-slate-100 bg-slate-600 border-slate-500';
-        scopeBadge.textContent = '待確認';
-        ghgContainer.innerHTML = '<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px]">查無預設溫室氣體，請確認物料名稱</span>';
-        return;
-      }
-
-      const isScope2 = auto.scope.includes('二');
-      const scopeColor = isScope2 ? 'text-white bg-cyan-600 border-cyan-500' : 'text-white bg-orange-500 border-orange-400';
-      scopeBadge.className = `px-2 py-0.5 rounded border text-[11px] font-semibold ${scopeColor}`;
-      scopeBadge.textContent = auto.scope;
-      ghgContainer.innerHTML = auto.ghg.map(g => `<span class="px-1.5 py-0.5 rounded bg-slate-700 border border-slate-600 text-slate-200 text-[10px] font-mono">${g}</span>`).join('');
+    function saveEmissionSources() {
+      try {
+        localStorage.setItem('cfv_emission_sources_v1', JSON.stringify(emissionSources));
+      } catch(e){}
+      syncGameDevicesLocalStorage();
     }
 
-    function checkDuplicateEquipId() {
-      const equipId = document.getElementById('esEquipId').value.trim();
-      const hintEl = document.getElementById('esEquipIdHint');
-      if (!equipId) { if (hintEl) hintEl.classList.add('hidden'); return; }
-      const existing = emissionSources.find(e => e.equipId === equipId);
-      if (existing && hintEl) {
-        hintEl.textContent = '您已建立過此設備編號，系統已為您自動帶入該設備名稱與位置。';
-        hintEl.classList.remove('hidden');
-        document.getElementById('esEquipName').value = existing.name;
-        document.getElementById('esLocation').value = existing.location;
-      } else if (hintEl) {
-        hintEl.classList.add('hidden');
+    function syncGameDevicesLocalStorage() {
+      const devices = [];
+      if (Array.isArray(emissionSources) && emissionSources.length > 0) {
+        emissionSources.forEach(es => {
+          if (es.name || es.energy) {
+            devices.push({
+              name: es.name || '場域設備',
+              energy: es.energy || '',
+              location: es.location || '主要場區',
+              scope: getESAuto(es.energy)?.scope || '範疇一',
+              quantity: parseInt(es.quantity) || 1
+            });
+          }
+        });
       }
+      if (Array.isArray(activityRecords) && activityRecords.length > 0) {
+        activityRecords.forEach(ar => {
+          const equipName = ar.equipName || ar.name;
+          if (equipName) {
+            const exists = devices.some(d => d.name === equipName && d.location === ar.location);
+            if (!exists) {
+              devices.push({
+                name: equipName,
+                energy: ar.materialName || ar.energy || '',
+                location: ar.location || ar.dept || '主要廠區',
+                scope: ar.scopeType || '範疇一',
+                quantity: parseInt(ar.quantity) || 1
+              });
+            }
+          }
+        });
+      }
+      localStorage.setItem('cfv_emission_sources', JSON.stringify(devices));
     }
 
     function addEmissionSource() {
@@ -2382,6 +2362,7 @@
       const hintEl = document.getElementById('esEquipIdHint');
       if (hintEl) hintEl.classList.add('hidden');
 
+      saveEmissionSources();
       updateESPreview();
       renderEmissionSourceTable();
     }
@@ -2389,6 +2370,7 @@
     function deleteEmissionSource(index) {
       if (confirm('確定要刪除此排放源設備嗎？')) {
         emissionSources.splice(index, 1);
+        saveEmissionSources();
         renderEmissionSourceTable();
       }
     }
@@ -2420,6 +2402,7 @@
         return;
       }
       emissionSources[index] = { ...emissionSources[index], equipId, name, location, energy, quantity };
+      saveEmissionSources();
       closeEditModal();
       renderEmissionSourceTable();
     }
@@ -2504,6 +2487,7 @@
       } catch (e) {
         console.error('Failed to save activity records to LocalStorage:', e);
       }
+      syncGameDevicesLocalStorage();
     }
 
     // Toast 提示訊息
@@ -3772,104 +3756,61 @@
       showToast(`已成功刪除「${r.equipName}」填報紀錄！`, 'success');
     }
 
-    // 批次匯入 / 帶入 Step 3 設備清單
+    // 批次匯入 / 帶入 Step 3 設備清單 (無遮蔽匯入所有相同與不相同設備，未填欄位維持空白)
     function batchImportFromStep3() {
       if (!emissionSources || emissionSources.length === 0) {
         alert('目前 Step 3 (三、排放源鑑別) 中尚無設備資料，請先至 Step 3 新增排放源設備！');
         return;
       }
 
-      const defaultOrgId   = document.getElementById('infoTaxId')?.value || '88889999';
-      const defaultOrgName = document.getElementById('boundOrgName')?.value || document.getElementById('infoName')?.value || '阿文優質水果攤 - 本店場域';
+      const defaultOrgId   = document.getElementById('infoTaxId')?.value || '';
+      const defaultOrgName = document.getElementById('boundOrgName')?.value || document.getElementById('infoName')?.value || '';
 
       let importedCount = 0;
-      let updatedCount = 0;
 
       emissionSources.forEach(es => {
-        const existingIdx = activityRecords.findIndex(r => r.equipNo === es.equipId || r.equipName === es.name);
         const auto = getESAuto(es.energy);
-        const isScope2 = auto && auto.scope && auto.scope.includes('二');
-        const scopeStr = isScope2 ? '間接排放 (Scope 2)' : '直接排放 (Scope 1)';
-
-        // 決定原物料代碼
-        let matCode = 'EL0001';
-        if (window.MATERIAL_LIST && window.MATERIAL_LIST.length > 0) {
-          const mMatch = window.MATERIAL_LIST.find(m => m.name === es.energy);
-          if (mMatch && mMatch.code) matCode = mMatch.code;
-        } else if (es.energy.includes('柴油')) matCode = '170006';
-        else if (es.energy.includes('汽油')) matCode = '170001';
-        else if (es.energy.includes('410')) matCode = '190239';
-        else if (es.energy.includes('404')) matCode = '190240';
-
-        // 決定排放型式
-        let emType = isScope2 ? '外購電力使用' : '固定燃燒';
-        if (es.energy.includes('柴油') || es.energy.includes('汽油')) emType = '移動燃燒';
-        if (es.energy.includes('冷媒') || es.energy.includes('滅火')) emType = '逸散排放';
-
-        // 預設活動數據使用量
-        let actVal = 10000;
-        let uStr = '度 (kWh)';
-        let srcStr = '電費單/台電發票';
-        let custStr = '會計部';
-
-        if (es.energy.includes('柴油')) {
-          actVal = 1200; uStr = '公升 (L)'; srcStr = '中油車隊卡加油發票'; custStr = '物流部';
-        } else if (es.energy.includes('汽油')) {
-          actVal = 800; uStr = '公升 (L)'; srcStr = '加油發票'; custStr = '總務部';
-        } else if (es.energy.includes('冷媒')) {
-          actVal = 2.5; uStr = 'kg'; srcStr = '冷媒原廠維修工單'; custStr = '廠務部';
-        } else if (es.energy.includes('電力')) {
-          actVal = es.quantity > 1 ? 15000 * es.quantity : 12500;
+        let scopeStr = '';
+        if (auto && auto.scope) {
+          scopeStr = auto.scope.includes('二') ? '間接排放 (Scope 2)' : '直接排放 (Scope 1)';
         }
 
-        // 決定部門
-        let dStr = '營運部';
-        if (es.location.includes('辦公')) dStr = '行政部';
-        else if (es.location.includes('倉儲')) dStr = '倉儲部';
-        else if (es.location.includes('運輸') || es.location.includes('車')) dStr = '物流部';
-        else if (es.location.includes('全場') || es.location.includes('照明')) dStr = '廠務部';
-
         const newRec = {
-          id: existingIdx >= 0 ? activityRecords[existingIdx].id : Date.now() + Math.random(),
-          equipNo: es.equipId || `EQ-00${existingIdx >= 0 ? existingIdx + 1 : activityRecords.length + 1}`,
-          equipCode: es.equipId ? es.equipId.replace('ES-', 'EQ-') : `EQ-CODE-${Date.now()}`,
-          equipName: es.name,
+          id: Date.now() + Math.random(),
+          equipNo: es.equipId || '',
+          equipCode: '',
+          equipName: es.name || '',
           orgId: defaultOrgId,
           orgName: defaultOrgName,
-          dept: dStr,
-          location: es.location,
-          quantity: es.quantity || 1,
-          materialCode: matCode,
-          materialName: es.energy,
+          dept: '', // 未在 Step 3 填寫處保持空白
+          location: es.location || '',
+          quantity: parseInt(es.quantity) || 1,
+          materialCode: '',
+          materialName: es.energy || '',
           scopeType: scopeStr,
-          emissionType: emType,
+          emissionType: '', // 未在 Step 3 填寫處保持空白
           inUse: '是',
-          activityData: existingIdx >= 0 ? activityRecords[existingIdx].activityData : actVal,
-          ratio: existingIdx >= 0 ? activityRecords[existingIdx].ratio : 100,
-          unit: existingIdx >= 0 ? activityRecords[existingIdx].unit : uStr,
-          dataSource: existingIdx >= 0 ? activityRecords[existingIdx].dataSource : srcStr,
-          custodyUnit: existingIdx >= 0 ? activityRecords[existingIdx].custodyUnit : custStr,
-          measurementFrequency: isScope2 ? '雙月 (每期)' : '每月',
-          measurementInstrument: isScope2 ? '台電數位電子電表' : '標準計量儀表',
-          calorificValueSource: '經濟部能源署常用熱值表',
+          activityData: '', // 未填寫處保持空白，由使用者親自填報或編輯
+          ratio: 100,
+          unit: '', // 未填寫處保持空白
+          dataSource: '', // 未填寫處保持空白
+          custodyUnit: '', // 未填寫處保持空白
+          measurementFrequency: '',
+          measurementInstrument: '',
+          calorificValueSource: '',
           netCalorificValue: '',
           netCalorificValueUnit: '',
           carbonContent: ''
         };
 
-        if (existingIdx >= 0) {
-          activityRecords[existingIdx] = { ...activityRecords[existingIdx], ...newRec };
-          updatedCount++;
-        } else {
-          activityRecords.push(newRec);
-          importedCount++;
-        }
+        activityRecords.push(newRec);
+        importedCount++;
       });
 
       saveActivityRecords();
       renderActivityTable();
       renderStep3Itemized();
-      showToast(`成功自 Step 3 帶入設備清單！(新增 ${importedCount} 筆，同步 ${updatedCount} 筆)`);
+      showToast(`已成功將 Step 3 的 ${importedCount} 筆設備全數匯入！未填寫欄位已維持空白供您編輯。`);
     }
 
     // 清空所有活動數據紀錄
@@ -4409,50 +4350,9 @@
     }
 
     function packageDataAndLaunchGame() {
-      // 1. 公司與場域名稱
       const name = document.getElementById('infoName')?.value || document.getElementById('boundOrgName')?.value || '我的場域';
       localStorage.setItem('cfv_company_info', JSON.stringify({ name: name }));
-
-      // 2. 收集填報的設備與活動數據
-      const devices = [];
-      if (window.activityData && Array.isArray(window.activityData) && window.activityData.length > 0) {
-        window.activityData.forEach(item => {
-          if (item.equip_name || item.raw_material) {
-            devices.push({
-              name: item.equip_name || item.process_name || '場域設備',
-              energy: item.raw_material || item.activity_type || '',
-              location: item.process_name || '主要廠區',
-              scope: item.scope || '範疇一',
-              quantity: parseInt(item.equip_count) || 1
-            });
-          }
-        });
-      }
-
-      const s3Rows = document.querySelectorAll('#emissionSourceTableBody tr');
-      s3Rows.forEach(row => {
-        const inputs = row.querySelectorAll('input, select');
-        if (inputs.length >= 3) {
-          const equipName = inputs[1]?.value || inputs[0]?.value;
-          const location = inputs[2]?.value;
-          const energy = inputs[3]?.value;
-          if (equipName) {
-            devices.push({
-              name: equipName,
-              energy: energy || '',
-              location: location || '主要廠區',
-              scope: '範疇一',
-              quantity: 1
-            });
-          }
-        }
-      });
-
-      if (devices.length > 0) {
-        localStorage.setItem('cfv_emission_sources', JSON.stringify(devices));
-      }
-
-      // 3. 跳轉至 2D 遊戲頁面
+      syncGameDevicesLocalStorage();
       window.location.href = 'game.html';
     }
 
