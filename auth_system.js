@@ -5,12 +5,12 @@
 
 'use strict';
 
-// 預設示範帳號 (初次進入可直接試用)
+// 預設示範帳號 (僅供參考)
 const DEMO_ACCOUNT = {
   email: 'demo@cfv.com',
   password: '123',
-  companyName: '台中魚市場股份有限公司',
-  industry: '市場與批發零售業'
+  companyName: '示範事業單位',
+  industry: '批發與零售業'
 };
 
 // 初始化帳號資料庫
@@ -18,13 +18,11 @@ function getStoredAccounts() {
   try {
     const raw = localStorage.getItem('cfv_accounts');
     if (!raw) {
-      const initial = [DEMO_ACCOUNT];
-      localStorage.setItem('cfv_accounts', JSON.stringify(initial));
-      return initial;
+      return [];
     }
     return JSON.parse(raw);
   } catch (e) {
-    return [DEMO_ACCOUNT];
+    return [];
   }
 }
 
@@ -153,9 +151,9 @@ function applyUserSession(user) {
   const boundOrgName = document.getElementById('boundOrgName');
   const infoIndustry = document.getElementById('infoIndustry');
 
-  if (infoName && (!infoName.value || infoName.value === '阿文水果攤')) infoName.value = user.companyName;
-  if (boundOrgName && (!boundOrgName.value || boundOrgName.value.includes('阿文'))) boundOrgName.value = `${user.companyName} - 本店場域`;
-  if (infoIndustry && user.industry) infoIndustry.value = user.industry;
+  if (infoName && !infoName.value) infoName.value = user.companyName;
+  if (boundOrgName && !boundOrgName.value) boundOrgName.value = `${user.companyName} - 本場域`;
+  if (infoIndustry && user.industry && !infoIndustry.value) infoIndustry.value = user.industry;
 
   // 2. 更新 game.html 公司名稱
   const gameCompany = document.getElementById('gameCompanyName');
