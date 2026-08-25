@@ -610,12 +610,17 @@
 
             <!-- SECTION 4: 活動數據計量與憑證管理 (必填) -->
             <div class="bg-slate-900/70 border border-slate-700/80 rounded-2xl p-4 space-y-3">
-              <div class="text-cyan-400 font-bold text-xs flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                <i class="fa-solid fa-receipt text-cyan-400"></i> 【區塊四】活動數據計量與憑證管理 (必填)
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                <div class="text-cyan-400 font-bold text-xs flex items-center gap-1.5">
+                  <i class="fa-solid fa-receipt text-cyan-400"></i> 【區塊四】活動數據計量與憑證管理 (必填)
+                </div>
+                <button type="button" onclick="openActivityCalculator()" class="px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-500/40 hover:to-teal-500/40 text-emerald-300 border border-emerald-500/50 text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                  <i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> 💡 智慧輔助計算（免手算）
+                </button>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑭ 活動數據 (年使用量) <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">⑭ 活動數據 (年總量) <span class="text-rose-400">*</span></label>
                   <input type="number" step="any" id="actActivityData" placeholder="例如：25000" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono" />
                 </div>
                 <div>
@@ -702,6 +707,313 @@
                 <span>儲存填報紀錄</span>
               </button>
             </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- MODAL: 活動數據智慧輔助計算器 (Smart Activity Calculator)                  -->
+      <!-- ========================================================================= -->
+      <div id="activityCalculatorModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[60] flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl border border-emerald-500/40 p-6 shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-md">
+                <i class="fa-solid fa-calculator text-lg"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-slate-100 flex items-center gap-2">
+                  <span>活動數據智慧輔助計算器</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">免手算</span>
+                </h3>
+                <p class="text-xs text-slate-400">依據單據發票、電表抄表或設備運轉規格，快速自動換算年總使用量</p>
+              </div>
+            </div>
+            <button onclick="closeActivityCalculator()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition flex items-center justify-center">
+              <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+          </div>
+
+          <!-- Category Navigation Tabs -->
+          <div class="flex flex-wrap gap-2 p-1.5 bg-slate-900/90 rounded-2xl border border-slate-800">
+            <button type="button" onclick="switchCalcCategory('elec')" id="btn-calc-tab-elec" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-bolt text-amber-400"></i> 外購電力
+            </button>
+            <button type="button" onclick="switchCalcCategory('fuel')" id="btn-calc-tab-fuel" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-gas-pump text-rose-400"></i> 車用汽柴油
+            </button>
+            <button type="button" onclick="switchCalcCategory('gas')" id="btn-calc-tab-gas" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-fire-burner text-orange-400"></i> 桶裝瓦斯 (LPG)
+            </button>
+            <button type="button" onclick="switchCalcCategory('refrig')" id="btn-calc-tab-refrig" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-snowflake text-cyan-400"></i> 冷媒填充
+            </button>
+            <button type="button" onclick="switchCalcCategory('custom')" id="btn-calc-tab-custom" class="calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-calculator text-slate-300"></i> 通用累加/乘法
+            </button>
+          </div>
+
+          <!-- Category 1: 外購電力 -->
+          <div id="calc-panel-elec" class="calc-panel space-y-4">
+            <!-- Submode Radios -->
+            <div class="flex flex-wrap gap-2">
+              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="elecSubMode" value="elec_bills" checked onchange="switchCalcSubMode('elec', 'elec_bills')" class="accent-emerald-500" />
+                <span class="text-slate-200 font-bold">模式 A：6期電費單度數加總</span>
+              </label>
+              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="elecSubMode" value="elec_cost" onchange="switchCalcSubMode('elec', 'elec_cost')" class="accent-emerald-500" />
+                <span class="text-slate-200 font-bold">模式 B：總電費金額反推</span>
+              </label>
+              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="elecSubMode" value="elec_hours" onchange="switchCalcSubMode('elec', 'elec_hours')" class="accent-emerald-500" />
+                <span class="text-slate-200 font-bold">模式 C：設備瓦數與時數估算</span>
+              </label>
+            </div>
+
+            <!-- Elec Submode A: 6 Bills -->
+            <div id="elec-sub-bills" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-300">請依台電雙月電費單輸入 1~6 期計費度數 (kWh)：</span>
+                <button type="button" onclick="clearElecBills()" class="text-[11px] text-slate-400 hover:text-rose-400 transition">清空輸入</button>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">第 1 期 (1-2月)</label>
+                  <input type="number" step="any" id="elecBill1" oninput="calcElectricity()" placeholder="度數" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">第 2 期 (3-4月)</label>
+                  <input type="number" step="any" id="elecBill2" oninput="calcElectricity()" placeholder="度數" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">第 3 期 (5-6月)</label>
+                  <input type="number" step="any" id="elecBill3" oninput="calcElectricity()" placeholder="度數" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">第 4 期 (7-8月)</label>
+                  <input type="number" step="any" id="elecBill4" oninput="calcElectricity()" placeholder="度數" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">第 5 期 (9-10月)</label>
+                  <input type="number" step="any" id="elecBill5" oninput="calcElectricity()" placeholder="度數" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">第 6 期 (11-12月)</label>
+                  <input type="number" step="any" id="elecBill6" oninput="calcElectricity()" placeholder="度數" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Elec Submode B: Cost -->
+            <div id="elec-sub-cost" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">全年度電費發票/繳費總金額 (新台幣 NTD)</label>
+                  <input type="number" step="any" id="elecTotalCost" oninput="calcElectricity()" placeholder="例如：95000" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">平均每度電價 (元/度，可依電費單調整)</label>
+                  <input type="number" step="any" id="elecUnitPrice" value="3.8" oninput="calcElectricity()" placeholder="例如：3.8" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                  <span class="text-[10px] text-slate-500 mt-1 block">公式：年總度數 = 總電費金額 ÷ 每度電價</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Elec Submode C: Hours -->
+            <div id="elec-sub-hours" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">設備額定功率 (W)</label>
+                  <input type="number" step="any" id="elecPowerWatt" oninput="calcElectricity()" placeholder="例如：800" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">設備數量 (台)</label>
+                  <input type="number" step="any" id="elecEquipCount" value="1" oninput="calcElectricity()" placeholder="例如：1" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">每日運轉時數 (小時/天)</label>
+                  <input type="number" step="any" id="elecDailyHours" value="12" oninput="calcElectricity()" placeholder="例如：12" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">全年營業天數 (天/年)</label>
+                  <input type="number" step="any" id="elecAnnualDays" value="365" oninput="calcElectricity()" placeholder="例如：365" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+              </div>
+              <div class="text-[10px] text-slate-500">
+                公式：年總度數 (kWh) = (功率 W × 台數 × 每日時數 × 全年天數) ÷ 1,000
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 2: 車用汽柴油 -->
+          <div id="calc-panel-fuel" class="calc-panel space-y-4 hidden">
+            <!-- Submode Radios -->
+            <div class="flex flex-wrap gap-2">
+              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="fuelSubMode" value="fuel_cost" checked onchange="switchCalcSubMode('fuel', 'fuel_cost')" class="accent-emerald-500" />
+                <span class="text-slate-200 font-bold">模式 A：加油發票金額反推公升數</span>
+              </label>
+              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="fuelSubMode" value="fuel_months" onchange="switchCalcSubMode('fuel', 'fuel_months')" class="accent-emerald-500" />
+                <span class="text-slate-200 font-bold">模式 B：12 個月加油公升數加總</span>
+              </label>
+            </div>
+
+            <!-- Fuel Submode A: Cost -->
+            <div id="fuel-sub-cost" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">年度加油發票總金額 (NTD)</label>
+                  <input type="number" step="any" id="fuelTotalCost" oninput="calcFuel()" placeholder="例如：33000" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">油品種類基準</label>
+                  <select id="fuelTypeSelect" onchange="onFuelTypeChange()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none text-xs">
+                    <option value="27.5">超級柴油 (預設 27.5 元/L)</option>
+                    <option value="31.0">95 無鉛汽油 (預設 31.0 元/L)</option>
+                    <option value="29.5">92 無鉛汽油 (預設 29.5 元/L)</option>
+                    <option value="33.0">98 無鉛汽油 (預設 33.0 元/L)</option>
+                    <option value="custom">自訂平均油價</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">平均每公升油價 (元/L)</label>
+                  <input type="number" step="any" id="fuelUnitPrice" value="27.5" oninput="calcFuel()" placeholder="例如：27.5" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+              </div>
+              <div class="text-[10px] text-slate-500">
+                公式：年使用量 (L) = 加油總金額 (NTD) ÷ 平均每公升油價 (元/L)
+              </div>
+            </div>
+
+            <!-- Fuel Submode B: 12 Months -->
+            <div id="fuel-sub-months" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-300">請輸入各月份加油公升數 (L)：</span>
+                <button type="button" onclick="clearFuelMonths()" class="text-[11px] text-slate-400 hover:text-rose-400 transition">清空輸入</button>
+              </div>
+              <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                <div><label class="block text-[10px] text-slate-400">1月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">2月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">3月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">4月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">5月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">6月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">7月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">8月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">9月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">10月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">11月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+                <div><label class="block text-[10px] text-slate-400">12月</label><input type="number" step="any" class="fuel-month-in w-full bg-slate-950 border border-slate-700 rounded p-1.5 text-xs text-slate-100 font-mono" oninput="calcFuel()" /></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 3: 桶裝瓦斯 -->
+          <div id="calc-panel-gas" class="calc-panel space-y-4 hidden">
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">瓦斯鋼瓶規格</label>
+                  <select id="gasBottleSpec" onchange="onGasSpecChange()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none text-xs">
+                    <option value="20">20 公斤 (kg) / 桶（營業常用）</option>
+                    <option value="16">16 公斤 (kg) / 桶（標準家用/商用）</option>
+                    <option value="50">50 公斤 (kg) / 桶（大型工業）</option>
+                    <option value="custom">自訂每桶重量</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">單桶淨重 (kg)</label>
+                  <input type="number" step="any" id="gasBottleWeight" value="20" oninput="calcLPG()" placeholder="20" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">叫貨頻率計算方式</label>
+                  <select id="gasFreqMode" onchange="calcLPG()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none text-xs">
+                    <option value="monthly">每月平均叫貨 (桶/月 × 12)</option>
+                    <option value="annual">全年累計總叫貨桶數 (桶/年)</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label id="gasCountLabel" class="block text-xs text-slate-300 font-medium mb-1">每月平均叫貨桶數 (桶/月)</label>
+                <input type="number" step="any" id="gasBottleCount" value="4" oninput="calcLPG()" placeholder="例如：4" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+              </div>
+              <div class="text-[10px] text-slate-500" id="gasFormulaNote">
+                公式：年總重量 (kg) = 每月 4 桶 × 12 個月 × 20 kg/桶 = 960 kg
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 4: 冷媒填充 -->
+          <div id="calc-panel-refrig" class="calc-panel space-y-4 hidden">
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-300">保養維護/灌冷媒紀錄清單（逸散活動數據以年度回充量計算）：</span>
+                <button type="button" onclick="addRefrigRow()" class="px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition flex items-center gap-1">
+                  <i class="fa-solid fa-plus text-[10px]"></i> 新增維修紀錄
+                </button>
+              </div>
+
+              <div class="space-y-2" id="refrigRowsContainer">
+                <!-- Row 1 -->
+                <div class="refrig-row flex items-center gap-2 bg-slate-950/70 p-2 rounded-xl border border-slate-800">
+                  <input type="date" class="refrig-date bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200 focus:border-emerald-500" />
+                  <input type="text" placeholder="維修保養項目（例如：夏季冷房定期大保養）" class="refrig-desc flex-1 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200 focus:border-emerald-500" />
+                  <div class="flex items-center gap-1">
+                    <input type="number" step="any" placeholder="灌注量" value="2.0" oninput="calcRefrigerant()" class="refrig-kg w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-100 font-mono text-right focus:border-emerald-500" />
+                    <span class="text-xs text-slate-400 font-mono">kg</span>
+                  </div>
+                  <button type="button" onclick="deleteRefrigRow(this)" class="text-slate-500 hover:text-rose-400 p-1 transition" title="刪除此紀錄">
+                    <i class="fa-solid fa-trash-can text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category 5: 通用累加/乘法 -->
+          <div id="calc-panel-custom" class="calc-panel space-y-4 hidden">
+            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">單次使用量 / 單筆數值</label>
+                  <input type="number" step="any" id="customBaseVal" oninput="calcCustom()" placeholder="例如：120" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-300 font-medium mb-1">年度發生次數 / 頻率倍數</label>
+                  <input type="number" step="any" id="customMultiplier" value="12" oninput="calcCustom()" placeholder="例如：12 (每月一次)" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono text-xs" />
+                </div>
+              </div>
+              <div class="text-[10px] text-slate-500">
+                公式：年總活動數據 = 單次數值 × 年度次數
+              </div>
+            </div>
+          </div>
+
+          <!-- Calculation Summary Output Box -->
+          <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-emerald-950/40 border border-emerald-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div class="text-[11px] text-emerald-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-sparkles text-emerald-400"></i> 計算結果預覽 (Calculated Total Activity)
+              </div>
+              <div class="flex items-baseline gap-2 mt-1">
+                <span class="text-3xl font-black text-emerald-400 font-mono" id="calcResultDisplay">0</span>
+                <span class="text-xs text-slate-300 font-bold" id="calcResultUnit">度 (kWh)</span>
+              </div>
+              <div class="text-[11px] text-slate-400 mt-1" id="calcResultFormulaText">
+                尚無輸入數據，請填寫上方任一模式之數據欄位。
+              </div>
+            </div>
+
+            <!-- Action Apply Button -->
+            <button type="button" onclick="applyCalculatorResult()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 whitespace-nowrap">
+              <i class="fa-solid fa-check text-sm"></i>
+              <span>套用計算結果至表單 ⑭ 欄位</span>
+            </button>
           </div>
 
         </div>
@@ -1492,6 +1804,322 @@
     function closeActivityModal() {
       const modal = document.getElementById('activityRecordModal');
       if (modal) modal.classList.add('hidden');
+    }
+
+    // =============================================
+    // 智慧輔助計算器 (Smart Activity Calculator) 核心邏輯
+    // =============================================
+
+    let currentCalcCat = 'elec';
+    let currentCalcVal = 0;
+    let currentCalcUnit = '度 (kWh)';
+    let currentCalcSource = '';
+
+    // 開啟智慧輔助計算器
+    function openActivityCalculator() {
+      const modal = document.getElementById('activityCalculatorModal');
+      if (!modal) return;
+
+      const matName = (document.getElementById('actMaterialName')?.value || '').trim();
+      const currentUnit = (document.getElementById('actUnit')?.value || '').trim();
+      const currentQty = parseInt(document.getElementById('actQuantity')?.value) || 1;
+
+      // 依目前選取的物料自動切換計算模式
+      if (matName.includes('電力') || currentUnit.includes('度') || currentUnit.includes('kWh')) {
+        switchCalcCategory('elec');
+      } else if (matName.includes('柴油') || matName.includes('汽油') || currentUnit.includes('L') || currentUnit.includes('公升')) {
+        switchCalcCategory('fuel');
+      } else if (matName.includes('瓦斯') || matName.includes('LPG') || matName.includes('LNG')) {
+        switchCalcCategory('gas');
+      } else if (matName.includes('冷媒') || matName.includes('410') || matName.includes('404') || matName.includes('134')) {
+        switchCalcCategory('refrig');
+      } else {
+        switchCalcCategory('elec');
+      }
+
+      // 同步電力模式 C 的設備數量
+      const eqCountInput = document.getElementById('elecEquipCount');
+      if (eqCountInput) eqCountInput.value = currentQty;
+
+      modal.classList.remove('hidden');
+    }
+
+    // 關閉智慧輔助計算器
+    function closeActivityCalculator() {
+      const modal = document.getElementById('activityCalculatorModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // 切換物料大類別 (外購電力/車用汽柴油/桶裝瓦斯/冷媒/通用)
+    function switchCalcCategory(cat) {
+      currentCalcCat = cat;
+
+      // 導覽按鈕樣式更新
+      document.querySelectorAll('.calc-cat-btn').forEach(b => {
+        b.className = 'calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800';
+      });
+      const activeBtn = document.getElementById(`btn-calc-tab-${cat}`);
+      if (activeBtn) {
+        activeBtn.className = 'calc-cat-btn flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-md border border-emerald-500';
+      }
+
+      // 面板顯示切換
+      document.querySelectorAll('.calc-panel').forEach(p => p.classList.add('hidden'));
+      const activePanel = document.getElementById(`calc-panel-${cat}`);
+      if (activePanel) activePanel.classList.remove('hidden');
+
+      // 觸發即時試算
+      if (cat === 'elec') calcElectricity();
+      else if (cat === 'fuel') calcFuel();
+      else if (cat === 'gas') calcLPG();
+      else if (cat === 'refrig') calcRefrigerant();
+      else if (cat === 'custom') calcCustom();
+    }
+
+    // 切換子模式 (例如 6期電費單 / 金額反推 / 時數估算)
+    function switchCalcSubMode(cat, mode) {
+      if (cat === 'elec') {
+        document.getElementById('elec-sub-bills').classList.toggle('hidden', mode !== 'elec_bills');
+        document.getElementById('elec-sub-cost').classList.toggle('hidden', mode !== 'elec_cost');
+        document.getElementById('elec-sub-hours').classList.toggle('hidden', mode !== 'elec_hours');
+        calcElectricity();
+      } else if (cat === 'fuel') {
+        document.getElementById('fuel-sub-cost').classList.toggle('hidden', mode !== 'fuel_cost');
+        document.getElementById('fuel-sub-months').classList.toggle('hidden', mode !== 'fuel_months');
+        calcFuel();
+      }
+    }
+
+    // 1. 【外購電力】計算邏輯
+    function clearElecBills() {
+      for (let i = 1; i <= 6; i++) {
+        const el = document.getElementById(`elecBill${i}`);
+        if (el) el.value = '';
+      }
+      calcElectricity();
+    }
+
+    function calcElectricity() {
+      const mode = document.querySelector('input[name="elecSubMode"]:checked')?.value || 'elec_bills';
+      let total = 0;
+      let formulaText = '';
+
+      if (mode === 'elec_bills') {
+        let count = 0;
+        for (let i = 1; i <= 6; i++) {
+          const val = parseFloat(document.getElementById(`elecBill${i}`)?.value);
+          if (!isNaN(val) && val > 0) {
+            total += val;
+            count++;
+          }
+        }
+        formulaText = `已加總 ${count} 期台電電費單度數，年總計 ${total.toLocaleString()} 度 (kWh)`;
+        currentCalcSource = '電費單/台電發票度數加總';
+      } else if (mode === 'elec_cost') {
+        const cost = parseFloat(document.getElementById('elecTotalCost')?.value) || 0;
+        const price = parseFloat(document.getElementById('elecUnitPrice')?.value) || 3.8;
+        if (cost > 0 && price > 0) {
+          total = Math.round((cost / price) * 100) / 100;
+          formulaText = `電費總額 NT$ ${cost.toLocaleString()} ÷ 每度單價 ${price} 元 = ${total.toLocaleString()} 度`;
+          currentCalcSource = '年度電費金額反推度數';
+        } else {
+          formulaText = '請輸入年度電費發票總金額 (例如：95,000)';
+        }
+      } else if (mode === 'elec_hours') {
+        const watts = parseFloat(document.getElementById('elecPowerWatt')?.value) || 0;
+        const qty = parseFloat(document.getElementById('elecEquipCount')?.value) || 1;
+        const hours = parseFloat(document.getElementById('elecDailyHours')?.value) || 0;
+        const days = parseFloat(document.getElementById('elecAnnualDays')?.value) || 365;
+        if (watts > 0 && hours > 0) {
+          total = Math.round(((watts * qty * hours * days) / 1000) * 100) / 100;
+          formulaText = `(${watts}W × ${qty}台 × 每日${hours}h × 每年${days}天) ÷ 1,000 = ${total.toLocaleString()} 度`;
+          currentCalcSource = '設備額定功率與運轉時數推算';
+        } else {
+          formulaText = '請輸入設備功率 (W) 與每日運轉時數';
+        }
+      }
+
+      currentCalcVal = total;
+      currentCalcUnit = '度 (kWh)';
+      updateCalcResultUI(total, currentCalcUnit, formulaText);
+    }
+
+    // 2. 【車用汽柴油】計算邏輯
+    function onFuelTypeChange() {
+      const sel = document.getElementById('fuelTypeSelect')?.value;
+      const unitIn = document.getElementById('fuelUnitPrice');
+      if (!unitIn) return;
+      if (sel !== 'custom') {
+        unitIn.value = sel;
+      }
+      calcFuel();
+    }
+
+    function clearFuelMonths() {
+      document.querySelectorAll('.fuel-month-in').forEach(el => el.value = '');
+      calcFuel();
+    }
+
+    function calcFuel() {
+      const mode = document.querySelector('input[name="fuelSubMode"]:checked')?.value || 'fuel_cost';
+      let total = 0;
+      let formulaText = '';
+
+      if (mode === 'fuel_cost') {
+        const cost = parseFloat(document.getElementById('fuelTotalCost')?.value) || 0;
+        const price = parseFloat(document.getElementById('fuelUnitPrice')?.value) || 27.5;
+        if (cost > 0 && price > 0) {
+          total = Math.round((cost / price) * 100) / 100;
+          formulaText = `加油總額 NT$ ${cost.toLocaleString()} ÷ 平均油價 ${price} 元/L = ${total.toLocaleString()} 公升 (L)`;
+          currentCalcSource = '中油車隊卡/加油發票金額換算';
+        } else {
+          formulaText = '請輸入年度加油發票總金額 (例如：33,000)';
+        }
+      } else if (mode === 'fuel_months') {
+        let count = 0;
+        document.querySelectorAll('.fuel-month-in').forEach(el => {
+          const val = parseFloat(el.value);
+          if (!isNaN(val) && val > 0) {
+            total += val;
+            count++;
+          }
+        });
+        total = Math.round(total * 100) / 100;
+        formulaText = `已加總 ${count} 個月份加油量，年總計 ${total.toLocaleString()} 公升 (L)`;
+        currentCalcSource = '每月油單加油公升數加總';
+      }
+
+      currentCalcVal = total;
+      currentCalcUnit = '公升 (L)';
+      updateCalcResultUI(total, currentCalcUnit, formulaText);
+    }
+
+    // 3. 【桶裝瓦斯 (LPG)】計算邏輯
+    function onGasSpecChange() {
+      const spec = document.getElementById('gasBottleSpec')?.value;
+      const weightIn = document.getElementById('gasBottleWeight');
+      if (weightIn && spec !== 'custom') {
+        weightIn.value = spec;
+      }
+      calcLPG();
+    }
+
+    function calcLPG() {
+      const weight = parseFloat(document.getElementById('gasBottleWeight')?.value) || 20;
+      const count = parseFloat(document.getElementById('gasBottleCount')?.value) || 0;
+      const mode = document.getElementById('gasFreqMode')?.value || 'monthly';
+      const labelEl = document.getElementById('gasCountLabel');
+
+      let total = 0;
+      let formulaText = '';
+
+      if (mode === 'monthly') {
+        if (labelEl) labelEl.innerText = '每月平均叫貨桶數 (桶/月)';
+        total = count * 12 * weight;
+        formulaText = `每月 ${count} 桶 × 12 個月 × 每桶 ${weight} kg = ${total.toLocaleString()} kg`;
+        currentCalcSource = '瓦斯叫貨紀錄/每月叫貨桶數估算';
+      } else {
+        if (labelEl) labelEl.innerText = '全年累計總叫貨桶數 (桶/年)';
+        total = count * weight;
+        formulaText = `全年共叫貨 ${count} 桶 × 每桶 ${weight} kg = ${total.toLocaleString()} kg`;
+        currentCalcSource = '瓦斯採購單/全年總叫貨桶數';
+      }
+
+      total = Math.round(total * 100) / 100;
+      currentCalcVal = total;
+      currentCalcUnit = '公斤 (kg)';
+      updateCalcResultUI(total, currentCalcUnit, formulaText);
+    }
+
+    // 4. 【冷媒填充】計算邏輯
+    function addRefrigRow() {
+      const container = document.getElementById('refrigRowsContainer');
+      if (!container) return;
+      const row = document.createElement('div');
+      row.className = 'refrig-row flex items-center gap-2 bg-slate-950/70 p-2 rounded-xl border border-slate-800';
+      row.innerHTML = `
+        <input type="date" class="refrig-date bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200 focus:border-emerald-500" />
+        <input type="text" placeholder="維修保養項目（例如：管線檢漏後冷媒回充）" class="refrig-desc flex-1 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-200 focus:border-emerald-500" />
+        <div class="flex items-center gap-1">
+          <input type="number" step="any" placeholder="灌注量" value="1.0" oninput="calcRefrigerant()" class="refrig-kg w-24 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-100 font-mono text-right focus:border-emerald-500" />
+          <span class="text-xs text-slate-400 font-mono">kg</span>
+        </div>
+        <button type="button" onclick="deleteRefrigRow(this)" class="text-slate-500 hover:text-rose-400 p-1 transition" title="刪除此紀錄">
+          <i class="fa-solid fa-trash-can text-xs"></i>
+        </button>
+      `;
+      container.appendChild(row);
+      calcRefrigerant();
+    }
+
+    function deleteRefrigRow(btn) {
+      const row = btn.closest('.refrig-row');
+      if (row) {
+        row.remove();
+        calcRefrigerant();
+      }
+    }
+
+    function calcRefrigerant() {
+      let total = 0;
+      let count = 0;
+      document.querySelectorAll('.refrig-kg').forEach(el => {
+        const val = parseFloat(el.value);
+        if (!isNaN(val) && val > 0) {
+          total += val;
+          count++;
+        }
+      });
+      total = Math.round(total * 100) / 100;
+      const formulaText = `已加總 ${count} 筆冷媒維護灌注紀錄，年總灌注量 = ${total} kg`;
+      currentCalcSource = '冷媒填充/原廠維修保養工單紀錄';
+      currentCalcVal = total;
+      currentCalcUnit = 'kg';
+      updateCalcResultUI(total, currentCalcUnit, formulaText);
+    }
+
+    // 5. 【通用累加/乘法】計算邏輯
+    function calcCustom() {
+      const base = parseFloat(document.getElementById('customBaseVal')?.value) || 0;
+      const mult = parseFloat(document.getElementById('customMultiplier')?.value) || 1;
+      const total = Math.round((base * mult) * 100) / 100;
+      const formulaText = `單次數值 ${base} × 頻率倍數 ${mult} = ${total.toLocaleString()}`;
+      currentCalcSource = '定期單據乘法累計';
+      currentCalcVal = total;
+      currentCalcUnit = document.getElementById('actUnit')?.value || '單位';
+      updateCalcResultUI(total, currentCalcUnit, formulaText);
+    }
+
+    // 更新計算結果 UI 預覽
+    function updateCalcResultUI(val, unit, formulaText) {
+      const dispEl = document.getElementById('calcResultDisplay');
+      const unitEl = document.getElementById('calcResultUnit');
+      const txtEl  = document.getElementById('calcResultFormulaText');
+
+      if (dispEl) dispEl.innerText = isNaN(val) ? '0' : val.toLocaleString();
+      if (unitEl) unitEl.innerText = unit;
+      if (txtEl)  txtEl.innerText  = formulaText || '';
+    }
+
+    // 套用計算結果至表單 ⑭ 欄位
+    function applyCalculatorResult() {
+      if (isNaN(currentCalcVal) || currentCalcVal <= 0) {
+        alert('請先在上方填寫有效數據，計算結果必須大於 0 方可套用！');
+        return;
+      }
+
+      const actDataIn = document.getElementById('actActivityData');
+      const unitIn    = document.getElementById('actUnit');
+      const srcIn     = document.getElementById('actDataSource');
+
+      if (actDataIn) actDataIn.value = currentCalcVal;
+      if (unitIn && currentCalcUnit) unitIn.value = currentCalcUnit;
+      if (srcIn && currentCalcSource && (!srcIn.value || srcIn.value.includes('電費單') || srcIn.value.includes('加油卡'))) {
+        srcIn.value = currentCalcSource;
+      }
+
+      closeActivityCalculator();
+      showToast(`已成功套用活動數據計算結果：${currentCalcVal.toLocaleString()} ${currentCalcUnit}！`);
     }
 
     // 儲存活動數據紀錄（含 18 必填防呆與數值驗證）
