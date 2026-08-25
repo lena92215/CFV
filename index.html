@@ -594,15 +594,21 @@
                   <input type="text" id="actMaterialCode" placeholder="例如：EL0001、170006" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑪ 直接/間接 <span class="text-rose-400">*</span></label>
-                  <select id="actScopeType" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none">
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-slate-300 font-medium">⑪ 直接/間接 <span class="text-rose-400">*</span></label>
+                    <span id="actScopeLockTag" class="text-[10px] text-emerald-400 font-bold hidden"><i class="fa-solid fa-lock text-[9px]"></i> 系統自動鎖定</span>
+                  </div>
+                  <select id="actScopeType" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none transition">
                     <option value="直接排放 (Scope 1)">直接排放 (Scope 1)</option>
                     <option value="間接排放 (Scope 2)">間接排放 (Scope 2)</option>
                   </select>
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑫ 排放型式 <span class="text-rose-400">*</span></label>
-                  <select id="actEmissionType" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none">
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-slate-300 font-medium">⑫ 排放型式 <span class="text-rose-400">*</span></label>
+                    <span id="actEmissionLockTag" class="text-[10px] text-emerald-400 font-bold hidden"><i class="fa-solid fa-lock text-[9px]"></i> 系統自動鎖定</span>
+                  </div>
+                  <select id="actEmissionType" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none transition">
                     <option value="外購電力使用">外購電力使用</option>
                     <option value="固定燃燒">固定燃燒</option>
                     <option value="移動燃燒">移動燃燒</option>
@@ -1208,10 +1214,10 @@
                 <div>
                   <label class="block text-xs text-slate-300 font-medium mb-1">銘牌標記單台冷媒充填量</label>
                   <div class="flex items-center gap-1.5">
-                    <input type="number" step="any" id="refrigChargeVal" value="180" oninput="calcRefrigerant()" placeholder="例如：180" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
-                    <select id="refrigChargeUnit" onchange="calcRefrigerant()" class="bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 text-xs">
-                      <option value="g" selected>公克 (g)</option>
-                      <option value="kg">公斤 (kg)</option>
+                    <input type="number" step="any" id="refrigChargeVal" value="1.2" oninput="calcRefrigerant()" placeholder="例如：1.2 (kg) 或 180 (g)" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                    <select id="refrigChargeUnit" onchange="calcRefrigerant()" class="bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 text-xs font-bold">
+                      <option value="kg" selected>公斤 (kg)</option>
+                      <option value="g">公克 (g)</option>
                     </select>
                   </div>
                 </div>
@@ -2043,58 +2049,246 @@
       datalist.innerHTML = html;
     }
 
+    // =============================================
+    // 溫室氣體盤查常見能源與氣體專屬資料庫 (GHG Material Database)
+    // 徹底排除米、麵粉、食材等無關商品代碼，專注於 Scope 1 / Scope 2 常用排碳能源與逸散氣體
+    // =============================================
+    const GHG_MATERIAL_DATABASE = [
+      // 1. 外購電力 (Scope 2 - 間接排放)
+      {
+        code: "EL0001",
+        name: "外購電力",
+        label: "EL0001 外購電力 [Scope 2 - 外購電力使用]",
+        aliases: ["電力", "台電", "電費", "電表", "用電", "發票電費", "低壓電力", "高壓電力", "電度"],
+        scopeType: "間接排放 (Scope 2)",
+        emissionType: "外購電力使用",
+        defaultUnit: "度 (kWh)",
+        defaultSource: "電費單/台電發票",
+        defaultCustody: "會計部"
+      },
+      // 2. 車用汽油 (Scope 1 - 移動燃燒)
+      {
+        code: "170001",
+        name: "95無鉛汽油",
+        label: "170001 95無鉛汽油 [Scope 1 - 移動燃燒]",
+        aliases: ["95", "95無鉛", "汽油", "車用汽油", "九五", "中油95", "加油發票"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "移動燃燒",
+        defaultUnit: "公升 (L)",
+        defaultSource: "加油卡/加油發票",
+        defaultCustody: "物流部"
+      },
+      {
+        code: "170002",
+        name: "92無鉛汽油",
+        label: "170002 92無鉛汽油 [Scope 1 - 移動燃燒]",
+        aliases: ["92", "92無鉛", "汽油", "車用汽油", "九二", "機車汽油"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "移動燃燒",
+        defaultUnit: "公升 (L)",
+        defaultSource: "加油卡/加油發票",
+        defaultCustody: "物流部"
+      },
+      {
+        code: "170003",
+        name: "98無鉛汽油",
+        label: "170003 98無鉛汽油 [Scope 1 - 移動燃燒]",
+        aliases: ["98", "98無鉛", "汽油", "車用汽油", "九八"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "移動燃燒",
+        defaultUnit: "公升 (L)",
+        defaultSource: "加油卡/加油發票",
+        defaultCustody: "物流部"
+      },
+      // 3. 車用柴油 (Scope 1 - 移動燃燒)
+      {
+        code: "170006",
+        name: "車用柴油 (超級柴油)",
+        label: "170006 車用柴油 (超級柴油) [Scope 1 - 移動燃燒]",
+        aliases: ["柴油", "超級柴油", "貨車柴油", "大貨車柴油", "柴油發票", "中油柴油"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "移動燃燒",
+        defaultUnit: "公升 (L)",
+        defaultSource: "中油車隊卡加油發票",
+        defaultCustody: "物流部"
+      },
+      // 4. 桶裝瓦斯 (Scope 1 - 固定燃燒)
+      {
+        code: "170008",
+        name: "桶裝瓦斯 (液化石油氣 LPG)",
+        label: "170008 桶裝瓦斯 (液化石油氣 LPG) [Scope 1 - 固定燃燒]",
+        aliases: ["瓦斯", "桶裝瓦斯", "液化石油氣", "LPG", "叫瓦斯", "瓦斯桶", "20kg瓦斯", "16kg瓦斯", "50kg瓦斯", "瓦斯行"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "固定燃燒",
+        defaultUnit: "公斤 (kg)",
+        defaultSource: "瓦斯採購單/發票",
+        defaultCustody: "廠務部"
+      },
+      // 5. 天然氣 (Scope 1 - 固定燃燒)
+      {
+        code: "170009",
+        name: "天然氣 (導管天然氣/LNG)",
+        label: "170009 天然氣 (導管天然氣/LNG) [Scope 1 - 固定燃燒]",
+        aliases: ["天然氣", "導管瓦斯", "LNG", "瓦斯管線", "欣欣天然氣", "大台北瓦斯", "天然氣收據"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "固定燃燒",
+        defaultUnit: "立方公尺 (m³)",
+        defaultSource: "天然氣繳費收據/發票",
+        defaultCustody: "總務部"
+      },
+      // 6. 燃料油 (Scope 1 - 固定燃燒)
+      {
+        code: "170010",
+        name: "重油 / 鍋爐燃料油",
+        label: "170010 重油 / 鍋爐燃料油 [Scope 1 - 固定燃燒]",
+        aliases: ["重油", "燃料油", "鍋爐油", "低硫燃料油"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "固定燃燒",
+        defaultUnit: "公升 (L)",
+        defaultSource: "燃油採購發票",
+        defaultCustody: "廠務部"
+      },
+      // 7. 常見冷媒 (Scope 1 - 逸散排放)
+      {
+        code: "190134",
+        name: "冷媒 (R-134a)",
+        label: "190134 冷媒 (R-134a) [Scope 1 - 逸散排放]",
+        aliases: ["R-134a", "R134a", "134a", "134", "冰箱冷媒", "飲水機冷媒", "開飲機冷媒", "汽車冷媒"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "逸散排放",
+        defaultUnit: "kg",
+        defaultSource: "冷媒原廠維護工單",
+        defaultCustody: "總務部"
+      },
+      {
+        code: "190410",
+        name: "冷媒 (R-410A)",
+        label: "190410 冷媒 (R-410A) [Scope 1 - 逸散排放]",
+        aliases: ["R-410A", "R410A", "410A", "410", "冷氣冷媒", "空調冷媒", "分離式冷氣冷媒", "變頻冷氣冷媒"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "逸散排放",
+        defaultUnit: "kg",
+        defaultSource: "冷氣保養維修保證紀錄",
+        defaultCustody: "總務部"
+      },
+      {
+        code: "190032",
+        name: "冷媒 (R-32)",
+        label: "190032 冷媒 (R-32) [Scope 1 - 逸散排放]",
+        aliases: ["R-32", "R32", "32", "大金冷媒", "日立冷媒", "新冷媒"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "逸散排放",
+        defaultUnit: "kg",
+        defaultSource: "冷氣保養維修保證紀錄",
+        defaultCustody: "總務部"
+      },
+      {
+        code: "190404",
+        name: "冷媒 (R-404A)",
+        label: "190404 冷媒 (R-404A) [Scope 1 - 逸散排放]",
+        aliases: ["R-404A", "R404A", "404A", "404", "冷凍庫冷媒", "低溫冷媒", "冷藏展示櫃冷媒"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "逸散排放",
+        defaultUnit: "kg",
+        defaultSource: "冷凍設備維護工單",
+        defaultCustody: "廠務部"
+      },
+      {
+        code: "190600",
+        name: "冷媒 (R-600a 異丁烷)",
+        label: "190600 冷媒 (R-600a 異丁烷) [Scope 1 - 逸散排放]",
+        aliases: ["R-600a", "R600a", "600a", "600", "異丁烷", "環保冰箱冷媒"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "逸散排放",
+        defaultUnit: "kg",
+        defaultSource: "冰箱保養紀錄",
+        defaultCustody: "總務部"
+      },
+      {
+        code: "190022",
+        name: "冷媒 (R-22)",
+        label: "190022 冷媒 (R-22) [Scope 1 - 逸散排放]",
+        aliases: ["R-22", "R22", "22", "舊型冷氣冷媒", "窗型冷氣冷媒"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "逸散排放",
+        defaultUnit: "kg",
+        defaultSource: "老舊冷氣維修工單",
+        defaultCustody: "總務部"
+      },
+      // 8. 滅火器用氣體 (Scope 1 - 逸散排放)
+      {
+        code: "190001",
+        name: "二氧化碳 (CO2 滅火器用氣體)",
+        label: "190001 二氧化碳 (CO2 滅火器用氣體) [Scope 1 - 逸散排放]",
+        aliases: ["滅火器", "二氧化碳", "CO2", "CO2滅火器", "二氧化碳滅火器", "滅火器用氣體", "滅火氣體", "二氧化碳氣體", "消防設備", "火警設備"],
+        scopeType: "直接排放 (Scope 1)",
+        emissionType: "逸散排放",
+        defaultUnit: "公斤 (kg)",
+        defaultSource: "滅火器年度檢修/充填紀錄",
+        defaultCustody: "總務部"
+      }
+    ];
+
+    // 全域覆蓋 MATERIAL_LIST，確保不會載入龐雜無關的農產品與商品
+    window.MATERIAL_LIST = GHG_MATERIAL_DATABASE.map(f => ({
+      code: f.code,
+      name: f.name,
+      label: f.label || `${f.code} ${f.name}`,
+      seq: 0
+    }));
+
     function loadMaterialsFromCSV() {
       const datalist = document.getElementById('materialsList');
       if (!datalist) return;
-      if (!window.MATERIAL_LIST || window.MATERIAL_LIST.length === 0) {
-        _fillFallbackOptions(['esEnergy', 'editESEnergy']);
-        return;
-      }
-      const rows = window.MATERIAL_LIST;
       let html = '';
-      rows.forEach(r => {
-        html += `<option value="${r.name}">${r.code} ${r.name}</option>`;
+      GHG_MATERIAL_DATABASE.forEach(r => {
+        html += `<option value="${r.name}">${r.label || (r.code + ' ' + r.name)}</option>`;
       });
       datalist.innerHTML = html;
       updateESPreview();
     }
 
     function _fillFallbackOptions(selectIds) {
-      const fallback = [
-        { code: '170001', name: '車用汽油' },
-        { code: '170006', name: '車用柴油' },
-        { code: '050004', name: '液化天然氣(LNG)' },
-        { code: '170050', name: '桶裝瓦斯(LPG)' },
-        { code: '190239', name: '冷媒(R-410A)' },
-        { code: '190240', name: '冷媒(R-404A)' },
-        { code: '190278', name: '乾粉滅火藥劑' },
-        { code: 'EL0001', name: '外購電力' },
-      ];
-      window.MATERIAL_LIST = fallback.map(f => ({ code: f.code, name: f.name, label: `${f.code} ${f.name}`, seq: 0 }));
+      window.MATERIAL_LIST = GHG_MATERIAL_DATABASE.map(f => ({ code: f.code, name: f.name, label: `${f.code} ${f.name}`, seq: 0 }));
     }
 
     // 排放源清單 (Sheet 3)
     let emissionSources = [
       { id: 1, equipId: "ES-001", name: "營業用冷藏展示櫃", location: "1F 門市展售區", energy: "外購電力", quantity: 2 },
-      { id: 2, equipId: "ES-002", name: "大型低溫冷藏庫", location: "1F 後方倉儲區", energy: "冷藏冷媒(R-404A)", quantity: 1 },
-      { id: 3, equipId: "ES-003", name: "3.5噸批發載貨車", location: "公務停車場", energy: "車用柴油", quantity: 1 },
-      { id: 4, equipId: "ES-004", name: "門市分離式冷氣", location: "2F 營運辦公室", energy: "冷氣冷媒(R-410A)", quantity: 3 }
+      { id: 2, equipId: "ES-002", name: "大型低溫冷藏庫", location: "1F 後方倉儲區", energy: "冷媒 (R-404A)", quantity: 1 },
+      { id: 3, equipId: "ES-003", name: "3.5噸批發載貨車", location: "公務停車場", energy: "車用柴油 (超級柴油)", quantity: 1 },
+      { id: 4, equipId: "ES-004", name: "門市分離式冷氣", location: "2F 營運辦公室", energy: "冷媒 (R-410A)", quantity: 3 }
     ];
 
     function getESAuto(energy) {
       if (!energy) return null;
-      if (window.CFV_MAPPING && window.CFV_MAPPING.materials) {
-        const materials = window.CFV_MAPPING.materials;
-        const match = Object.values(materials).find(item => item.name === energy);
-        if (match && match.scope) return match;
-        for (const item of Object.values(materials)) {
-          if (item.name && energy.includes(item.name) && item.scope) return item;
+      const clean = energy.trim().toLowerCase();
+
+      // 先從專屬 GHG 資料庫尋找
+      const found = GHG_MATERIAL_DATABASE.find(m =>
+        m.name === energy ||
+        m.aliases.some(a => a.toLowerCase() === clean || clean.includes(a.toLowerCase())) ||
+        clean.includes(m.name.toLowerCase())
+      );
+
+      if (found) {
+        const isScope2 = found.scopeType.includes('2');
+        let ghg = ["CO2", "CH4", "N2O"];
+        if (isScope2) ghg = ["CO2"];
+        else if (found.emissionType === '逸散排放') {
+          ghg = found.name.includes('二氧化碳') ? ["CO2"] : ["HFCs"];
         }
+        return {
+          scope: isScope2 ? "範疇二 (能源間接)" : `範疇一 (${found.emissionType})`,
+          ghg: ghg
+        };
       }
-      // Fallback lookup
-      if (energy.includes("電力")) return { scope: "範疇二 (能源間接)", ghg: ["CO2"] };
-      if (energy.includes("柴油") || energy.includes("汽油")) return { scope: "範疇一 (移動燃燒)", ghg: ["CO2", "CH4", "N2O"] };
-      if (energy.includes("冷媒") || energy.includes("410") || energy.includes("404")) return { scope: "範疇一 (逸散排放)", ghg: ["HFCs"] };
+
+      // 啟發式備用判定
+      if (clean.includes("電力")) return { scope: "範疇二 (能源間接)", ghg: ["CO2"] };
+      if (clean.includes("柴油") || clean.includes("汽油")) return { scope: "範疇一 (移動燃燒)", ghg: ["CO2", "CH4", "N2O"] };
+      if (clean.includes("瓦斯") || clean.includes("天然氣") || clean.includes("lpg")) return { scope: "範疇一 (固定燃燒)", ghg: ["CO2", "CH4", "N2O"] };
+      if (clean.includes("冷媒") || clean.includes("滅火") || clean.includes("co2") || clean.includes("410") || clean.includes("404")) return { scope: "範疇一 (逸散排放)", ghg: ["HFCs"] };
       return { scope: "範疇一 (直接排放)", ghg: ["CO2", "CH4", "N2O"] };
     }
 
@@ -2430,49 +2624,104 @@
       }, 3000);
     }
 
-    // 物料變更時自動帶入關聯欄位 (代碼、範疇、型式、單位、來源)
+    // 物料變更時自動帶入關聯欄位 (代碼、範疇、型式、單位、來源) 並進行防呆唯讀鎖定
     function onActivityMaterialChange() {
       const nameInput = document.getElementById('actMaterialName');
       if (!nameInput) return;
-      const materialName = nameInput.value.trim();
-      if (!materialName) return;
-
-      // 查代碼
-      if (window.MATERIAL_LIST && window.MATERIAL_LIST.length > 0) {
-        const found = window.MATERIAL_LIST.find(m => m.name === materialName || m.label?.includes(materialName));
-        if (found && found.code) {
-          document.getElementById('actMaterialCode').value = found.code;
-        }
+      const rawInput = nameInput.value.trim();
+      if (!rawInput) {
+        setScopeEmissionLock(false);
+        return;
       }
 
-      // 查範疇與型式
-      const auto = getESAuto(materialName);
-      if (auto) {
-        const isScope2 = auto.scope && auto.scope.includes('二');
-        document.getElementById('actScopeType').value = isScope2 ? '間接排放 (Scope 2)' : '直接排放 (Scope 1)';
+      const lowerInput = rawInput.toLowerCase();
 
-        if (materialName.includes('電力')) {
-          document.getElementById('actEmissionType').value = '外購電力使用';
-          document.getElementById('actUnit').value = '度 (kWh)';
-          document.getElementById('actDataSource').value = '電費單/台電發票';
-          document.getElementById('actCustodyUnit').value = '會計部';
-        } else if (materialName.includes('柴油') || materialName.includes('汽油')) {
-          document.getElementById('actEmissionType').value = '移動燃燒';
-          document.getElementById('actUnit').value = '公升 (L)';
-          document.getElementById('actDataSource').value = '加油卡/加油發票';
-          document.getElementById('actCustodyUnit').value = '物流部';
-        } else if (materialName.includes('瓦斯') || materialName.includes('LPG') || materialName.includes('LNG')) {
-          document.getElementById('actEmissionType').value = '固定燃燒';
-          document.getElementById('actUnit').value = '公斤 (kg)';
-          document.getElementById('actDataSource').value = '瓦斯採購單/發票';
-          document.getElementById('actCustodyUnit').value = '廠務部';
-        } else if (materialName.includes('冷媒') || materialName.includes('410') || materialName.includes('404')) {
-          document.getElementById('actEmissionType').value = '逸散排放';
-          document.getElementById('actUnit').value = 'kg';
-          document.getElementById('actDataSource').value = '冷媒原廠維護工單';
-          document.getElementById('actCustodyUnit').value = '總務部';
+      // 搜尋專屬 GHG 資料庫 (先全名/代碼精準匹配 -> 再別名匹配 -> 再包含匹配)
+      let found = GHG_MATERIAL_DATABASE.find(m => m.name === rawInput || m.code.toLowerCase() === lowerInput || (m.label && m.label === rawInput));
+      if (!found) {
+        found = GHG_MATERIAL_DATABASE.find(m => m.aliases.some(a => a.toLowerCase() === lowerInput || lowerInput.includes(a.toLowerCase())));
+      }
+      if (!found) {
+        found = GHG_MATERIAL_DATABASE.find(m => m.name.toLowerCase().includes(lowerInput) || lowerInput.includes(m.name.toLowerCase()));
+      }
+
+      const scopeEl = document.getElementById('actScopeType');
+      const emissionEl = document.getElementById('actEmissionType');
+      const codeEl = document.getElementById('actMaterialCode');
+      const unitEl = document.getElementById('actUnit');
+      const srcEl = document.getElementById('actDataSource');
+      const custodyEl = document.getElementById('actCustodyUnit');
+
+      if (found) {
+        if (codeEl) codeEl.value = found.code;
+        if (scopeEl) scopeEl.value = found.scopeType;
+        if (emissionEl) emissionEl.value = found.emissionType;
+        if (unitEl && (!unitEl.value || unitEl.value === '度 (kWh)' || unitEl.value === 'kg' || unitEl.value === '公升 (L)' || unitEl.value === '公斤 (kg)')) {
+          unitEl.value = found.defaultUnit;
+        }
+        if (srcEl && !srcEl.value) srcEl.value = found.defaultSource;
+        if (custodyEl && !custodyEl.value) custodyEl.value = found.defaultCustody;
+
+        // 鎖定 ⑪ 和 ⑫ 為唯讀狀態以防填錯
+        setScopeEmissionLock(true);
+      } else {
+        // 自訂關鍵字啟發式判定
+        let autoScope = '';
+        let autoEmission = '';
+
+        if (lowerInput.includes('電') || lowerInput.includes('elec') || lowerInput.includes('kwh')) {
+          autoScope = '間接排放 (Scope 2)';
+          autoEmission = '外購電力使用';
+        } else if (lowerInput.includes('油') || lowerInput.includes('汽油') || lowerInput.includes('柴油') || lowerInput.includes('車')) {
+          autoScope = '直接排放 (Scope 1)';
+          autoEmission = '移動燃燒';
+        } else if (lowerInput.includes('瓦斯') || lowerInput.includes('天然氣') || lowerInput.includes('lpg') || lowerInput.includes('lng') || lowerInput.includes('鍋爐')) {
+          autoScope = '直接排放 (Scope 1)';
+          autoEmission = '固定燃燒';
+        } else if (lowerInput.includes('冷媒') || lowerInput.includes('滅火') || lowerInput.includes('co2') || lowerInput.includes('r-') || lowerInput.includes('r134') || lowerInput.includes('r410') || lowerInput.includes('r32') || lowerInput.includes('r404')) {
+          autoScope = '直接排放 (Scope 1)';
+          autoEmission = '逸散排放';
+        }
+
+        if (autoScope && autoEmission) {
+          if (scopeEl) scopeEl.value = autoScope;
+          if (emissionEl) emissionEl.value = autoEmission;
+          setScopeEmissionLock(true);
+        } else {
+          // 未知自訂物料，開放手動選擇
+          setScopeEmissionLock(false);
         }
       }
+    }
+
+    function setScopeEmissionLock(isLocked) {
+      const scopeEl = document.getElementById('actScopeType');
+      const emissionEl = document.getElementById('actEmissionType');
+      const scopeLockTag = document.getElementById('actScopeLockTag');
+      const emissionLockTag = document.getElementById('actEmissionLockTag');
+
+      if (scopeEl) {
+        scopeEl.disabled = isLocked;
+        if (isLocked) {
+          scopeEl.classList.add('bg-slate-800', 'text-slate-400', 'cursor-not-allowed', 'border-slate-700');
+          scopeEl.classList.remove('bg-slate-950', 'text-slate-100', 'focus:border-emerald-500');
+        } else {
+          scopeEl.classList.remove('bg-slate-800', 'text-slate-400', 'cursor-not-allowed', 'border-slate-700');
+          scopeEl.classList.add('bg-slate-950', 'text-slate-100', 'focus:border-emerald-500');
+        }
+      }
+      if (emissionEl) {
+        emissionEl.disabled = isLocked;
+        if (isLocked) {
+          emissionEl.classList.add('bg-slate-800', 'text-slate-400', 'cursor-not-allowed', 'border-slate-700');
+          emissionEl.classList.remove('bg-slate-950', 'text-slate-100', 'focus:border-emerald-500');
+        } else {
+          emissionEl.classList.remove('bg-slate-800', 'text-slate-400', 'cursor-not-allowed', 'border-slate-700');
+          emissionEl.classList.add('bg-slate-950', 'text-slate-100', 'focus:border-emerald-500');
+        }
+      }
+      if (scopeLockTag) scopeLockTag.classList.toggle('hidden', !isLocked);
+      if (emissionLockTag) emissionLockTag.classList.toggle('hidden', !isLocked);
     }
 
     // 開啟活動數據 Modal (新增或編輯)
@@ -2508,6 +2757,9 @@
         document.getElementById('actDataSource').value = '電費單/台電發票';
         document.getElementById('actCustodyUnit').value = '會計部';
 
+        // 自動觸發判定並鎖定
+        onActivityMaterialChange();
+
         // 選填
         document.getElementById('actMeasurementFrequency').value = '雙月 (每期)';
         document.getElementById('actMeasurementInstrument').value = '台電數位電子電表';
@@ -2539,6 +2791,9 @@
         document.getElementById('actUnit').value = r.unit || '';
         document.getElementById('actDataSource').value = r.dataSource || '';
         document.getElementById('actCustodyUnit').value = r.custodyUnit || '';
+
+        // 依據編輯物料自動判定並鎖定
+        onActivityMaterialChange();
 
         // 選填
         document.getElementById('actMeasurementFrequency').value = r.measurementFrequency || '';
@@ -3197,14 +3452,23 @@
         currentCalcSource = '冷媒填充/原廠維修保養工單紀錄';
       } else if (mode === 'refrig_escape') {
         const chargeVal = parseFloat(document.getElementById('refrigChargeVal')?.value) || 0;
-        const unit = document.getElementById('refrigChargeUnit')?.value || 'g';
+        const unit = document.getElementById('refrigChargeUnit')?.value || 'kg';
         const qty = parseFloat(document.getElementById('refrigEquipQty')?.value) || 1;
         const rate = parseFloat(document.getElementById('refrigEscapeRate')?.value) || 10.0;
 
-        const chargeKg = unit === 'g' ? (chargeVal / 1000) : chargeVal;
+        let chargeKg = chargeVal;
+        let chargeText = '';
+        if (unit === 'g') {
+          chargeKg = Math.round((chargeVal / 1000) * 10000) / 10000;
+          chargeText = `單台冷媒 ${chargeVal}g = ${chargeKg} kg`;
+        } else {
+          chargeKg = chargeVal;
+          chargeText = `單台冷媒 ${chargeVal} kg`;
+        }
+
         total = Math.round((chargeKg * qty * (rate / 100)) * 10000) / 10000;
         
-        formulaText = `(單台冷媒 ${chargeVal}${unit} = ${chargeKg} kg) × ${qty} 台 × 年逸散率 ${rate}% = 年逸散量 ${total} kg`;
+        formulaText = `(${chargeText}) × ${qty} 台 × 年逸散率 ${rate}% = 年逸散量 ${total} kg`;
         currentCalcSource = `銘牌冷媒量依逸散率推估 (年逸散率 ${rate}%)`;
       }
 
