@@ -106,7 +106,7 @@
       
       <!-- Excel Sheet Tabs (Mirrors the Excel workbook sheets) -->
       <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
-        <button onclick="switchSheetTab('sheet1')" id="stab-sheet1" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
+        <button onclick="switchSheetTab('sheet1')" id="stab-sheet1" class="sheet-tab active px-4 py-2 rounded-xl text-xs font-black border border-emerald-500 bg-emerald-600 text-white shadow flex items-center gap-1.5">
           <i class="fa-solid fa-id-card"></i> 一、事業基本資料
         </button>
         <button onclick="switchSheetTab('sheet2')" id="stab-sheet2" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
@@ -118,7 +118,7 @@
         <button onclick="switchSheetTab('sheet4')" id="stab-sheet4" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
           <i class="fa-solid fa-calculator"></i> 四、活動數據填報
         </button>
-        <button onclick="switchSheetTab('sheet5')" id="stab-sheet5" class="sheet-tab active px-4 py-2 rounded-xl text-xs font-black border border-emerald-500 bg-emerald-600 text-white shadow flex items-center gap-1.5">
+        <button onclick="switchSheetTab('sheet5')" id="stab-sheet5" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
           <i class="fa-solid fa-table-list text-amber-300"></i> 五、定量盤查明細清冊 (Step 3: Itemized list)
         </button>
         <button onclick="switchSheetTab('sheet6')" id="stab-sheet6" class="sheet-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 flex items-center gap-1.5">
@@ -127,7 +127,7 @@
       </div>
 
       <!-- SHEET 1: 事業基本資料 -->
-      <div id="sec-sheet1" class="sheet-content glass-panel rounded-2xl p-6 space-y-4 hidden">
+      <div id="sec-sheet1" class="sheet-content glass-panel rounded-2xl p-6 space-y-4">
         <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2 border-b border-slate-700 pb-3">
           <i class="fa-solid fa-id-card text-emerald-400"></i> 一、事業基本資料 (Business Information)
         </h2>
@@ -1807,7 +1807,7 @@
       <!-- ========================================================================= -->
       <!-- SHEET 5: STEP 3: ITEMIZED LIST (五、定量盤查明細清冊 - 核心功能)            -->
       <!-- ========================================================================= -->
-      <div id="sec-sheet5" class="sheet-content space-y-6">
+      <div id="sec-sheet5" class="sheet-content space-y-6 hidden">
         
         <!-- Key KPI Banners -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -4496,13 +4496,23 @@
     }
 
     function switchSheetTab(sheetId) {
+      // 1. 隱藏所有頁籤內容面板
       document.querySelectorAll('.sheet-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.sheet-tab').forEach(el => el.classList.remove('active'));
 
+      // 2. 重置所有頁籤按鈕為預設暗色樣式，徹底移除 active 與高亮 classes
+      document.querySelectorAll('.sheet-tab').forEach(el => {
+        el.classList.remove('active', 'bg-emerald-600', 'text-white', 'border-emerald-500', 'shadow', 'font-black');
+        el.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700', 'font-bold');
+      });
+
+      // 3. 顯示目標頁籤面板並為其按鈕套用唯一 active 高亮樣式
       const target = document.getElementById(`sec-${sheetId}`);
       const btn = document.getElementById(`stab-${sheetId}`);
       if (target) target.classList.remove('hidden');
-      if (btn) btn.classList.add('active');
+      if (btn) {
+        btn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700', 'font-bold');
+        btn.classList.add('active', 'bg-emerald-600', 'text-white', 'border-emerald-500', 'shadow', 'font-black');
+      }
 
       if (sheetId === 'sheet4') {
         renderActivityTable();
