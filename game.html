@@ -56,6 +56,9 @@
         <span class="text-emerald-400">🌿 等級</span>
         <span id="statLevel" class="font-bold text-emerald-300">Lv.1</span>
       </div>
+
+      <!-- User Account Nav -->
+      <div id="userAccountNav" class="hidden shrink-0"></div>
     </div>
   </header>
 
@@ -365,11 +368,99 @@
     </div>
   </div>
 
+  <!-- ===== 🔐 帳號登入與註冊 MODAL ===== -->
+  <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="modal-overlay absolute inset-0 bg-slate-950/90 backdrop-blur-md"></div>
+    <div class="modal-card relative z-10 w-full max-w-md p-6 space-y-5 bg-slate-900 border-2 border-emerald-500/60 rounded-3xl shadow-2xl">
+      
+      <!-- Brand Header -->
+      <div class="text-center space-y-1">
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 flex items-center justify-center text-3xl shadow-lg animate-bounce mb-2">
+          🌱
+        </div>
+        <h2 class="font-black text-xl text-emerald-400 tracking-wide">CFV 碳管理平台</h2>
+        <p class="text-slate-400 text-xs">請先登入或註冊事業身份以開始盤查與遊戲</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex items-center gap-2 bg-slate-950 p-1 rounded-2xl border border-slate-800">
+        <button onclick="switchAuthTab('login')" id="tabAuthLoginBtn" class="flex-1 py-2.5 rounded-xl font-black text-xs bg-emerald-500 text-slate-950 shadow-md transition-all">
+          🔑 帳號登入
+        </button>
+        <button onclick="switchAuthTab('register')" id="tabAuthRegBtn" class="flex-1 py-2.5 rounded-xl font-bold text-xs bg-slate-900 text-slate-400 hover:text-white transition-all">
+          📝 註冊新帳號
+        </button>
+      </div>
+
+      <!-- 1. LOGIN FORM -->
+      <form id="authLoginForm" onsubmit="handleLoginSubmit(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-slate-300 text-xs font-bold mb-1">電子信箱 / 帳號*</label>
+          <input type="email" id="authLogEmail" placeholder="yourname@company.com" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl p-2.5 text-xs text-white outline-none" required />
+        </div>
+        <div>
+          <label class="block text-slate-300 text-xs font-bold mb-1">密碼*</label>
+          <input type="password" id="authLogPassword" placeholder="請輸入密碼" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl p-2.5 text-xs text-white outline-none" required />
+        </div>
+        <div id="authLogErr" class="hidden text-rose-400 text-xs font-bold bg-rose-950/40 p-2.5 rounded-xl border border-rose-500/40"></div>
+        
+        <button type="submit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-lg transition-all flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-right-to-bracket"></i> 立即登入平台
+        </button>
+
+        <p class="text-slate-500 text-[11px] text-center pt-1">
+          💡 請輸入註冊時的電子信箱與密碼進行登入
+        </p>
+      </form>
+
+      <!-- 2. REGISTER FORM -->
+      <form id="authRegisterForm" onsubmit="handleRegisterSubmit(event)" class="space-y-3 hidden">
+        <div>
+          <label class="block text-slate-300 text-xs font-bold mb-1">事業 / 公司名稱*</label>
+          <input type="text" id="authRegCompanyName" placeholder="例如：綠洲食品股份有限公司" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl p-2.5 text-xs text-white outline-none" required />
+        </div>
+        <div>
+          <label class="block text-slate-300 text-xs font-bold mb-1">電子信箱 (作為登入帳號)*</label>
+          <input type="email" id="authRegEmail" placeholder="yourname@company.com" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl p-2.5 text-xs text-white outline-none" required />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-300 text-xs font-bold mb-1">設定密碼*</label>
+            <input type="password" id="authRegPassword" placeholder="密碼" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl p-2.5 text-xs text-white outline-none" required />
+          </div>
+          <div>
+            <label class="block text-slate-300 text-xs font-bold mb-1">確認密碼*</label>
+            <input type="password" id="authRegPasswordConfirm" placeholder="再輸一次" class="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl p-2.5 text-xs text-white outline-none" required />
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-300 text-xs font-bold mb-1">行業類別</label>
+          <select id="authRegIndustry" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none">
+            <option value="市場與批發零售業">市場與批發零售業</option>
+            <option value="製造加工業">製造加工業</option>
+            <option value="餐飲服務業">餐飲服務業</option>
+            <option value="運輸物流業">運輸物流業</option>
+            <option value="商業辦公大樓">商業辦公大樓</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+
+        <div id="authRegErr" class="hidden text-rose-400 text-xs font-bold bg-rose-950/40 p-2.5 rounded-xl border border-rose-500/40"></div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-lg transition-all flex items-center justify-center gap-1.5 mt-2">
+          <i class="fa-solid fa-user-plus"></i> 完成註冊並開始使用
+        </button>
+      </form>
+
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="Emission-source/materials_data.js"></script>
   <script src="Emission-source/equipments_data.js"></script>
   <script src="Emission-source/mapping_data.js"></script>
   <script src="game/ods_inventory_data.js"></script>
+  <script src="auth_system.js"></script>
   <script src="game/game.js"></script>
 </body>
 </html>
