@@ -1213,9 +1213,9 @@
                 </div>
                 <div>
                   <label class="block text-xs text-slate-300 font-medium mb-1">銘牌標記單台冷媒充填量</label>
-                  <div class="flex items-center gap-1.5">
-                    <input type="number" step="any" id="refrigChargeVal" value="1.2" oninput="calcRefrigerant()" placeholder="例如：1.2 (kg) 或 180 (g)" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
-                    <select id="refrigChargeUnit" onchange="calcRefrigerant()" class="bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 text-xs font-bold">
+                  <div class="flex w-full rounded-lg shadow-sm">
+                    <input type="number" step="any" id="refrigChargeVal" value="1.2" oninput="calcRefrigerant()" placeholder="例如：1.2 或 180" class="flex-1 min-w-0 bg-slate-950 border border-slate-700 rounded-l-lg rounded-r-none p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs z-10" />
+                    <select id="refrigChargeUnit" onchange="calcRefrigerant()" class="bg-slate-800 hover:bg-slate-700 border border-l-0 border-slate-700 rounded-r-lg rounded-l-none px-2.5 py-2.5 text-slate-200 focus:border-cyan-500 focus:outline-none text-xs font-bold shrink-0 cursor-pointer">
                       <option value="kg" selected>公斤 (kg)</option>
                       <option value="g">公克 (g)</option>
                     </select>
