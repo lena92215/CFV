@@ -4534,11 +4534,56 @@
         document.getElementById('btn-mode-form').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition";
         document.getElementById('btn-mode-game').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
       } else {
-        document.getElementById('mode-form-section').classList.add('hidden');
-        document.getElementById('mode-game-section').classList.remove('hidden');
-        document.getElementById('btn-mode-form').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
-        document.getElementById('btn-mode-game').className = "px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition";
+        packageDataAndLaunchGame();
       }
+    }
+
+    function packageDataAndLaunchGame() {
+      // 1. 公司與場域名稱
+      const name = document.getElementById('infoName')?.value || document.getElementById('boundOrgName')?.value || '我的場域';
+      localStorage.setItem('cfv_company_info', JSON.stringify({ name: name }));
+
+      // 2. 收集填報的設備與活動數據
+      const devices = [];
+      if (window.activityData && Array.isArray(window.activityData) && window.activityData.length > 0) {
+        window.activityData.forEach(item => {
+          if (item.equip_name || item.raw_material) {
+            devices.push({
+              name: item.equip_name || item.process_name || '場域設備',
+              energy: item.raw_material || item.activity_type || '',
+              location: item.process_name || '主要廠區',
+              scope: item.scope || '範疇一',
+              quantity: parseInt(item.equip_count) || 1
+            });
+          }
+        });
+      }
+
+      const s3Rows = document.querySelectorAll('#emissionSourceTableBody tr');
+      s3Rows.forEach(row => {
+        const inputs = row.querySelectorAll('input, select');
+        if (inputs.length >= 3) {
+          const equipName = inputs[1]?.value || inputs[0]?.value;
+          const location = inputs[2]?.value;
+          const energy = inputs[3]?.value;
+          if (equipName) {
+            devices.push({
+              name: equipName,
+              energy: energy || '',
+              location: location || '主要廠區',
+              scope: '範疇一',
+              quantity: 1
+            });
+          }
+        }
+      });
+
+      if (devices.length > 0) {
+        localStorage.setItem('cfv_emission_sources', JSON.stringify(devices));
+      }
+
+      // 3. 跳轉至 2D 遊戲頁面
+      window.location.href = 'game.html';
     }
 
     // 匯出完整 Excel (.xlsx) 包含 Sheet 4 的 24 個欄位
