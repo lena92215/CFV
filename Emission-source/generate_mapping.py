@@ -32,7 +32,11 @@ with open(ghg_csv, 'r', encoding='utf-8-sig', errors='replace') as f:
 # 規則定義
 def determine_ghg_scope(name):
     name = name.lower()
-    if re.search(r'汽油|柴油|車|航空|機車|船舶', name):
+    if '乾粉' in name and '滅火' in name:
+        return '範疇一 (逸散排放)', ['無']
+    elif '污泥' in name:
+        return '範疇一 (逸散排放)', ['無']
+    elif re.search(r'汽油|柴油|車|航空|機車|船舶', name):
         return '範疇一 (移動燃燒)', ['CO₂', 'CH₄', 'N₂O']
     elif re.search(r'電力|電', name):
         return '範疇二 (外購電力)', ['CO₂']
