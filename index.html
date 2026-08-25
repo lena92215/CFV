@@ -781,18 +781,22 @@
           <!-- Category 1: 外購電力 -->
           <div id="calc-panel-elec" class="calc-panel space-y-4">
             <!-- Submode Radios -->
-            <div class="flex flex-wrap gap-2">
-              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
                 <input type="radio" name="elecSubMode" value="elec_bills" checked onchange="switchCalcSubMode('elec', 'elec_bills')" class="accent-emerald-500" />
-                <span class="text-slate-200 font-bold">模式 A：6期電費單度數加總</span>
+                <span class="text-slate-200 font-bold">1. 6期電費單度數</span>
               </label>
-              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
                 <input type="radio" name="elecSubMode" value="elec_cost" onchange="switchCalcSubMode('elec', 'elec_cost')" class="accent-emerald-500" />
-                <span class="text-slate-200 font-bold">模式 B：總電費金額反推</span>
+                <span class="text-slate-200 font-bold">2. 電費金額反推</span>
               </label>
-              <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
                 <input type="radio" name="elecSubMode" value="elec_hours" onchange="switchCalcSubMode('elec', 'elec_hours')" class="accent-emerald-500" />
-                <span class="text-slate-200 font-bold">模式 C：設備瓦數與時數估算</span>
+                <span class="text-slate-200 font-bold">3. 瓦數時數估算</span>
+              </label>
+              <label class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 cursor-pointer text-xs transition">
+                <input type="radio" name="elecSubMode" value="elec_shared" onchange="switchCalcSubMode('elec', 'elec_shared')" class="accent-emerald-500" />
+                <span class="text-slate-200 font-bold">4. 🏢 共用電表/商場分攤</span>
               </label>
             </div>
 
@@ -872,6 +876,92 @@
               </div>
               <div class="text-[10px] text-slate-500">
                 公式：年總度數 (kWh) = (功率 W × 台數 × 每日時數 × 全年天數) ÷ 1,000
+              </div>
+            </div>
+
+            <!-- Elec Submode D: Shared Meter / Mall Allocation (共用電表/商場合租分攤小幫手) -->
+            <div id="elec-sub-shared" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-4 hidden">
+              <!-- Sharing Rule Selector -->
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                <div class="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                  <i class="fa-solid fa-building text-cyan-400"></i> 請選擇共用分攤規則：
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-700 hover:border-cyan-500/60 cursor-pointer text-xs transition">
+                    <input type="radio" name="sharedRule" value="shared_area" checked onchange="switchSharedRule('shared_area')" class="accent-cyan-500" />
+                    <span class="text-slate-200 font-bold">模式一：依坪數面積比</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-700 hover:border-cyan-500/60 cursor-pointer text-xs transition">
+                    <input type="radio" name="sharedRule" value="shared_count" onchange="switchSharedRule('shared_count')" class="accent-cyan-500" />
+                    <span class="text-slate-200 font-bold">模式二：依攤位數均分</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-700 hover:border-cyan-500/60 cursor-pointer text-xs transition">
+                    <input type="radio" name="sharedRule" value="shared_landlord" onchange="switchSharedRule('shared_landlord')" class="accent-cyan-500" />
+                    <span class="text-slate-200 font-bold">模式三：繳費金額反推 (夜市/市場)</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Shared Rule 1: Area Proportional -->
+              <div id="shared-rule-area" class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">大電表/商場全年總度數 (kWh) <span class="text-rose-400">*</span></label>
+                    <input type="number" step="any" id="sharedTotalKwhArea" oninput="calcElectricity()" placeholder="例如：120000" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                  </div>
+                  <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">商場總坪數/總面積 (A) <span class="text-rose-400">*</span></label>
+                    <input type="number" step="any" id="sharedTotalArea" oninput="calcElectricity()" placeholder="例如：200" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                  </div>
+                  <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">本攤位使用坪數 (B) <span class="text-rose-400">*</span></label>
+                    <input type="number" step="any" id="sharedMyArea" oninput="calcElectricity()" placeholder="例如：25" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                  </div>
+                </div>
+                <div class="text-[10px] text-slate-500">
+                  公式：我的用電度數 = 大電表總度數 × (攤位 B 坪 ÷ 商場 A 坪) ； 分配比率 = (B ÷ A) × 100%
+                </div>
+              </div>
+
+              <!-- Shared Rule 2: Count Proportional -->
+              <div id="shared-rule-count" class="space-y-3 hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">大電表/商場全年總度數 (kWh) <span class="text-rose-400">*</span></label>
+                    <input type="number" step="any" id="sharedTotalKwhCount" oninput="calcElectricity()" placeholder="例如：80000" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                  </div>
+                  <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">共同分攤之攤位/店家總數 (N) <span class="text-rose-400">*</span></label>
+                    <input type="number" step="any" id="sharedTenantCount" value="8" oninput="calcElectricity()" placeholder="例如：8" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                  </div>
+                </div>
+                <div class="text-[10px] text-slate-500">
+                  公式：我的用電度數 = 大電表總度數 ÷ N ； 分配比率 = (1 ÷ N) × 100%
+                </div>
+              </div>
+
+              <!-- Shared Rule 3: Fixed Fee to Landlord -->
+              <div id="shared-rule-landlord" class="space-y-3 hidden">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">每期繳給房東/管委會電費 (NTD) <span class="text-rose-400">*</span></label>
+                    <input type="number" step="any" id="landlordFee" oninput="calcElectricity()" placeholder="例如：1500" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                  </div>
+                  <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">繳費頻率</label>
+                    <select id="landlordFreq" onchange="calcElectricity()" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none text-xs">
+                      <option value="12" selected>每月繳費 (全年 12 期)</option>
+                      <option value="6">雙月繳費 (全年 6 期)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs text-slate-300 font-medium mb-1">參考每度電價 (元/度，可自訂)</label>
+                    <input type="number" step="any" id="landlordUnitPrice" value="4.0" oninput="calcElectricity()" placeholder="例如：4.0" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none font-mono text-xs" />
+                  </div>
+                </div>
+                <div class="text-[10px] text-slate-500">
+                  公式：我的年用電度數 = (每期繳費 NTD × 全年期數) ÷ 參考電價 (元/度)
+                </div>
               </div>
             </div>
           </div>
@@ -2124,12 +2214,15 @@
       else if (cat === 'custom') calcCustom();
     }
 
-    // 切換子模式 (例如 6期電費單 / 金額反推 / 時數估算 / 車用燃油 4 大模式)
+    let currentCalcRatio = 100;
+
+    // 切換子模式 (例如 6期電費單 / 金額反推 / 時數估算 / 共用分攤 / 車用燃油 4 大模式)
     function switchCalcSubMode(cat, mode) {
       if (cat === 'elec') {
         document.getElementById('elec-sub-bills').classList.toggle('hidden', mode !== 'elec_bills');
         document.getElementById('elec-sub-cost').classList.toggle('hidden', mode !== 'elec_cost');
         document.getElementById('elec-sub-hours').classList.toggle('hidden', mode !== 'elec_hours');
+        document.getElementById('elec-sub-shared').classList.toggle('hidden', mode !== 'elec_shared');
         calcElectricity();
       } else if (cat === 'fuel') {
         document.getElementById('fuel-sub-cost').classList.toggle('hidden', mode !== 'fuel_cost');
@@ -2138,6 +2231,14 @@
         document.getElementById('fuel-sub-months').classList.toggle('hidden', mode !== 'fuel_months');
         calcFuel();
       }
+    }
+
+    // 切換共用電表分攤規則 (坪數面積比 / 攤位均分 / 固定繳費反推)
+    function switchSharedRule(rule) {
+      document.getElementById('shared-rule-area').classList.toggle('hidden', rule !== 'shared_area');
+      document.getElementById('shared-rule-count').classList.toggle('hidden', rule !== 'shared_count');
+      document.getElementById('shared-rule-landlord').classList.toggle('hidden', rule !== 'shared_landlord');
+      calcElectricity();
     }
 
     // 1. 【外購電力】計算邏輯
@@ -2156,6 +2257,7 @@
       const mode = document.querySelector('input[name="elecSubMode"]:checked')?.value || 'elec_bills';
       let total = 0;
       let formulaText = '';
+      currentCalcRatio = 100;
 
       if (mode === 'elec_bills') {
         let count = 0;
@@ -2191,6 +2293,53 @@
           currentCalcSource = '設備額定功率與運轉時數推算';
         } else {
           formulaText = '請輸入設備功率 (W) 與每日運轉時數';
+        }
+      } else if (mode === 'elec_shared') {
+        const rule = document.querySelector('input[name="sharedRule"]:checked')?.value || 'shared_area';
+        
+        // 模式一：依坪數面積比例分攤
+        if (rule === 'shared_area') {
+          const totalKwh = parseFloat(document.getElementById('sharedTotalKwhArea')?.value) || 0;
+          const totalArea = parseFloat(document.getElementById('sharedTotalArea')?.value) || 0;
+          const myArea = parseFloat(document.getElementById('sharedMyArea')?.value) || 0;
+          if (totalKwh > 0 && totalArea > 0 && myArea > 0) {
+            const ratio = Math.round((myArea / totalArea) * 10000) / 100;
+            total = Math.round((totalKwh * (myArea / totalArea)) * 100) / 100;
+            currentCalcRatio = ratio;
+            formulaText = `大電表總度數 ${totalKwh.toLocaleString()} 度 × (本攤位 ${myArea} 坪 ÷ 商場總面積 ${totalArea} 坪 = ${ratio}%) = 我的用電 ${total.toLocaleString()} 度 (kWh)`;
+            currentCalcSource = `商場大電表分攤（依坪數比 ${ratio}%）`;
+          } else {
+            formulaText = '請輸入商場大電表總度數、商場總坪數與本攤位使用坪數';
+          }
+        }
+        // 模式二：依攤位/店家數量平均分攤
+        else if (rule === 'shared_count') {
+          const totalKwh = parseFloat(document.getElementById('sharedTotalKwhCount')?.value) || 0;
+          const count = parseFloat(document.getElementById('sharedTenantCount')?.value) || 1;
+          if (totalKwh > 0 && count > 0) {
+            const ratio = Math.round((1 / count) * 10000) / 100;
+            total = Math.round((totalKwh / count) * 100) / 100;
+            currentCalcRatio = ratio;
+            formulaText = `大電表總度數 ${totalKwh.toLocaleString()} 度 ÷ 共同分攤之 ${count} 攤 (每攤 ${ratio}%) = 我的用電 ${total.toLocaleString()} 度 (kWh)`;
+            currentCalcSource = `商場大電表平均分攤（共 ${count} 攤）`;
+          } else {
+            formulaText = '請輸入商場大電表總度數與共同分攤之攤位總數';
+          }
+        }
+        // 模式三：固定繳費金額反推 (夜市/菜市場)
+        else if (rule === 'shared_landlord') {
+          const fee = parseFloat(document.getElementById('landlordFee')?.value) || 0;
+          const freq = parseFloat(document.getElementById('landlordFreq')?.value) || 12;
+          const price = parseFloat(document.getElementById('landlordUnitPrice')?.value) || 4.0;
+          if (fee > 0 && price > 0) {
+            const annualCost = Math.round(fee * freq * 100) / 100;
+            total = Math.round((annualCost / price) * 100) / 100;
+            const freqName = freq === 12 ? '每月' : '每雙月';
+            formulaText = `(${freqName}繳費 NT$ ${fee.toLocaleString()} × ${freq} 期 = 年繳 NT$ ${annualCost.toLocaleString()}) ÷ 參考電價 ${price} 元/度 = ${total.toLocaleString()} 度 (kWh)`;
+            currentCalcSource = `${freqName}固定電費 $${fee.toLocaleString()} 反推`;
+          } else {
+            formulaText = '請輸入每期繳給房東/管委會的電費金額';
+          }
         }
       }
 
@@ -2438,11 +2587,15 @@
       const actDataIn = document.getElementById('actActivityData');
       const unitIn    = document.getElementById('actUnit');
       const srcIn     = document.getElementById('actDataSource');
+      const ratioIn   = document.getElementById('actRatio');
 
       if (actDataIn) actDataIn.value = currentCalcVal;
       if (unitIn && currentCalcUnit) unitIn.value = currentCalcUnit;
       if (srcIn && currentCalcSource) {
         srcIn.value = currentCalcSource;
+      }
+      if (ratioIn && currentCalcRatio !== undefined && currentCalcRatio > 0 && currentCalcRatio <= 100) {
+        ratioIn.value = currentCalcRatio;
       }
 
       closeActivityCalculator();
@@ -2812,10 +2965,15 @@
         const inUseFactor = r.inUse === '否' ? 0 : 1;
         const effectiveAct = Math.round(actVal * (ratioVal / 100) * inUseFactor * 100) / 100;
 
-        const isEstimated = r.dataSource && (r.dataSource.includes('推估') || r.dataSource.includes('基準') || r.dataSource.includes('估算'));
-        const estimateBadge = isEstimated
-          ? `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold ml-1.5 whitespace-nowrap shadow-sm"><i class="fa-solid fa-triangle-exclamation text-[9px]"></i> 推估值</span>`
-          : '';
+        const isShared = r.dataSource && (r.dataSource.includes('分攤') || r.dataSource.includes('共用'));
+        const isEstimated = !isShared && r.dataSource && (r.dataSource.includes('推估') || r.dataSource.includes('基準') || r.dataSource.includes('估算') || r.dataSource.includes('反推'));
+
+        let auditBadge = '';
+        if (isShared) {
+          auditBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold ml-1.5 whitespace-nowrap shadow-sm"><i class="fa-solid fa-building text-[9px]"></i> 分攤值</span>`;
+        } else if (isEstimated) {
+          auditBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold ml-1.5 whitespace-nowrap shadow-sm"><i class="fa-solid fa-triangle-exclamation text-[9px]"></i> 推估值</span>`;
+        }
 
         const calValStr = r.netCalorificValue ? `${r.netCalorificValue} ${r.netCalorificValueUnit || ''}` : '<span class="text-slate-600">-</span>';
         const carbStr = r.carbonContent ? `${r.carbonContent}%` : '<span class="text-slate-600">-</span>';
@@ -2858,7 +3016,7 @@
           <!-- ⑯ 數據單位 -->
           <td class="p-3 text-slate-300 whitespace-nowrap">${r.unit || '-'}</td>
           <!-- ⑰ 數據來源 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap"><div class="flex items-center gap-1"><span>${r.dataSource || '-'}</span>${estimateBadge}</div></td>
+          <td class="p-3 text-slate-300 whitespace-nowrap"><div class="flex items-center gap-1"><span>${r.dataSource || '-'}</span>${auditBadge}</div></td>
           <!-- ⑱ 保存單位 -->
           <td class="p-3 text-slate-300 whitespace-nowrap">${r.custodyUnit || '-'}</td>
           <!-- ⑲ 量測頻率 -->
