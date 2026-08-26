@@ -4349,13 +4349,11 @@
       const s3Rows = emissionSources.map((es, i) => [i + 1, es.name, es.location, es.energy, es.quantity]);
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s3Header.concat(s3Rows)), "三、排放源鑑別");
 
-      // Sheet 4: 活動數據填報 (完整 24 個欄位)
+      // Sheet 4: 活動數據填報
       const s4Header = [
-        "序號", "設備編號", "設備代碼", "設備名稱", "機構編號", "機構名稱",
-        "設備所屬單位/部門", "設備詳細位置/樓層", "設備數量", "原(燃)物料代碼", "原(燃)物料名稱",
-        "直接/間接", "排放型式", "今年度有無使用該項設備", "活動數據 (年總量)", "活動數據分配比率%",
-        "有效活動數據", "活動數據單位", "數據來源", "保存單位",
-        "量測頻率", "量測儀器", "燃料熱值來源", "燃料低位熱值", "燃料低位熱值單位", "碳含量(%)"
+        "序號", "設備編號", "設備名稱", "設備所屬單位/部門", "設備詳細位置/樓層", "設備數量",
+        "原(燃)物料名稱", "直接/間接", "排放型式", "溫室氣體種類", "今年度有無使用該項設備",
+        "活動數據 (年總量)", "活動數據分配比率%", "有效活動數據", "活動數據單位", "數據來源", "保存單位"
       ];
       const s4Rows = activityRecords.map((r, idx) => {
         const inUseFactor = r.inUse === '否' ? 0 : 1;
@@ -4363,33 +4361,24 @@
         return [
           idx + 1,
           r.equipNo,
-          r.equipCode,
           r.equipName,
-          r.orgId,
-          r.orgName,
-          r.dept,
-          r.location,
-          r.quantity,
-          r.materialCode,
+          r.dept || "",
+          r.location || "",
+          r.quantity || 1,
           r.materialName,
           r.scopeType,
           r.emissionType,
+          r.ghg || "",
           r.inUse,
-          r.activityData,
+          r.activityData !== '' ? r.activityData : "",
           `${r.ratio}%`,
           effAct,
           r.unit,
-          r.dataSource,
-          r.custodyUnit,
-          r.measurementFrequency || "",
-          r.measurementInstrument || "",
-          r.calorificValueSource || "",
-          r.netCalorificValue || "",
-          r.netCalorificValueUnit || "",
-          r.carbonContent ? `${r.carbonContent}%` : ""
+          r.dataSource || "",
+          r.custodyUnit || ""
         ];
       });
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([s4Header].concat(s4Rows)), "四、活動數據填報表(24欄位)");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([s4Header].concat(s4Rows)), "四、活動數據填報表");
 
       // Sheet 5: 定量盤查明細清冊 (Itemized)
       const { items, totalCarbon } = computeItemizedList();
