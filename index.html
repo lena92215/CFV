@@ -3727,14 +3727,24 @@
         }
       }
 
-      // 重複設備編號檢查（排除自身）
-      const isDuplicate = activityRecords.some((r, i) => i !== editIndex && r.equipNo.toLowerCase() === equipNo.toLowerCase());
+      // 複合鍵防呆檢查：【同一個設備編號 (equipNo)】+【同一個原(燃)物料代碼 (materialCode) 或名稱 (materialName)】不能重複
+      // 溫室氣體盤查實務允許同一台設備（如公務車）同時填報汽油（移動燃燒）與冷媒（逸散排放）等不同物料紀錄
+      const isDuplicate = activityRecords.some((r, i) => {
+        if (i === editIndex) return false;
+        const sameEquip = (r.equipNo || '').trim().toLowerCase() === equipNo.toLowerCase();
+        if (!sameEquip) return false;
+        
+        const sameCode = materialCode && r.materialCode && (r.materialCode.trim().toLowerCase() === materialCode.toLowerCase());
+        const sameName = materialName && r.materialName && (r.materialName.trim().toLowerCase() === materialName.toLowerCase());
+        return sameCode || sameName;
+      });
+
       if (isDuplicate) {
-        return showError(`設備編號「${equipNo}」已存在於其他紀錄，請使用唯一編號！`);
+        return showError(`設備編號「${equipNo}」已存在「${materialName || materialCode}」的填報紀錄！若為不同物料請調整原(燃)物料名稱/代碼。`);
       }
 
       const recordData = {
-        id: editIndex >= 0 ? activityRecords[editIndex].id : Date.now(),
+        id: editIndex >= 0 ? activityRecords[editIndex].id : (Date.now() + '_' + Math.random().toString(36).substring(2, 9)),
         equipNo,
         equipCode,
         equipName,
