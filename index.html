@@ -88,9 +88,9 @@
         <button onclick="switchAppMode('form')" id="btn-mode-form" class="px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition">
           <i class="fa-solid fa-pen-to-square"></i> 1. 清冊填報與表格紀錄
         </button>
-        <button onclick="switchAppMode('game')" id="btn-mode-game" class="px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+        <a href="game.html" onclick="packageDataAndLaunchGame()" id="btn-mode-game" class="px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">
           <i class="fa-solid fa-gamepad text-amber-400"></i> 2. 轉化為減碳遊戲
-        </button>
+        </a>
         <button onclick="exportToExcel()" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md transition flex items-center gap-1.5">
           <i class="fa-solid fa-file-excel"></i> 匯出 Excel (.xlsx)
         </button>
@@ -1898,9 +1898,9 @@
             <button onclick="switchSheetTab('sheet4')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-semibold transition flex items-center gap-1">
               <i class="fa-solid fa-plus text-emerald-400"></i> 新增活動數據
             </button>
-            <button onclick="switchAppMode('game')" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition flex items-center gap-1 shadow">
+            <a href="game.html" onclick="packageDataAndLaunchGame()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition flex items-center gap-1 shadow cursor-pointer">
               轉化為減碳遊戲 <i class="fa-solid fa-gamepad text-amber-300"></i>
-            </button>
+            </a>
           </div>
         </div>
 
