@@ -86,10 +86,7 @@
       <!-- Mode Switcher & User Account -->
       <div class="flex items-center gap-3 w-full lg:w-auto flex-wrap">
         <button onclick="switchAppMode('form')" id="btn-mode-form" class="px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition">
-          <i class="fa-solid fa-pen-to-square"></i> 1. 清冊填報與表格紀錄
-        </button>
-        <button onclick="switchAppMode('game')" id="btn-mode-game" class="px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-          <i class="fa-solid fa-gamepad text-amber-400"></i> 2. 轉化為減碳遊戲
+          <i class="fa-solid fa-pen-to-square"></i> 清冊填報與表格紀錄
         </button>
         <button onclick="exportToExcel()" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md transition flex items-center gap-1.5">
           <i class="fa-solid fa-file-excel"></i> 匯出 Excel (.xlsx)
@@ -1903,9 +1900,6 @@
             <button onclick="switchSheetTab('sheet4')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-semibold transition flex items-center gap-1">
               <i class="fa-solid fa-plus text-emerald-400"></i> 新增活動數據
             </button>
-            <button onclick="switchAppMode('game')" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition flex items-center gap-1 shadow">
-              轉化為減碳遊戲 <i class="fa-solid fa-gamepad text-amber-300"></i>
-            </button>
           </div>
         </div>
 
@@ -1947,27 +1941,6 @@
           </div>
         </div>
 
-        <!-- Charts: Scope Ratio & Top Hotspots -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="glass-panel rounded-2xl p-5 space-y-3">
-            <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5 border-b border-slate-700 pb-2">
-              <i class="fa-solid fa-chart-pie text-cyan-400"></i> 範疇一 / 範疇二 排放結構佔比
-            </h4>
-            <div class="h-60 relative">
-              <canvas id="chartScope"></canvas>
-            </div>
-          </div>
-
-          <div class="glass-panel rounded-2xl p-5 space-y-3">
-            <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5 border-b border-slate-700 pb-2">
-              <i class="fa-solid fa-chart-column text-emerald-400"></i> 主要排碳設備當量排行 (tCO₂e)
-            </h4>
-            <div class="h-60 relative">
-              <canvas id="chartItemsBar"></canvas>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <!-- SHEET 6: 溫室氣體排放量彙總 -->
@@ -1999,8 +1972,25 @@
           </div>
         </div>
 
-        <div class="h-64 sm:h-80 relative">
-          <canvas id="summaryChart"></canvas>
+        <!-- 📊 兩項圖表 (自 Step 5 遷移至 Step 6) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+          <div class="glass-panel rounded-2xl p-5 space-y-3">
+            <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5 border-b border-slate-700 pb-2">
+              <i class="fa-solid fa-chart-pie text-cyan-400"></i> 範疇一 / 範疇二 排放結構佔比
+            </h4>
+            <div class="h-60 relative">
+              <canvas id="chartScope"></canvas>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-5 space-y-3">
+            <h4 class="text-xs font-bold text-slate-200 flex items-center gap-1.5 border-b border-slate-700 pb-2">
+              <i class="fa-solid fa-chart-column text-emerald-400"></i> 主要排碳設備當量排行 (tCO₂e)
+            </h4>
+            <div class="h-60 relative">
+              <canvas id="chartItemsBar"></canvas>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -4088,12 +4078,12 @@
     }
 
     // =============================================
-    // STEP 5: ITEMIZED LIST CALCULATION ENGINE (連動活動數據)
+    // STEP 5: ITEMIZED LIST CALCULATION ENGINE (連動活動數據 + 關鍵字智能匹配)
     // =============================================
     const GWP_DATA = {
-      "AR5": { CO2: 1, CH4: 28, N2O: 265, "R-410A": 2088, "R-404A": 3922, "R-134a": 1430, SF6: 23500, NF3: 16100 },
-      "AR6": { CO2: 1, CH4: 27.9, N2O: 273, "R-410A": 2255.5, "R-404A": 4728, "R-134a": 1526, SF6: 25200, NF3: 17400 },
-      "AR4": { CO2: 1, CH4: 25, N2O: 298, "R-410A": 2088, "R-404A": 3922, "R-134a": 1430, SF6: 22800, NF3: 17200 }
+      "AR5": { CO2: 1, CH4: 28, N2O: 265, "R-410A": 2088, "R-404A": 3922, "R-134a": 1430, "R-32": 675, "R-22": 1810, SF6: 23500, NF3: 16100 },
+      "AR6": { CO2: 1, CH4: 27.9, N2O: 273, "R-410A": 2255.5, "R-404A": 4728, "R-134a": 1526, "R-32": 771, "R-22": 1960, SF6: 25200, NF3: 17400 },
+      "AR4": { CO2: 1, CH4: 25, N2O: 298, "R-410A": 2088, "R-404A": 3922, "R-134a": 1430, "R-32": 675, "R-22": 1810, SF6: 22800, NF3: 17200 }
     };
     let currentGWP = "AR5";
 
@@ -4102,19 +4092,194 @@
       "車用柴油": { factor: 2.66, co2: 2.606, ch4: 0.00039, n2o: 0.00018, unit: "公升 (L)", scope: "Scope 1 - 移動燃燒", ref: "環境部 6.0.4 柴油" },
       "車用汽油": { factor: 2.36, co2: 2.263, ch4: 0.00078, n2o: 0.00021, unit: "公升 (L)", scope: "Scope 1 - 移動燃燒", ref: "環境部 6.0.4 汽油" },
       "桶裝瓦斯(LPG)": { factor: 3.11, co2: 3.003, ch4: 0.0001, n2o: 0.00005, unit: "公斤 (kg)", scope: "Scope 1 - 固定燃燒", ref: "環境部 6.0.4 LPG" },
+      "天然氣(LNG)": { factor: 2.09, co2: 2.09, ch4: 0.00005, n2o: 0.00003, unit: "立方公尺 (m³)", scope: "Scope 1 - 固定燃燒", ref: "環境部 6.0.4 天然氣" },
       "冷氣冷媒(R-410A)": { factor: 2088, co2: 0, ch4: 0, n2o: 0, other: 1.0, gas: "R-410A", unit: "kg", scope: "Scope 1 - 逸散排放", ref: "IPCC GWP" },
       "冷藏冷媒(R-404A)": { factor: 3922, co2: 0, ch4: 0, n2o: 0, other: 1.0, gas: "R-404A", unit: "kg", scope: "Scope 1 - 逸散排放", ref: "IPCC GWP" },
       "乾粉滅火藥劑": { factor: 28, co2: 28, ch4: 0, n2o: 0, unit: "kg", scope: "Scope 1 - 逸散排放", ref: "環境部逸散係數" }
     };
 
+    // 🧠 關鍵字智能匹配引擎 (Smart Factor Matching Engine)
+    function getSmartEmissionFactor(rawName, scopeType = '') {
+      const name = (rawName || '').trim().toLowerCase();
+      const scope = (scopeType || '').toLowerCase();
+
+      // 1. 電力類 (Scope 2)
+      if (name.includes('電') || name.includes('kwh') || name.includes('度') || name.includes('electricity') || scope.includes('間接') || scope.includes('scope 2')) {
+        return {
+          type: 'electricity',
+          name: '外購電力',
+          factor: 0.495,
+          co2: 0.495,
+          ch4: 0,
+          n2o: 0,
+          unit: '度 (kWh)',
+          scope: 'Scope 2',
+          ref: '經濟部電力排碳係數 (0.495 kg/度)'
+        };
+      }
+
+      // 2. 柴油類 (Scope 1)
+      if (name.includes('柴油') || name.includes('diesel') || name.includes('170006')) {
+        return {
+          type: 'fuel',
+          name: '車用柴油',
+          factor: 2.66,
+          co2: 2.606,
+          ch4: 0.00039,
+          n2o: 0.00018,
+          unit: '公升 (L)',
+          scope: 'Scope 1',
+          ref: '環境部 6.0.4 柴油 (2.606 kg/L)'
+        };
+      }
+
+      // 3. 汽油類 (Scope 1: 含 92 / 95 / 98 / 無鉛汽油)
+      if (name.includes('汽油') || name.includes('95') || name.includes('92') || name.includes('98') || name.includes('gasoline') || name.includes('petrol') || name.includes('170001')) {
+        return {
+          type: 'fuel',
+          name: '車用汽油',
+          factor: 2.36,
+          co2: 2.263,
+          ch4: 0.00078,
+          n2o: 0.00021,
+          unit: '公升 (L)',
+          scope: 'Scope 1',
+          ref: '環境部 6.0.4 汽油 (2.263 kg/L)'
+        };
+      }
+
+      // 4. 瓦斯 / 液化石油氣 / 天然氣 (Scope 1)
+      if (name.includes('天然氣') || name.includes('lng') || name.includes('導管') || name.includes('管道')) {
+        return {
+          type: 'fuel',
+          name: '天然氣(LNG)',
+          factor: 2.09,
+          co2: 2.09,
+          ch4: 0.00005,
+          n2o: 0.00003,
+          unit: '立方公尺 (m³)',
+          scope: 'Scope 1',
+          ref: '環境部 6.0.4 天然氣 (2.09 kg/m³)'
+        };
+      }
+      if (name.includes('瓦斯') || name.includes('lpg') || name.includes('液化石油') || name.includes('桶裝')) {
+        return {
+          type: 'fuel',
+          name: '桶裝瓦斯(LPG)',
+          factor: 3.11,
+          co2: 3.003,
+          ch4: 0.0001,
+          n2o: 0.00005,
+          unit: '公斤 (kg)',
+          scope: 'Scope 1',
+          ref: '環境部 6.0.4 LPG (3.003 kg/kg)'
+        };
+      }
+
+      // 5. 冷媒 / 逸散氣體 (Scope 1)
+      if (name.includes('404') || name.includes('r-404') || name.includes('r404')) {
+        return { type: 'refrigerant', name: '冷藏冷媒(R-404A)', gas: 'R-404A', unit: 'kg', scope: 'Scope 1', ref: 'IPCC GWP R-404A' };
+      }
+      if (name.includes('134') || name.includes('r-134') || name.includes('r134')) {
+        return { type: 'refrigerant', name: '冷媒(R-134a)', gas: 'R-134a', unit: 'kg', scope: 'Scope 1', ref: 'IPCC GWP R-134a' };
+      }
+      if (name.includes('32') || name.includes('r-32') || name.includes('r32')) {
+        return { type: 'refrigerant', name: '環保冷媒(R-32)', gas: 'R-32', unit: 'kg', scope: 'Scope 1', ref: 'IPCC GWP R-32' };
+      }
+      if (name.includes('22') || name.includes('r-22') || name.includes('r22')) {
+        return { type: 'refrigerant', name: '舊型冷媒(R-22)', gas: 'R-22', unit: 'kg', scope: 'Scope 1', ref: 'IPCC GWP R-22' };
+      }
+      if (name.includes('sf6') || name.includes('六氟化硫')) {
+        return { type: 'refrigerant', name: '六氟化硫(SF6)', gas: 'SF6', unit: 'kg', scope: 'Scope 1', ref: 'IPCC GWP SF6' };
+      }
+      if (name.includes('nf3') || name.includes('三氟化氮')) {
+        return { type: 'refrigerant', name: '三氟化氮(NF3)', gas: 'NF3', unit: 'kg', scope: 'Scope 1', ref: 'IPCC GWP NF3' };
+      }
+      if (name.includes('冷媒') || name.includes('410') || name.includes('r-410') || name.includes('hfc') || name.includes('pfc')) {
+        return { type: 'refrigerant', name: '冷氣冷媒(R-410A)', gas: 'R-410A', unit: 'kg', scope: 'Scope 1', ref: 'IPCC GWP R-410A' };
+      }
+
+      // 6. 滅火器 (Scope 1)
+      if (name.includes('滅火') || name.includes('乾粉')) {
+        return {
+          type: 'fuel',
+          name: '乾粉滅火藥劑',
+          factor: 28,
+          co2: 28,
+          ch4: 0,
+          n2o: 0,
+          unit: 'kg',
+          scope: 'Scope 1',
+          ref: '環境部逸散係數 (28 kg/kg)'
+        };
+      }
+
+      // 7. 重油 / 燃料油 / 煤炭
+      if (name.includes('重油') || name.includes('燃料油')) {
+        return {
+          type: 'fuel',
+          name: '重油/燃料油',
+          factor: 3.11,
+          co2: 3.114,
+          ch4: 0.0003,
+          n2o: 0.00008,
+          unit: '公升 (L)',
+          scope: 'Scope 1',
+          ref: '環境部 6.0.4 重油'
+        };
+      }
+      if (name.includes('煤') || name.includes('焦炭')) {
+        return {
+          type: 'fuel',
+          name: '煤炭/焦炭',
+          factor: 2.45,
+          co2: 2.45,
+          ch4: 0.0002,
+          n2o: 0.00004,
+          unit: '公斤 (kg)',
+          scope: 'Scope 1',
+          ref: '環境部 6.0.4 煤炭'
+        };
+      }
+
+      // 8. 智能防呆 Fallback
+      if (scope.includes('scope 1') || scope.includes('直接') || scope.includes('燃燒') || scope.includes('逸散')) {
+        return {
+          type: 'fuel',
+          name: rawName || '自訂直接排放源',
+          factor: 2.5,
+          co2: 2.45,
+          ch4: 0.0005,
+          n2o: 0.0001,
+          unit: '單位',
+          scope: 'Scope 1',
+          ref: '環境部通用直接排放基準 (2.5 kg/單位)'
+        };
+      }
+
+      return {
+        type: 'electricity',
+        name: rawName || '外購電力',
+        factor: 0.495,
+        co2: 0.495,
+        ch4: 0,
+        n2o: 0,
+        unit: '度 (kWh)',
+        scope: 'Scope 2',
+        ref: '經濟部電力排碳係數 (0.495 kg/度)'
+      };
+    }
+
     let currentScopeFilter = "ALL";
 
     function computeItemizedList() {
-      const gwp = GWP_DATA[currentGWP];
+      const gwp = GWP_DATA[currentGWP] || GWP_DATA["AR5"];
       let totalCarbon = 0, s1Total = 0, s2Total = 0;
 
-      const items = activityRecords.map(r => {
-        const fInfo = FACTOR_MAP[r.materialName] || FACTOR_MAP["外購電力"];
+      const records = (typeof activityRecords !== 'undefined') ? activityRecords : [];
+
+      const items = records.map(r => {
+        const smartFactor = getSmartEmissionFactor(r.materialName, r.scopeType);
         const inUseFactor = r.inUse === '否' ? 0 : 1;
         const effectiveActivity = (parseFloat(r.activityData) || 0) * ((parseFloat(r.ratio) || 100) / 100) * inUseFactor;
 
@@ -4122,28 +4287,28 @@
         let itemCO2e = 0;
         let factorText = "";
 
-        if (r.materialName.includes("冷媒") || r.materialName.includes("410") || r.materialName.includes("404")) {
-          const gName = r.materialName.includes("404") ? "R-404A" : "R-410A";
+        if (smartFactor.type === 'refrigerant') {
+          const gName = smartFactor.gas || "R-410A";
           const gwpVal = gwp[gName] || 2088;
           tOther = effectiveActivity / 1000;
           itemCO2e = tOther * gwpVal;
-          factorText = `GWP: ${gwpVal}`;
-        } else if (r.materialName.includes("電力")) {
-          tCO2 = (effectiveActivity * (fInfo.co2 || 0.495)) / 1000;
+          factorText = `GWP: ${gwpVal} (${gName})`;
+        } else if (smartFactor.type === 'electricity') {
+          tCO2 = (effectiveActivity * (smartFactor.co2 || 0.495)) / 1000;
           itemCO2e = tCO2;
-          factorText = `${fInfo.co2 || 0.495} kg/度`;
+          factorText = `${smartFactor.co2 || 0.495} kg/度`;
         } else {
-          tCO2 = (effectiveActivity * (fInfo.co2 || 0)) / 1000;
-          tCH4 = (effectiveActivity * (fInfo.ch4 || 0)) / 1000;
-          tN2O = (effectiveActivity * (fInfo.n2o || 0)) / 1000;
-          itemCO2e = (tCO2 * gwp.CO2) + (tCH4 * gwp.CH4) + (tN2O * gwp.N2O);
-          factorText = `${fInfo.factor || 0} kg/單位`;
+          tCO2 = (effectiveActivity * (smartFactor.co2 || 0)) / 1000;
+          tCH4 = (effectiveActivity * (smartFactor.ch4 || 0)) / 1000;
+          tN2O = (effectiveActivity * (smartFactor.n2o || 0)) / 1000;
+          itemCO2e = (tCO2 * (gwp.CO2 || 1)) + (tCH4 * (gwp.CH4 || 28)) + (tN2O * (gwp.N2O || 265));
+          factorText = `${smartFactor.factor || smartFactor.co2 || 0} kg/單位`;
         }
 
         itemCO2e = Math.round(itemCO2e * 1000) / 1000;
 
-        const isScope1 = r.scopeType.includes("Scope 1") || r.scopeType.includes("直接");
-        const isScope2 = r.scopeType.includes("Scope 2") || r.scopeType.includes("間接");
+        const isScope1 = smartFactor.scope === 'Scope 1' || (r.scopeType && (r.scopeType.includes("Scope 1") || r.scopeType.includes("直接")));
+        const isScope2 = smartFactor.scope === 'Scope 2' || (r.scopeType && (r.scopeType.includes("Scope 2") || r.scopeType.includes("間接")));
 
         if (isScope1) s1Total += itemCO2e;
         if (isScope2) s2Total += itemCO2e;
@@ -4151,7 +4316,7 @@
 
         let potential = "中等";
         let potentialColor = "bg-amber-950 text-amber-300 border-amber-500/30";
-        if (itemCO2e >= 10 || r.materialName.includes("冷媒")) {
+        if (itemCO2e >= 10 || smartFactor.type === 'refrigerant' || (r.materialName && r.materialName.includes("冷媒"))) {
           potential = "極高 (優先改善)";
           potentialColor = "bg-rose-950 text-rose-300 border-rose-500/30 font-bold";
         } else if (itemCO2e < 2) {
@@ -4161,10 +4326,10 @@
 
         return {
           ...r,
-          name: r.equipName,
-          fuel: r.materialName,
+          name: r.equipName || '未命名設備',
+          fuel: r.materialName || '一般能源',
           scope: isScope2 ? "Scope 2" : "Scope 1",
-          annualTotal: r.activityData,
+          annualTotal: r.activityData || 0,
           effectiveActivity: Math.round(effectiveActivity * 100) / 100,
           scopeType: isScope2 ? "Scope 2" : "Scope 1",
           tCO2: Math.round(tCO2 * 1000) / 1000,
