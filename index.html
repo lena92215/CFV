@@ -86,7 +86,10 @@
       <!-- Mode Switcher & User Account -->
       <div class="flex items-center gap-3 w-full lg:w-auto flex-wrap">
         <button onclick="switchAppMode('form')" id="btn-mode-form" class="px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-emerald-600 text-white shadow-lg transition">
-          <i class="fa-solid fa-pen-to-square"></i> 清冊填報與表格紀錄
+          <i class="fa-solid fa-pen-to-square"></i> 1. 清冊填報與表格紀錄
+        </button>
+        <button onclick="switchAppMode('game')" id="btn-mode-game" class="px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+          <i class="fa-solid fa-gamepad text-amber-400"></i> 2. 轉化為減碳遊戲
         </button>
         <button onclick="exportToExcel()" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md transition flex items-center gap-1.5">
           <i class="fa-solid fa-file-excel"></i> 匯出 Excel (.xlsx)
