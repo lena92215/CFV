@@ -2508,15 +2508,21 @@
     }
 
     // Toast 提示訊息
-    function showToast(message, type = 'success') {
+    function showToast(message, type = 'success', duration = 4000) {
       const toast = document.createElement('div');
-      const isSuccess = type === 'success';
-      toast.className = `fixed bottom-5 right-5 z-50 px-4 py-3 rounded-2xl text-xs font-bold shadow-2xl flex items-center gap-2.5 transition-all duration-300 transform translate-y-4 opacity-0 border ${
-        isSuccess ? 'bg-slate-900/95 text-emerald-300 border-emerald-500/50' : 'bg-slate-900/95 text-rose-300 border-rose-500/50'
-      }`;
+      let borderClass = 'bg-slate-900/95 text-emerald-300 border-emerald-500/50';
+      let iconClass = 'fa-circle-check text-emerald-400';
+      if (type === 'warning' || type === 'warn') {
+        borderClass = 'bg-slate-900/95 text-amber-300 border-amber-500/60 shadow-amber-500/20';
+        iconClass = 'fa-triangle-exclamation text-amber-400';
+      } else if (type === 'error' || type === 'danger') {
+        borderClass = 'bg-slate-900/95 text-rose-300 border-rose-500/50';
+        iconClass = 'fa-circle-exclamation text-rose-400';
+      }
+      toast.className = `fixed bottom-5 right-5 z-50 px-5 py-3.5 rounded-2xl text-xs font-bold shadow-2xl flex items-center gap-3 transition-all duration-300 transform translate-y-4 opacity-0 border max-w-md ${borderClass}`;
       toast.innerHTML = `
-        <i class="fa-solid ${isSuccess ? 'fa-circle-check text-emerald-400' : 'fa-circle-exclamation text-rose-400'} text-base"></i>
-        <span>${message}</span>
+        <i class="fa-solid ${iconClass} text-lg shrink-0"></i>
+        <span class="leading-relaxed">${message}</span>
       `;
       document.body.appendChild(toast);
       setTimeout(() => {
@@ -2525,7 +2531,7 @@
       setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-y-4');
         setTimeout(() => toast.remove(), 300);
-      }, 3000);
+      }, duration);
     }
 
     // 物料變更時自動帶入關聯欄位 (代碼、範疇、型式、單位、來源) 並進行防呆唯讀鎖定
@@ -3780,21 +3786,15 @@
       showToast(`已成功刪除「${r.equipName}」填報紀錄！`, 'success');
     }
 
-    // 批次匯入 / 帶入 Step 3 設備清單（嚴格依照 Step 3 帶入：設備編號、設備名稱、所屬部門/位置、原(燃)物料、排放型式、溫室氣體，其餘欄位一律維持空白供使用者自行編輯）
+    // 批次匯入 / 帶入 Step 3 設備清單（嚴格映射 Step 3 欄位，絕不捏造任何假數據）
     function batchImportFromStep3() {
       if (!emissionSources || emissionSources.length === 0) {
         alert('目前 Step 3 (三、排放源鑑別) 中尚無設備資料，請先至 Step 3 新增排放源設備！');
         return;
       }
 
-      // 嚴格依照 Step 3 清單 1-to-1 精準建立/對齊 Step 4 清冊
+      // 嚴格依照 Step 3 清單 1-to-1 精準映射建立 Step 4 清冊
       const newRecords = emissionSources.map((es, idx) => {
-        // 尋找既有 activityRecords 中是否已有該設備（比對設備編號或名稱，優先保留使用者既有輸入）
-        const existing = activityRecords.find(r =>
-          (r.equipNo && r.equipNo === es.equipId) ||
-          (r.equipName && (r.equipName === es.name || r.equipName.includes(es.name) || es.name.includes(r.equipName)))
-        );
-
         const auto = getESAuto(es.energy, es.name);
         const isScope2 = auto && auto.scope && auto.scope.includes('二');
         const scopeStr = isScope2 ? '間接排放 (Scope 2)' : (auto?.scope || '直接排放 (Scope 1)');
@@ -3804,7 +3804,7 @@
         if (es.energy.includes('柴油') || es.energy.includes('汽油')) emType = '移動燃燒';
         if (es.energy.includes('冷媒') || es.energy.includes('滅火')) emType = '逸散排放';
 
-        // 溫室氣體
+        // 溫室氣體種類
         let ghgVal = 'CO2';
         if (auto && auto.ghg) {
           ghgVal = Array.isArray(auto.ghg) ? auto.ghg.join(', ') : auto.ghg;
@@ -3832,37 +3832,37 @@
         }
 
         return {
-          id: existing ? existing.id : (Date.now() + idx),
-          // 1. 來自 STEP 3 的真實資料
+          id: Date.now() + idx,
+          // 1. 嚴格映射 Step 3 欄位
           equipNo: es.equipId || `ES-00${idx + 1}`,
           equipName: es.name,
-          location: es.location || existing?.location || '',
+          location: es.location || '',
           materialName: es.energy,
-          emissionType: emType,
-          ghg: existing?.ghg || ghgVal,
-
-          // 2. 系統關聯屬性
+          materialCode: matCode || '',
           scopeType: scopeStr,
+          emissionType: emType,
           quantity: es.quantity || 1,
-          inUse: existing?.inUse || '是',
-          ratio: existing?.ratio !== undefined ? existing.ratio : 100,
-          unit: existing?.unit || uStr,
+          ghg: ghgVal,
 
-          // 3. 其餘欄位一律直接空白供使用者自行填寫（絕不虛構填補）
-          equipCode: existing?.equipCode || '',
-          orgId: existing?.orgId || '',
-          orgName: existing?.orgName || '',
-          dept: existing?.dept || '',
-          materialCode: existing?.materialCode || matCode || '',
-          activityData: existing && existing.activityData !== undefined && existing.activityData !== null ? existing.activityData : '',
-          dataSource: existing?.dataSource || '',
-          custodyUnit: existing?.custodyUnit || '',
-          measurementFrequency: existing?.measurementFrequency || '',
-          measurementInstrument: existing?.measurementInstrument || '',
-          calorificValueSource: existing?.calorificValueSource || '',
-          netCalorificValue: existing?.netCalorificValue || '',
-          netCalorificValueUnit: existing?.netCalorificValueUnit || '',
-          carbonContent: existing?.carbonContent || ''
+          // 2. 初始化 Step 4 專屬欄位（絕對不可帶入預設數值，一律空白或標準預設選項）
+          activityData: '',             // ⑭ 活動數據 (年總量)：設為空字串，嚴禁填入假數據
+          dataSource: '',               // ⑰ 數據來源：設為空字串，嚴禁填寫假憑證
+          custodyUnit: '',              // ⑱ 保存單位：設為空字串，嚴禁填寫假部門
+          inUse: '是',                  // ⑬ 今年度有無使用：預設「是 (正常運轉使用中)」
+          ratio: 100,                   // ⑮ 分配比率%：預設 100
+          unit: uStr,                   // ⑯ 數據單位：標準計量單位
+
+          // 3. ⑲ ~ ㉔ 及其他進階欄位：一律空白
+          equipCode: '',                // ② 設備代碼：空字串
+          orgId: '',                    // ④ 機構編號：空字串
+          orgName: '',                  // ⑤ 機構名稱：空字串
+          dept: '',                     // ⑥ 設備所屬單位/部門：空字串
+          measurementFrequency: '',     // ⑲ 量測頻率：空字串
+          measurementInstrument: '',    // ⑳ 量測儀器：空字串
+          calorificValueSource: '',     // ㉑ 燃料熱值來源：空字串
+          netCalorificValue: '',        // ㉒ 燃料低位熱值：空字串
+          netCalorificValueUnit: '',    // 燃料熱值單位：空字串
+          carbonContent: ''             // ㉓ 碳含量(%)：空字串
         };
       });
 
@@ -3870,8 +3870,11 @@
       saveActivityRecords();
       renderActivityTable();
       renderStep3Itemized();
-      showToast(`已成功自 Step 3 帶入設備資料（共 ${activityRecords.length} 筆，其餘欄位空白供自行編輯）！`);
+      showToast('✅ 已成功帶入設備清單！⚠️ 請點擊列表右側的『編輯』，依據實際單據補齊『活動數據』與『數據來源』。', 'warning', 7000);
     }
+
+    // 別名支援
+    window.importFromStep3 = batchImportFromStep3;
 
     // 清空所有活動數據紀錄
     function resetActivityDemoData() {
