@@ -2470,7 +2470,7 @@
       if (esCountEl) esCountEl.innerText = emissionSources.length;
     }
 
-    const ACTIVITY_STORAGE_KEY = 'cfv_activity_records_v3';
+    const ACTIVITY_STORAGE_KEY = 'cfv_activity_records_v4';
 
     // 活動數據清單 (Sheet 4) - 預設維持完全空白，由使用者親自新增或輸入，或點擊批次帶入
     const DEFAULT_ACTIVITY_RECORDS = [];
@@ -2480,16 +2480,23 @@
     // LocalStorage 讀取與儲存
     function loadActivityRecords() {
       try {
-        // 清理舊版本快取的 Demo 數據
+        // 清理所有舊版本快取的 Demo 數據
         localStorage.removeItem('cfv_activity_records_v1');
         localStorage.removeItem('cfv_activity_records_v2');
+        localStorage.removeItem('cfv_activity_records_v3');
         
         const raw = localStorage.getItem(ACTIVITY_STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) {
-            // 過濾舊 demo 資料
-            const clean = parsed.filter(r => r.orgId !== '88889999' && !r.equipName?.includes('阿文') && !r.orgName?.includes('阿文'));
+            // 過濾任何包含舊 demo 特徵的假資料
+            const clean = parsed.filter(r => 
+              r.orgId !== '88889999' && 
+              !r.equipName?.includes('阿文') && 
+              !r.orgName?.includes('阿文') &&
+              r.dataSource !== '中油車隊卡加油發票' &&
+              r.measurementInstrument !== '台電數位電子電表'
+            );
             return clean;
           }
         }
