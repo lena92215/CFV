@@ -3855,45 +3855,58 @@
           auditBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold ml-1.5 whitespace-nowrap shadow-sm"><i class="fa-solid fa-triangle-exclamation text-[9px]"></i> 推估值</span>`;
         }
 
+        const emptyBadge = `<span class="text-amber-400 font-semibold px-2 py-0.5 bg-amber-950/60 border border-amber-500/30 rounded text-[11px] inline-block whitespace-nowrap shadow-sm">待填寫</span>`;
+
+        function formatCellText(val, customClass = 'text-slate-300') {
+          if (val === null || val === undefined) return emptyBadge;
+          const s = String(val).trim();
+          if (s === '' || s === '-') return emptyBadge;
+          return `<span class="${customClass}">${s}</span>`;
+        }
+
         const ghgDisplay = r.ghg
           ? (Array.isArray(r.ghg) ? r.ghg : r.ghg.split(',')).map(g => `<span class="px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono">${g.trim()}</span>`).join(' ')
-          : '<span class="text-slate-600">-</span>';
+          : emptyBadge;
+
+        const dataSourceDisplay = (r.dataSource && r.dataSource.trim() !== '' && r.dataSource.trim() !== '-')
+          ? `<div class="flex items-center gap-1"><span>${r.dataSource.trim()}</span>${auditBadge}</div>`
+          : emptyBadge;
 
         tr.innerHTML = `
           <!-- 序號 -->
           <td class="p-3 text-center font-mono text-slate-400 sticky left-0 z-10 bg-slate-950/90 border-r border-slate-800">${displayIdx + 1}</td>
           <!-- 設備編號 -->
-          <td class="p-3 font-mono font-bold text-emerald-400 whitespace-nowrap">${r.equipNo || '-'}</td>
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.equipNo, 'font-mono font-bold text-emerald-400')}</td>
           <!-- 設備名稱 -->
-          <td class="p-3 font-bold text-slate-100 whitespace-nowrap">${r.equipName || '-'}</td>
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.equipName, 'font-bold text-slate-100')}</td>
           <!-- 設備所屬單位/部門 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.dept || '-'}</td>
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.dept, 'text-slate-300')}</td>
           <!-- 設備詳細位置/樓層 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.location || '-'}</td>
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.location, 'text-slate-300')}</td>
           <!-- 設備數量 -->
           <td class="p-3 text-center font-mono text-slate-200 font-semibold">${r.quantity || 1}</td>
           <!-- 原(燃)物料名稱 -->
-          <td class="p-3 font-semibold text-slate-200 whitespace-nowrap">${r.materialName || '-'}</td>
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.materialName, 'font-semibold text-slate-200')}</td>
           <!-- 直接/間接 -->
           <td class="p-3">${scopeBadge}</td>
           <!-- 排放型式 -->
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[10px] whitespace-nowrap">${r.emissionType || '-'}</span></td>
+          <td class="p-3">${r.emissionType ? `<span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[10px] whitespace-nowrap">${r.emissionType}</span>` : emptyBadge}</td>
           <!-- 溫室氣體 -->
           <td class="p-3 whitespace-nowrap">${ghgDisplay}</td>
           <!-- 今年度有無使用 -->
           <td class="p-3 text-center">${inUseBadge}</td>
           <!-- 活動數據 (年總量) -->
-          <td class="p-3 text-right font-mono font-bold whitespace-nowrap">${hasAct ? `<span class="text-amber-300">${actVal.toLocaleString()}</span>` : '<span class="text-amber-400 font-semibold px-2 py-0.5 bg-amber-950/60 border border-amber-500/30 rounded text-[11px]">待填寫</span>'}</td>
+          <td class="p-3 text-right font-mono font-bold whitespace-nowrap">${hasAct ? `<span class="text-amber-300">${actVal.toLocaleString()}</span>` : emptyBadge}</td>
           <!-- 分配比率% -->
           <td class="p-3 text-right font-mono text-slate-300">${ratioVal}%</td>
           <!-- 有效活動數據 -->
           <td class="p-3 text-right font-mono font-black whitespace-nowrap">${hasAct ? `<span class="text-emerald-400">${effectiveAct.toLocaleString()}</span>` : '<span class="text-slate-600">-</span>'}</td>
           <!-- 數據單位 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.unit || '-'}</td>
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.unit, 'text-slate-300')}</td>
           <!-- 數據來源 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap"><div class="flex items-center gap-1"><span>${r.dataSource || '-'}</span>${auditBadge}</div></td>
+          <td class="p-3 text-slate-300 whitespace-nowrap">${dataSourceDisplay}</td>
           <!-- 保存單位 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.custodyUnit || '-'}</td>
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.custodyUnit, 'text-slate-300')}</td>
           <!-- 操作 -->
           <td class="p-3 text-center sticky right-0 z-10 bg-slate-950/90 border-l border-slate-800 whitespace-nowrap">
             <div class="flex items-center justify-center gap-1.5">
