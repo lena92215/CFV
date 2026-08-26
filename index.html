@@ -464,6 +464,7 @@
                   <th class="p-3 w-44 font-semibold">⑩ 原(燃)物料名稱 *</th>
                   <th class="p-3 w-32 font-semibold">⑪ 直接/間接 *</th>
                   <th class="p-3 w-32 font-semibold">⑫ 排放型式 *</th>
+                  <th class="p-3 w-28 font-semibold">溫室氣體 *</th>
                   <th class="p-3 w-28 text-center font-semibold">⑬ 今年度有無使用 *</th>
                   <th class="p-3 w-36 text-right font-semibold">⑭ 活動數據 (年總量) *</th>
                   <th class="p-3 w-28 text-right font-semibold">⑮ 分配比率% *</th>
@@ -636,6 +637,10 @@
                     <option value="外購蒸氣使用">外購蒸氣使用</option>
                     <option value="其他">其他</option>
                   </select>
+                </div>
+                <div>
+                  <label class="block text-slate-300 font-medium mb-1">溫室氣體種類 (GHG)</label>
+                  <input type="text" id="actGHG" placeholder="例如：CO2、CH4、N2O、HFCs" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
               </div>
             </div>
@@ -2551,6 +2556,8 @@
       const srcEl = document.getElementById('actDataSource');
       const custodyEl = document.getElementById('actCustodyUnit');
 
+      const ghgEl = document.getElementById('actGHG');
+
       if (found) {
         if (codeEl) codeEl.value = found.code;
         if (scopeEl) scopeEl.value = found.scopeType;
@@ -2558,8 +2565,10 @@
         if (unitEl && (!unitEl.value || unitEl.value === '度 (kWh)' || unitEl.value === 'kg' || unitEl.value === '公升 (L)' || unitEl.value === '公斤 (kg)')) {
           unitEl.value = found.defaultUnit;
         }
-        if (srcEl && !srcEl.value) srcEl.value = found.defaultSource;
-        if (custodyEl && !custodyEl.value) custodyEl.value = found.defaultCustody;
+        if (ghgEl) {
+          const isScope2 = found.scopeType.includes('2');
+          ghgEl.value = isScope2 ? 'CO2' : (found.emissionType === '逸散排放' ? (found.name.includes('二氧化碳') ? 'CO2' : 'HFCs') : 'CO2, CH4, N2O');
+        }
 
         // 鎖定 ⑪ 和 ⑫ 為唯讀狀態以防填錯
         setScopeEmissionLock(true);
@@ -2742,6 +2751,7 @@
         document.getElementById('actUnit').value = '度 (kWh)';
         document.getElementById('actDataSource').value = '';
         document.getElementById('actCustodyUnit').value = '';
+        document.getElementById('actGHG').value = 'CO2';
 
         // 自動觸發判定並鎖定
         onActivityMaterialChange();
@@ -2777,6 +2787,7 @@
         document.getElementById('actUnit').value = r.unit || '';
         document.getElementById('actDataSource').value = r.dataSource || '';
         document.getElementById('actCustodyUnit').value = r.custodyUnit || '';
+        document.getElementById('actGHG').value = r.ghg ? (Array.isArray(r.ghg) ? r.ghg.join(', ') : r.ghg) : '';
 
         // 依據編輯物料自動判定並鎖定
         onActivityMaterialChange();
@@ -3612,11 +3623,11 @@
       showToast(`已成功套用活動數據計算結果：${currentCalcVal.toLocaleString()} ${currentCalcUnit}！`);
     }
 
-    // 儲存活動數據紀錄（含 18 必填防呆與數值驗證）
+    // 儲存活動數據紀錄
     function saveActivityRecord() {
       const editIndex = parseInt(document.getElementById('actEditIndex').value);
 
-      // 讀取 18 必填
+      // 讀取各欄位
       const equipNo      = document.getElementById('actEquipNo').value.trim();
       const equipCode    = document.getElementById('actEquipCode').value.trim();
       const equipName    = document.getElementById('actEquipName').value.trim();
@@ -3629,6 +3640,7 @@
       const materialName = document.getElementById('actMaterialName').value.trim();
       const scopeType    = document.getElementById('actScopeType').value.trim();
       const emissionType = document.getElementById('actEmissionType').value.trim();
+      const ghg          = document.getElementById('actGHG')?.value.trim() || '';
       const inUse        = document.getElementById('actInUse').value.trim();
       const actDataRaw   = document.getElementById('actActivityData').value.trim();
       const ratioRaw     = document.getElementById('actRatio').value.trim();
@@ -3636,7 +3648,7 @@
       const dataSource   = document.getElementById('actDataSource').value.trim();
       const custodyUnit  = document.getElementById('actCustodyUnit').value.trim();
 
-      // 讀取 6 選填
+      // 讀取選填
       const measurementFrequency  = document.getElementById('actMeasurementFrequency').value.trim();
       const measurementInstrument = document.getElementById('actMeasurementInstrument').value.trim();
       const calorificValueSource  = document.getElementById('actCalorificValueSource').value.trim();
@@ -3656,37 +3668,36 @@
         }
       }
 
-      // 1. 必填文字欄位空白驗證
-      if (!equipNo)      return showError('請輸入【設備編號】（例如：EQ-001）！');
-      if (!equipCode)    return showError('請輸入【設備代碼】（例如：REF-C01）！');
+      // 1. 核心必填欄位空白驗證
+      if (!equipNo)      return showError('請輸入【設備編號】（例如：ES-001、EQ-001）！');
       if (!equipName)    return showError('請輸入【設備名稱】！');
-      if (!orgId)        return showError('請輸入【機構編號】！');
-      if (!orgName)      return showError('請輸入【機構名稱】！');
-      if (!dept)         return showError('請輸入【設備所屬單位/部門】！');
-      if (!location)     return showError('請輸入【設備詳細位置/樓層】！');
-      if (!materialCode) return showError('請輸入【原(燃)物料代碼】！');
       if (!materialName) return showError('請輸入【原(燃)物料名稱】！');
       if (!scopeType)    return showError('請選擇【直接/間接】排放範疇！');
       if (!emissionType) return showError('請選擇【排放型式】！');
       if (!inUse)        return showError('請選擇【今年度有無使用該項設備】！');
-      if (!unit)         return showError('請輸入【活動數據單位】（例如：度 (kWh)、公升 (L)）！');
-      if (!dataSource)   return showError('請輸入【數據來源】憑證！');
-      if (!custodyUnit)  return showError('請輸入【保存單位】！');
 
       // 2. 數值合理性防呆驗證
-      const quantity = parseInt(quantityRaw);
-      if (isNaN(quantity) || quantity < 1) {
+      const quantity = parseInt(quantityRaw) || 1;
+      if (quantity < 1) {
         return showError('【設備數量】必須為大於或等於 1 的整數！');
       }
 
-      const activityData = parseFloat(actDataRaw);
-      if (isNaN(activityData) || activityData <= 0) {
-        return showError('【活動數據 (年使用量)】必須填寫且為大於 0 的有效數值！');
+      let activityData = '';
+      if (actDataRaw !== '') {
+        const aVal = parseFloat(actDataRaw);
+        if (isNaN(aVal) || aVal < 0) {
+          return showError('【活動數據 (年使用量)】請輸入大於或等於 0 的有效數值！');
+        }
+        activityData = aVal;
       }
 
-      const ratio = parseFloat(ratioRaw);
-      if (isNaN(ratio) || ratio < 0 || ratio > 100) {
-        return showError('【活動數據分配比率%】必須為介於 0 至 100 之間的數值！');
+      let ratio = 100;
+      if (ratioRaw !== '') {
+        const rVal = parseFloat(ratioRaw);
+        if (isNaN(rVal) || rVal < 0 || rVal > 100) {
+          return showError('【活動數據分配比率%】必須為介於 0 至 100 之間的數值！');
+        }
+        ratio = rVal;
       }
 
       if (carbonContent !== '') {
@@ -3723,6 +3734,7 @@
         materialName,
         scopeType,
         emissionType,
+        ghg,
         inUse,
         activityData,
         ratio,
@@ -3768,32 +3780,41 @@
       showToast(`已成功刪除「${r.equipName}」填報紀錄！`, 'success');
     }
 
-    // 批次匯入 / 帶入 Step 3 設備清單（嚴格 1-to-1 精準帶入 Step 3 既有資料，其餘非 Step 3 欄位維持空白讓使用者編輯）
+    // 批次匯入 / 帶入 Step 3 設備清單（嚴格依照 Step 3 帶入：設備編號、設備名稱、所屬部門/位置、原(燃)物料、排放型式、溫室氣體，其餘欄位一律維持空白供使用者自行編輯）
     function batchImportFromStep3() {
       if (!emissionSources || emissionSources.length === 0) {
         alert('目前 Step 3 (三、排放源鑑別) 中尚無設備資料，請先至 Step 3 新增排放源設備！');
         return;
       }
 
-      const defaultOrgId   = document.getElementById('infoTaxId')?.value || '';
-      const defaultOrgName = document.getElementById('boundOrgName')?.value || document.getElementById('infoName')?.value || '';
-
       // 嚴格依照 Step 3 清單 1-to-1 精準建立/對齊 Step 4 清冊
       const newRecords = emissionSources.map((es, idx) => {
-        // 尋找既有 activityRecords 中是否已有該設備（比對設備編號、代碼或名稱）
+        // 尋找既有 activityRecords 中是否已有該設備（比對設備編號或名稱，優先保留使用者既有輸入）
         const existing = activityRecords.find(r =>
           (r.equipNo && r.equipNo === es.equipId) ||
-          (r.equipCode && es.equipId && r.equipCode === es.equipId.replace('ES-', 'EQ-')) ||
           (r.equipName && (r.equipName === es.name || r.equipName.includes(es.name) || es.name.includes(r.equipName)))
         );
 
         const auto = getESAuto(es.energy, es.name);
         const isScope2 = auto && auto.scope && auto.scope.includes('二');
-        const scopeStr = isScope2 ? '間接排放 (Scope 2)' : '直接排放 (Scope 1)';
+        const scopeStr = isScope2 ? '間接排放 (Scope 2)' : (auto?.scope || '直接排放 (Scope 1)');
 
-        // 決定原物料代碼與標準單位
-        let matCode = '';
+        // 排放型式
+        let emType = isScope2 ? '外購電力使用' : '固定燃燒';
+        if (es.energy.includes('柴油') || es.energy.includes('汽油')) emType = '移動燃燒';
+        if (es.energy.includes('冷媒') || es.energy.includes('滅火')) emType = '逸散排放';
+
+        // 溫室氣體
+        let ghgVal = 'CO2';
+        if (auto && auto.ghg) {
+          ghgVal = Array.isArray(auto.ghg) ? auto.ghg.join(', ') : auto.ghg;
+        } else if (!isScope2) {
+          ghgVal = es.energy.includes('冷媒') ? 'HFCs' : 'CO2, CH4, N2O';
+        }
+
+        // 標準計量單位
         let uStr = '';
+        let matCode = '';
         if (window.GHG_MATERIAL_DATABASE && window.GHG_MATERIAL_DATABASE.length > 0) {
           const mMatch = window.GHG_MATERIAL_DATABASE.find(m =>
             m.name === es.energy ||
@@ -3804,34 +3825,35 @@
             if (mMatch.defaultUnit) uStr = mMatch.defaultUnit;
           }
         }
-
-        // 決定排放型式
-        let emType = isScope2 ? '外購電力使用' : '固定燃燒';
-        if (es.energy.includes('柴油') || es.energy.includes('汽油')) emType = '移動燃燒';
-        if (es.energy.includes('冷媒') || es.energy.includes('滅火')) emType = '逸散排放';
+        if (!uStr) {
+          if (es.energy.includes('電力')) uStr = '度 (kWh)';
+          else if (es.energy.includes('柴油') || es.energy.includes('汽油')) uStr = '公升 (L)';
+          else if (es.energy.includes('冷媒') || es.energy.includes('瓦斯')) uStr = 'kg';
+        }
 
         return {
           id: existing ? existing.id : (Date.now() + idx),
-          // 1. Step 3 具備之真實欄位
+          // 1. 來自 STEP 3 的真實資料
           equipNo: es.equipId || `ES-00${idx + 1}`,
-          equipCode: es.equipId ? es.equipId.replace('ES-', 'EQ-') : `EQ-00${idx + 1}`,
           equipName: es.name,
           location: es.location || existing?.location || '',
-          quantity: es.quantity || 1,
           materialName: es.energy,
-          materialCode: matCode,
-          scopeType: scopeStr,
           emissionType: emType,
+          ghg: existing?.ghg || ghgVal,
+
+          // 2. 系統關聯屬性
+          scopeType: scopeStr,
+          quantity: es.quantity || 1,
           inUse: existing?.inUse || '是',
-          unit: existing?.unit || uStr,
           ratio: existing?.ratio !== undefined ? existing.ratio : 100,
+          unit: existing?.unit || uStr,
 
-          // 2. 來自基本資料設定（若有填寫則帶入，無則空白）
-          orgId: existing?.orgId || defaultOrgId,
-          orgName: existing?.orgName || defaultOrgName,
-
-          // 3. 非 Step 3 欄位：若先前已編輯輸入過則保留，否則一律空白讓使用者自行編輯（絕不虛構）
+          // 3. 其餘欄位一律直接空白供使用者自行填寫（絕不虛構填補）
+          equipCode: existing?.equipCode || '',
+          orgId: existing?.orgId || '',
+          orgName: existing?.orgName || '',
           dept: existing?.dept || '',
+          materialCode: existing?.materialCode || matCode || '',
           activityData: existing && existing.activityData !== undefined && existing.activityData !== null ? existing.activityData : '',
           dataSource: existing?.dataSource || '',
           custodyUnit: existing?.custodyUnit || '',
@@ -3848,7 +3870,7 @@
       saveActivityRecords();
       renderActivityTable();
       renderStep3Itemized();
-      showToast(`已成功自 Step 3 帶入設備資料（共 ${activityRecords.length} 筆設備，活動數據待填寫）！`);
+      showToast(`已成功自 Step 3 帶入設備資料（共 ${activityRecords.length} 筆，其餘欄位空白供自行編輯）！`);
     }
 
     // 清空所有活動數據紀錄
@@ -3972,6 +3994,10 @@
         const calValStr = r.netCalorificValue ? `${r.netCalorificValue} ${r.netCalorificValueUnit || ''}` : '<span class="text-slate-600">-</span>';
         const carbStr = r.carbonContent ? `${r.carbonContent}%` : '<span class="text-slate-600">-</span>';
 
+        const ghgDisplay = r.ghg
+          ? (Array.isArray(r.ghg) ? r.ghg : r.ghg.split(',')).map(g => `<span class="px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono">${g.trim()}</span>`).join(' ')
+          : '<span class="text-slate-600">-</span>';
+
         tr.innerHTML = `
           <!-- 序號 -->
           <td class="p-3 text-center font-mono text-slate-400 sticky left-0 z-10 bg-slate-950/90 border-r border-slate-800">${displayIdx + 1}</td>
@@ -3999,6 +4025,8 @@
           <td class="p-3">${scopeBadge}</td>
           <!-- ⑫ 排放型式 -->
           <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[10px] whitespace-nowrap">${r.emissionType || '-'}</span></td>
+          <!-- 溫室氣體 -->
+          <td class="p-3 whitespace-nowrap">${ghgDisplay}</td>
           <!-- ⑬ 今年度有無使用 -->
           <td class="p-3 text-center">${inUseBadge}</td>
           <!-- ⑭ 活動數據 (年總量) -->
