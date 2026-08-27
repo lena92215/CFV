@@ -448,36 +448,27 @@
 
           <!-- Table Container with Horizontal Scroll -->
           <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/40">
-            <table class="w-full text-left text-xs border-collapse min-w-[2800px]">
+            <table class="w-full text-left text-xs border-collapse min-w-[1600px]">
               <thead>
                 <tr class="bg-slate-900/90 text-slate-300 border-b border-slate-700 text-[11px]">
                   <th class="p-3 w-12 text-center sticky left-0 z-10 bg-slate-900 border-r border-slate-800">序號</th>
-                  <th class="p-3 w-28 font-semibold">① 設備編號 *</th>
-                  <th class="p-3 w-28 font-semibold">② 設備代碼 *</th>
-                  <th class="p-3 w-48 font-semibold">③ 設備名稱 *</th>
-                  <th class="p-3 w-28 font-semibold">④ 機構編號 *</th>
-                  <th class="p-3 w-44 font-semibold">⑤ 機構名稱 *</th>
-                  <th class="p-3 w-32 font-semibold">⑥ 設備所屬單位/部門 *</th>
-                  <th class="p-3 w-40 font-semibold">⑦ 設備詳細位置/樓層 *</th>
-                  <th class="p-3 w-20 text-center font-semibold">⑧ 設備數量 *</th>
-                  <th class="p-3 w-32 font-semibold">⑨ 原(燃)物料代碼 *</th>
-                  <th class="p-3 w-44 font-semibold">⑩ 原(燃)物料名稱 *</th>
-                  <th class="p-3 w-32 font-semibold">⑪ 直接/間接 *</th>
-                  <th class="p-3 w-32 font-semibold">⑫ 排放型式 *</th>
+                  <th class="p-3 w-28 font-semibold">設備編號 *</th>
+                  <th class="p-3 w-48 font-semibold">設備名稱 *</th>
+                  <th class="p-3 w-32 font-semibold">設備所屬單位/部門 *</th>
+                  <th class="p-3 w-40 font-semibold">設備詳細位置/樓層 *</th>
+                  <th class="p-3 w-20 text-center font-semibold">設備數量 *</th>
+                  <th class="p-3 w-44 font-semibold">原(燃)物料名稱 *</th>
+                  <th class="p-3 w-32 font-semibold">直接/間接 *</th>
+                  <th class="p-3 w-32 font-semibold">排放型式 *</th>
                   <th class="p-3 w-28 font-semibold">溫室氣體 *</th>
-                  <th class="p-3 w-28 text-center font-semibold">⑬ 今年度有無使用 *</th>
-                  <th class="p-3 w-36 text-right font-semibold">⑭ 活動數據 (年總量) *</th>
-                  <th class="p-3 w-28 text-right font-semibold">⑮ 分配比率% *</th>
+                  <th class="p-3 w-28 text-center font-semibold">今年度有無使用 *</th>
+                  <th class="p-3 w-36 text-right font-semibold">活動數據 (年總量) *</th>
+                  <th class="p-3 w-28 text-right font-semibold">分配比率% *</th>
                   <th class="p-3 w-36 text-right font-semibold text-emerald-300">有效活動數據</th>
-                  <th class="p-3 w-24 font-semibold">⑯ 數據單位 *</th>
-                  <th class="p-3 w-36 font-semibold">⑰ 數據來源 *</th>
-                  <th class="p-3 w-32 font-semibold">⑱ 保存單位 *</th>
-                  <th class="p-3 w-28 font-semibold text-slate-400">⑲ 量測頻率</th>
-                  <th class="p-3 w-36 font-semibold text-slate-400">⑳ 量測儀器</th>
-                  <th class="p-3 w-36 font-semibold text-slate-400">㉑ 燃料熱值來源</th>
-                  <th class="p-3 w-36 font-semibold text-slate-400">㉒ 燃料低位熱值與單位</th>
-                  <th class="p-3 w-28 text-right font-semibold text-slate-400">㉓ 碳含量(%)</th>
-                  <th class="p-3 w-32 text-center sticky right-0 z-10 bg-slate-900 border-l border-slate-800 font-semibold">操作</th>
+                  <th class="p-3 w-24 font-semibold">數據單位 *</th>
+                  <th class="p-3 w-36 font-semibold">數據來源 *</th>
+                  <th class="p-3 w-32 font-semibold">保存單位 *</th>
+                  <th class="p-3 w-28 text-center sticky right-0 z-10 bg-slate-900 border-l border-slate-800 font-semibold">操作</th>
                 </tr>
               </thead>
               <tbody id="activityTableBody" class="divide-y divide-slate-800/80">
@@ -505,7 +496,7 @@
                   新增活動數據填報紀錄
                 </h3>
                 <p class="text-[11px] text-slate-400">
-                  標註 <span class="text-rose-400 font-bold">*</span> 為 18 項必填欄位，其餘 6 項為熱值與量測選填欄位
+                  標註 <span class="text-rose-400 font-bold">*</span> 為必填欄位，所有活動數據將自動連動碳排計算
                 </p>
               </div>
             </div>
@@ -532,37 +523,25 @@
             </div>
           </div>
 
-          <!-- Form Content (Grouped into 5 logical sections) -->
+          <!-- Form Content (Grouped into 4 clean logical sections) -->
           <div class="space-y-4 text-xs">
 
-            <!-- SECTION 1: 機構與設備基本識別 (必填) -->
+            <!-- SECTION 1: 設備基本識別 (必填) -->
             <div class="bg-slate-900/70 border border-slate-700/80 rounded-2xl p-4 space-y-3">
               <div class="text-emerald-400 font-bold text-xs flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                <i class="fa-solid fa-building text-teal-400"></i> 【區塊一】機構與設備基本識別 (必填)
+                <i class="fa-solid fa-cube text-teal-400"></i> 【區塊一】設備基本識別 (必填)
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">① 設備編號 <span class="text-rose-400">*</span></label>
-                  <input type="text" id="actEquipNo" placeholder="例如：EQ-001、ES-001" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
+                  <label class="block text-slate-300 font-medium mb-1">設備編號 <span class="text-rose-400">*</span></label>
+                  <input type="text" id="actEquipNo" placeholder="例如：AS-001、EQ-001" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">② 設備代碼 <span class="text-rose-400">*</span></label>
-                  <input type="text" id="actEquipCode" placeholder="例如：REF-C01、AC-01" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
+                  <label class="block text-slate-300 font-medium mb-1">設備名稱 <span class="text-rose-400">*</span></label>
+                  <input type="text" id="actEquipName" list="equipmentsList" placeholder="例如：營業用冷藏展示櫃、公務貨車" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">③ 設備名稱 <span class="text-rose-400">*</span></label>
-                  <input type="text" id="actEquipName" list="equipmentsList" placeholder="例如：營業用開放式冷藏展示櫃" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label class="block text-slate-300 font-medium mb-1">④ 機構編號 <span class="text-rose-400">*</span></label>
-                  <input type="text" id="actOrgId" placeholder="例如：ORG-001 或 統一編號" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑤ 機構名稱 <span class="text-rose-400">*</span></label>
-                  <input type="text" id="actOrgName" placeholder="例如：阿文優質水果攤 - 本店場域" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑧ 設備數量 <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">設備數量 <span class="text-rose-400">*</span></label>
                   <input type="number" id="actQuantity" min="1" value="1" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
               </div>
@@ -575,15 +554,15 @@
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑥ 設備所屬單位/部門 <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">設備所屬單位/部門 <span class="text-rose-400">*</span></label>
                   <input type="text" id="actDept" placeholder="例如：營運部、倉儲部、物流部、行政部" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑦ 設備詳細位置/樓層 <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">設備詳細位置/樓層 <span class="text-rose-400">*</span></label>
                   <input type="text" id="actLocation" placeholder="例如：1F 展售區 A08、2F 辦公室" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑬ 今年度有無使用該項設備 <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">今年度有無使用該項設備 <span class="text-rose-400">*</span></label>
                   <select id="actInUse" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none">
                     <option value="是">是 (正常運轉使用中)</option>
                     <option value="否">否 (本年度停用或備用)</option>
@@ -605,17 +584,13 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                 <div>
                   <div class="flex items-center justify-between mb-1">
-                    <label class="block text-slate-300 font-medium">⑩ 原(燃)物料名稱 <span class="text-rose-400">*</span></label>
+                    <label class="block text-slate-300 font-medium">原(燃)物料名稱 <span class="text-rose-400">*</span></label>
                   </div>
                   <input type="text" id="actMaterialName" list="materialsList" oninput="onActivityMaterialChange()" onchange="onActivityMaterialChange()" placeholder="輸入關鍵字選擇物料…" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑨ 原(燃)物料代碼 <span class="text-rose-400">*</span></label>
-                  <input type="text" id="actMaterialCode" placeholder="例如：EL0001、170006" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
-                </div>
-                <div>
                   <div class="flex items-center justify-between mb-1">
-                    <label class="block text-slate-300 font-medium">⑪ 直接/間接 <span class="text-rose-400">*</span></label>
+                    <label class="block text-slate-300 font-medium">直接/間接 <span class="text-rose-400">*</span></label>
                     <span id="actScopeLockTag" class="text-[10px] text-emerald-400 font-bold hidden"><i class="fa-solid fa-lock text-[9px]"></i> 系統自動鎖定</span>
                   </div>
                   <select id="actScopeType" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none transition">
@@ -625,7 +600,7 @@
                 </div>
                 <div>
                   <div class="flex items-center justify-between mb-1">
-                    <label class="block text-slate-300 font-medium">⑫ 排放型式 <span class="text-rose-400">*</span></label>
+                    <label class="block text-slate-300 font-medium">排放型式 <span class="text-rose-400">*</span></label>
                     <span id="actEmissionLockTag" class="text-[10px] text-emerald-400 font-bold hidden"><i class="fa-solid fa-lock text-[9px]"></i> 系統自動鎖定</span>
                   </div>
                   <select id="actEmissionType" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none transition">
@@ -662,23 +637,23 @@
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑭ 活動數據 (年總量) <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">活動數據 (年總量) <span class="text-rose-400">*</span></label>
                   <input type="number" step="any" id="actActivityData" oninput="checkActivityDataSanity()" placeholder="例如：25000" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑮ 分配比率% (0~100) <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">分配比率% (0~100) <span class="text-rose-400">*</span></label>
                   <input type="number" step="any" id="actRatio" value="100" min="0" max="100" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑯ 活動數據單位 <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">活動數據單位 <span class="text-rose-400">*</span></label>
                   <input type="text" id="actUnit" value="度 (kWh)" oninput="checkActivityDataSanity()" placeholder="例如：度 (kWh)、公升 (L)、kg" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑰ 數據來源 <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">數據來源 <span class="text-rose-400">*</span></label>
                   <input type="text" id="actDataSource" placeholder="例如：電費單/台電發票、加油卡" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
                 <div>
-                  <label class="block text-slate-300 font-medium mb-1">⑱ 保存單位 <span class="text-rose-400">*</span></label>
+                  <label class="block text-slate-300 font-medium mb-1">保存單位 <span class="text-rose-400">*</span></label>
                   <input type="text" id="actCustodyUnit" placeholder="例如：廠務部、總務部、會計部" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none" />
                 </div>
               </div>
@@ -692,51 +667,6 @@
                     <span class="text-[10px] font-normal text-amber-400/80">（不阻擋儲存，僅提供防呆檢核）</span>
                   </div>
                   <div id="actSanityWarningMsg" class="leading-relaxed text-amber-300 text-xs font-normal"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- SECTION 5: 燃料熱值與檢測量測 (選填 - 6 欄位) -->
-            <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 space-y-3">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <span class="text-indigo-400 font-bold text-xs flex items-center gap-1.5">
-                  <i class="fa-solid fa-flask-vial text-indigo-400"></i> 【區塊五】量測儀器與燃料熱值分析 (選填)
-                </span>
-                <span class="text-[10px] text-slate-500">以下 6 項欄位為選擇性提供之進階參數</span>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                <div>
-                  <label class="block text-slate-400 mb-1">⑲ 量測頻率 (選填)</label>
-                  <select id="actMeasurementFrequency" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:border-indigo-500 focus:outline-none">
-                    <option value="">— 請選擇量測頻率 —</option>
-                    <option value="每月">每月 (Monthly)</option>
-                    <option value="雙月 (每期)">雙月 / 每期 (Bi-monthly)</option>
-                    <option value="每季">每季 (Quarterly)</option>
-                    <option value="每半年">每半年 (Semi-annually)</option>
-                    <option value="每年">每年 (Annually)</option>
-                    <option value="連續自動監測">連續自動監測 (Continuous)</option>
-                    <option value="不定期/按批次">不定期 / 按批次</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-slate-400 mb-1">⑳ 量測儀器 (選填)</label>
-                  <input type="text" id="actMeasurementInstrument" placeholder="例如：台電電子數位電表、加油計量表、電子地磅" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:border-indigo-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label class="block text-slate-400 mb-1">㉑ 燃料熱值來源 (選填)</label>
-                  <input type="text" id="actCalorificValueSource" placeholder="例如：能源署標準熱值表、供應商檢驗報告(CoA)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:border-indigo-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label class="block text-slate-400 mb-1">㉒ 燃料低位熱值 (選填)</label>
-                  <input type="number" step="any" id="actNetCalorificValue" placeholder="例如：8400、9000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:border-indigo-500 focus:outline-none font-mono" />
-                </div>
-                <div>
-                  <label class="block text-slate-400 mb-1">㉒-2 燃料低位熱值單位 (選填)</label>
-                  <input type="text" id="actNetCalorificValueUnit" placeholder="例如：kcal/kg、kcal/L、MJ/m³" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:border-indigo-500 focus:outline-none" />
-                </div>
-                <div>
-                  <label class="block text-slate-400 mb-1">㉓ 碳含量(%) (選填 0~100)</label>
-                  <input type="number" step="any" min="0" max="100" id="actCarbonContent" placeholder="例如：85.5" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:border-indigo-500 focus:outline-none font-mono" />
                 </div>
               </div>
             </div>
@@ -2463,7 +2393,7 @@
       if (esCountEl) esCountEl.innerText = emissionSources.length;
     }
 
-    const ACTIVITY_STORAGE_KEY = 'cfv_activity_records_v4';
+    const ACTIVITY_STORAGE_KEY = 'cfv_activity_records_v5';
 
     // 活動數據清單 (Sheet 4) - 預設維持完全空白，由使用者親自新增或輸入，或點擊批次帶入
     const DEFAULT_ACTIVITY_RECORDS = [];
@@ -2477,6 +2407,7 @@
         localStorage.removeItem('cfv_activity_records_v1');
         localStorage.removeItem('cfv_activity_records_v2');
         localStorage.removeItem('cfv_activity_records_v3');
+        localStorage.removeItem('cfv_activity_records_v4');
         
         const raw = localStorage.getItem(ACTIVITY_STORAGE_KEY);
         if (raw) {
@@ -2557,15 +2488,10 @@
 
       const scopeEl = document.getElementById('actScopeType');
       const emissionEl = document.getElementById('actEmissionType');
-      const codeEl = document.getElementById('actMaterialCode');
       const unitEl = document.getElementById('actUnit');
-      const srcEl = document.getElementById('actDataSource');
-      const custodyEl = document.getElementById('actCustodyUnit');
-
       const ghgEl = document.getElementById('actGHG');
 
       if (found) {
-        if (codeEl) codeEl.value = found.code;
         if (scopeEl) scopeEl.value = found.scopeType;
         if (emissionEl) emissionEl.value = found.emissionType;
         if (unitEl && (!unitEl.value || unitEl.value === '度 (kWh)' || unitEl.value === 'kg' || unitEl.value === '公升 (L)' || unitEl.value === '公斤 (kg)')) {
@@ -2650,11 +2576,10 @@
       if (!warnEl) return;
 
       const matName = (document.getElementById('actMaterialName')?.value || '').trim();
-      const matCode = (document.getElementById('actMaterialCode')?.value || '').trim();
       const scopeType = (document.getElementById('actScopeType')?.value || '').trim();
       const editIndex = parseInt(document.getElementById('actEditIndex')?.value ?? -1);
 
-      const isElec = matName.includes('電力') || matName.includes('台電') || matCode === 'EL0001' || scopeType.includes('Scope 2') || scopeType.includes('間接');
+      const isElec = matName.includes('電力') || matName.includes('台電') || scopeType.includes('Scope 2') || scopeType.includes('間接');
 
       if (!isElec) {
         warnEl.classList.add('hidden');
@@ -2665,9 +2590,8 @@
       const hasOtherElecRecord = activityRecords.some((r, idx) => {
         if (editIndex >= 0 && idx === editIndex) return false;
         const rName = r.materialName || '';
-        const rCode = r.materialCode || '';
         const rScope = r.scopeType || '';
-        return rName.includes('電力') || rCode === 'EL0001' || rScope.includes('Scope 2') || rScope.includes('間接');
+        return rName.includes('電力') || rScope.includes('Scope 2') || rScope.includes('間接');
       });
 
       if (hasOtherElecRecord) {
@@ -2740,35 +2664,23 @@
         const padNum = nextNum < 10 ? `00${nextNum}` : (nextNum < 100 ? `0${nextNum}` : `${nextNum}`);
 
         document.getElementById('actEquipNo').value = `EQ-${padNum}`;
-        document.getElementById('actEquipCode').value = `EQ-CODE-${nextNum}`;
         document.getElementById('actEquipName').value = '';
-        document.getElementById('actOrgId').value = document.getElementById('infoTaxId')?.value || '';
-        document.getElementById('actOrgName').value = document.getElementById('boundOrgName')?.value || document.getElementById('infoName')?.value || '';
         document.getElementById('actDept').value = '';
         document.getElementById('actLocation').value = '';
         document.getElementById('actQuantity').value = '1';
-        document.getElementById('actMaterialCode').value = 'EL0001';
         document.getElementById('actMaterialName').value = '外購電力';
         document.getElementById('actScopeType').value = '間接排放 (Scope 2)';
         document.getElementById('actEmissionType').value = '外購電力使用';
+        document.getElementById('actGHG').value = 'CO2';
         document.getElementById('actInUse').value = '是';
         document.getElementById('actActivityData').value = '';
         document.getElementById('actRatio').value = '100';
         document.getElementById('actUnit').value = '度 (kWh)';
         document.getElementById('actDataSource').value = '';
         document.getElementById('actCustodyUnit').value = '';
-        document.getElementById('actGHG').value = 'CO2';
 
         // 自動觸發判定並鎖定
         onActivityMaterialChange();
-
-        // 選填
-        document.getElementById('actMeasurementFrequency').value = '';
-        document.getElementById('actMeasurementInstrument').value = '';
-        document.getElementById('actCalorificValueSource').value = '';
-        document.getElementById('actNetCalorificValue').value = '';
-        document.getElementById('actNetCalorificValueUnit').value = '';
-        document.getElementById('actCarbonContent').value = '';
       } else {
         // 編輯模式
         const r = activityRecords[index];
@@ -2776,35 +2688,23 @@
         document.getElementById('actModalTitle').innerText = `編輯活動數據填報紀錄 (${r.equipNo} - ${r.equipName})`;
 
         document.getElementById('actEquipNo').value = r.equipNo || '';
-        document.getElementById('actEquipCode').value = r.equipCode || '';
         document.getElementById('actEquipName').value = r.equipName || '';
-        document.getElementById('actOrgId').value = r.orgId || '';
-        document.getElementById('actOrgName').value = r.orgName || '';
         document.getElementById('actDept').value = r.dept || '';
         document.getElementById('actLocation').value = r.location || '';
         document.getElementById('actQuantity').value = r.quantity || 1;
-        document.getElementById('actMaterialCode').value = r.materialCode || '';
         document.getElementById('actMaterialName').value = r.materialName || '';
         document.getElementById('actScopeType').value = r.scopeType || '間接排放 (Scope 2)';
         document.getElementById('actEmissionType').value = r.emissionType || '外購電力使用';
+        document.getElementById('actGHG').value = r.ghg ? (Array.isArray(r.ghg) ? r.ghg.join(', ') : r.ghg) : '';
         document.getElementById('actInUse').value = r.inUse || '是';
         document.getElementById('actActivityData').value = r.activityData !== undefined ? r.activityData : '';
         document.getElementById('actRatio').value = r.ratio !== undefined ? r.ratio : 100;
         document.getElementById('actUnit').value = r.unit || '';
         document.getElementById('actDataSource').value = r.dataSource || '';
         document.getElementById('actCustodyUnit').value = r.custodyUnit || '';
-        document.getElementById('actGHG').value = r.ghg ? (Array.isArray(r.ghg) ? r.ghg.join(', ') : r.ghg) : '';
 
         // 依據編輯物料自動判定並鎖定
         onActivityMaterialChange();
-
-        // 選填
-        document.getElementById('actMeasurementFrequency').value = r.measurementFrequency || '';
-        document.getElementById('actMeasurementInstrument').value = r.measurementInstrument || '';
-        document.getElementById('actCalorificValueSource').value = r.calorificValueSource || '';
-        document.getElementById('actNetCalorificValue').value = r.netCalorificValue || '';
-        document.getElementById('actNetCalorificValueUnit').value = r.netCalorificValueUnit || '';
-        document.getElementById('actCarbonContent').value = r.carbonContent || '';
       }
 
       // 觸發常理極端值防雷檢核與電力重複計算提醒
@@ -3631,36 +3531,24 @@
 
     // 儲存活動數據紀錄
     function saveActivityRecord() {
-      const editIndex = parseInt(document.getElementById('actEditIndex').value);
+      const editIndex = parseInt(document.getElementById('actEditIndex')?.value || '-1');
 
-      // 讀取各欄位
-      const equipNo      = document.getElementById('actEquipNo').value.trim();
-      const equipCode    = document.getElementById('actEquipCode').value.trim();
-      const equipName    = document.getElementById('actEquipName').value.trim();
-      const orgId        = document.getElementById('actOrgId').value.trim();
-      const orgName      = document.getElementById('actOrgName').value.trim();
-      const dept         = document.getElementById('actDept').value.trim();
-      const location     = document.getElementById('actLocation').value.trim();
-      const quantityRaw  = document.getElementById('actQuantity').value.trim();
-      const materialCode = document.getElementById('actMaterialCode').value.trim();
-      const materialName = document.getElementById('actMaterialName').value.trim();
-      const scopeType    = document.getElementById('actScopeType').value.trim();
-      const emissionType = document.getElementById('actEmissionType').value.trim();
+      // 讀取保留之有效欄位
+      const equipNo      = document.getElementById('actEquipNo')?.value.trim() || '';
+      const equipName    = document.getElementById('actEquipName')?.value.trim() || '';
+      const dept         = document.getElementById('actDept')?.value.trim() || '';
+      const location     = document.getElementById('actLocation')?.value.trim() || '';
+      const quantityRaw  = document.getElementById('actQuantity')?.value.trim() || '1';
+      const materialName = document.getElementById('actMaterialName')?.value.trim() || '';
+      const scopeType    = document.getElementById('actScopeType')?.value.trim() || '';
+      const emissionType = document.getElementById('actEmissionType')?.value.trim() || '';
       const ghg          = document.getElementById('actGHG')?.value.trim() || '';
-      const inUse        = document.getElementById('actInUse').value.trim();
-      const actDataRaw   = document.getElementById('actActivityData').value.trim();
-      const ratioRaw     = document.getElementById('actRatio').value.trim();
-      const unit         = document.getElementById('actUnit').value.trim();
-      const dataSource   = document.getElementById('actDataSource').value.trim();
-      const custodyUnit  = document.getElementById('actCustodyUnit').value.trim();
-
-      // 讀取選填
-      const measurementFrequency  = document.getElementById('actMeasurementFrequency').value.trim();
-      const measurementInstrument = document.getElementById('actMeasurementInstrument').value.trim();
-      const calorificValueSource  = document.getElementById('actCalorificValueSource').value.trim();
-      const netCalorificValue     = document.getElementById('actNetCalorificValue').value.trim();
-      const netCalorificValueUnit = document.getElementById('actNetCalorificValueUnit').value.trim();
-      const carbonContent         = document.getElementById('actCarbonContent').value.trim();
+      const inUse        = document.getElementById('actInUse')?.value.trim() || '是';
+      const actDataRaw   = document.getElementById('actActivityData')?.value.trim() || '';
+      const ratioRaw     = document.getElementById('actRatio')?.value.trim() || '100';
+      const unit         = document.getElementById('actUnit')?.value.trim() || '';
+      const dataSource   = document.getElementById('actDataSource')?.value.trim() || '';
+      const custodyUnit  = document.getElementById('actCustodyUnit')?.value.trim() || '';
 
       const errEl  = document.getElementById('actModalError');
       const msgEl  = document.getElementById('actModalErrorMsg');
@@ -3675,7 +3563,7 @@
       }
 
       // 1. 核心必填欄位空白驗證
-      if (!equipNo)      return showError('請輸入【設備編號】（例如：ES-001、EQ-001）！');
+      if (!equipNo)      return showError('請輸入【設備編號】（例如：AS-001、EQ-001）！');
       if (!equipName)    return showError('請輸入【設備名稱】！');
       if (!materialName) return showError('請輸入【原(燃)物料名稱】！');
       if (!scopeType)    return showError('請選擇【直接/間接】排放範疇！');
@@ -3706,47 +3594,26 @@
         ratio = rVal;
       }
 
-      if (carbonContent !== '') {
-        const cVal = parseFloat(carbonContent);
-        if (isNaN(cVal) || cVal < 0 || cVal > 100) {
-          return showError('【碳含量(%)】必須為介於 0 至 100 之間的數值！');
-        }
-      }
-
-      if (netCalorificValue !== '') {
-        const nVal = parseFloat(netCalorificValue);
-        if (isNaN(nVal) || nVal <= 0) {
-          return showError('【燃料低位熱值】必須為大於 0 的數值！');
-        }
-      }
-
-      // 複合鍵防呆檢查：【同一個設備編號 (equipNo)】+【同一個原(燃)物料代碼 (materialCode) 或名稱 (materialName)】不能重複
-      // 溫室氣體盤查實務允許同一台設備（如公務車）同時填報汽油（移動燃燒）與冷媒（逸散排放）等不同物料紀錄
+      // 3. 複合鍵防呆檢查：【同一個設備編號 (equipNo)】+【同一個原(燃)物料名稱 (materialName)】不能重複
+      // 只要「原(燃)物料名稱」不同，就絕對放行儲存（例如同一台物流車 AS-001 可同時填報「汽油」與「冷媒」）
       const isDuplicate = activityRecords.some((r, i) => {
         if (i === editIndex) return false;
         const sameEquip = (r.equipNo || '').trim().toLowerCase() === equipNo.toLowerCase();
-        if (!sameEquip) return false;
-        
-        const sameCode = materialCode && r.materialCode && (r.materialCode.trim().toLowerCase() === materialCode.toLowerCase());
-        const sameName = materialName && r.materialName && (r.materialName.trim().toLowerCase() === materialName.toLowerCase());
-        return sameCode || sameName;
+        const sameMat   = (r.materialName || '').trim().toLowerCase() === materialName.toLowerCase();
+        return sameEquip && sameMat;
       });
 
       if (isDuplicate) {
-        return showError(`設備編號「${equipNo}」已存在「${materialName || materialCode}」的填報紀錄！若為不同物料請調整原(燃)物料名稱/代碼。`);
+        return showError('此設備已新增過相同的原(燃)物料，請確認是否重複填寫！');
       }
 
       const recordData = {
-        id: editIndex >= 0 ? activityRecords[editIndex].id : (Date.now() + '_' + Math.random().toString(36).substring(2, 9)),
+        id: (editIndex >= 0 && activityRecords[editIndex]) ? activityRecords[editIndex].id : (Date.now() + '_' + Math.random().toString(36).substring(2, 9)),
         equipNo,
-        equipCode,
         equipName,
-        orgId,
-        orgName,
         dept,
         location,
         quantity,
-        materialCode,
         materialName,
         scopeType,
         emissionType,
@@ -3756,16 +3623,10 @@
         ratio,
         unit,
         dataSource,
-        custodyUnit,
-        measurementFrequency,
-        measurementInstrument,
-        calorificValueSource,
-        netCalorificValue,
-        netCalorificValueUnit,
-        carbonContent
+        custodyUnit
       };
 
-      if (editIndex >= 0) {
+      if (editIndex >= 0 && activityRecords[editIndex]) {
         activityRecords[editIndex] = recordData;
         showToast(`已成功更新設備「${equipName}」(${equipNo}) 的填報紀錄！`);
       } else {
@@ -3824,15 +3685,13 @@
 
         // 標準計量單位
         let uStr = '';
-        let matCode = '';
         if (window.GHG_MATERIAL_DATABASE && window.GHG_MATERIAL_DATABASE.length > 0) {
           const mMatch = window.GHG_MATERIAL_DATABASE.find(m =>
             m.name === es.energy ||
             m.aliases.some(a => a.toLowerCase() === es.energy.trim().toLowerCase() || es.energy.trim().toLowerCase().includes(a.toLowerCase()))
           );
-          if (mMatch) {
-            if (mMatch.code) matCode = mMatch.code;
-            if (mMatch.defaultUnit) uStr = mMatch.defaultUnit;
+          if (mMatch && mMatch.defaultUnit) {
+            uStr = mMatch.defaultUnit;
           }
         }
         if (!uStr) {
@@ -3842,37 +3701,25 @@
         }
 
         return {
-          id: Date.now() + idx,
+          id: Date.now() + '_' + idx + '_' + Math.random().toString(36).substring(2, 6),
           // 1. 嚴格映射 Step 3 欄位
           equipNo: es.equipId || `ES-00${idx + 1}`,
           equipName: es.name,
+          dept: '',
           location: es.location || '',
+          quantity: es.quantity || 1,
           materialName: es.energy,
-          materialCode: matCode || '',
           scopeType: scopeStr,
           emissionType: emType,
-          quantity: es.quantity || 1,
           ghg: ghgVal,
 
-          // 2. 初始化 Step 4 專屬欄位（絕對不可帶入預設數值，一律空白或標準預設選項）
+          // 2. 初始化 Step 4 專屬欄位（絕對空白化/標準選項）
           activityData: '',             // ⑭ 活動數據 (年總量)：設為空字串，嚴禁填入假數據
           dataSource: '',               // ⑰ 數據來源：設為空字串，嚴禁填寫假憑證
           custodyUnit: '',              // ⑱ 保存單位：設為空字串，嚴禁填寫假部門
           inUse: '是',                  // ⑬ 今年度有無使用：預設「是 (正常運轉使用中)」
           ratio: 100,                   // ⑮ 分配比率%：預設 100
-          unit: uStr,                   // ⑯ 數據單位：標準計量單位
-
-          // 3. ⑲ ~ ㉔ 及其他進階欄位：一律空白
-          equipCode: '',                // ② 設備代碼：空字串
-          orgId: '',                    // ④ 機構編號：空字串
-          orgName: '',                  // ⑤ 機構名稱：空字串
-          dept: '',                     // ⑥ 設備所屬單位/部門：空字串
-          measurementFrequency: '',     // ⑲ 量測頻率：空字串
-          measurementInstrument: '',    // ⑳ 量測儀器：空字串
-          calorificValueSource: '',     // ㉑ 燃料熱值來源：空字串
-          netCalorificValue: '',        // ㉒ 燃料低位熱值：空字串
-          netCalorificValueUnit: '',    // 燃料熱值單位：空字串
-          carbonContent: ''             // ㉓ 碳含量(%)：空字串
+          unit: uStr                    // ⑯ 數據單位：標準計量單位
         };
       });
 
@@ -3897,7 +3744,7 @@
       }
     }
 
-    // 渲染 Sheet 4 活動數據 24 欄位表格
+    // 渲染 Sheet 4 活動數據表格
     function renderActivityTable() {
       const tbody = document.getElementById('activityTableBody');
       if (!tbody) return;
@@ -3935,13 +3782,10 @@
       const filtered = activityRecords.filter(r => {
         const matchKeyword = !keyword || (
           (r.equipNo && r.equipNo.toLowerCase().includes(keyword)) ||
-          (r.equipCode && r.equipCode.toLowerCase().includes(keyword)) ||
           (r.equipName && r.equipName.toLowerCase().includes(keyword)) ||
-          (r.orgName && r.orgName.toLowerCase().includes(keyword)) ||
           (r.dept && r.dept.toLowerCase().includes(keyword)) ||
           (r.location && r.location.toLowerCase().includes(keyword)) ||
-          (r.materialName && r.materialName.toLowerCase().includes(keyword)) ||
-          (r.materialCode && r.materialCode.toLowerCase().includes(keyword))
+          (r.materialName && r.materialName.toLowerCase().includes(keyword))
         );
 
         if (!matchKeyword) return false;
@@ -3959,7 +3803,7 @@
       if (filtered.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="26" class="text-center py-10 text-slate-500">
+            <td colspan="18" class="text-center py-10 text-slate-500">
               <div class="space-y-2">
                 <i class="fa-solid fa-inbox text-3xl text-slate-600"></i>
                 <p>查無符合條件的活動數據填報紀錄</p>
@@ -4004,66 +3848,58 @@
           auditBadge = `<span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold ml-1.5 whitespace-nowrap shadow-sm"><i class="fa-solid fa-triangle-exclamation text-[9px]"></i> 推估值</span>`;
         }
 
-        const calValStr = r.netCalorificValue ? `${r.netCalorificValue} ${r.netCalorificValueUnit || ''}` : '<span class="text-slate-600">-</span>';
-        const carbStr = r.carbonContent ? `${r.carbonContent}%` : '<span class="text-slate-600">-</span>';
+        const emptyBadge = `<span class="text-amber-400 font-semibold px-2 py-0.5 bg-amber-950/60 border border-amber-500/30 rounded text-[11px] inline-block whitespace-nowrap shadow-sm">待填寫</span>`;
+
+        function formatCellText(val, customClass = 'text-slate-300') {
+          if (val === null || val === undefined) return emptyBadge;
+          const s = String(val).trim();
+          if (s === '' || s === '-') return emptyBadge;
+          return `<span class="${customClass}">${s}</span>`;
+        }
 
         const ghgDisplay = r.ghg
           ? (Array.isArray(r.ghg) ? r.ghg : r.ghg.split(',')).map(g => `<span class="px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono">${g.trim()}</span>`).join(' ')
-          : '<span class="text-slate-600">-</span>';
+          : emptyBadge;
+
+        const dataSourceDisplay = (r.dataSource && r.dataSource.trim() !== '' && r.dataSource.trim() !== '-')
+          ? `<div class="flex items-center gap-1"><span>${r.dataSource.trim()}</span>${auditBadge}</div>`
+          : emptyBadge;
 
         tr.innerHTML = `
           <!-- 序號 -->
           <td class="p-3 text-center font-mono text-slate-400 sticky left-0 z-10 bg-slate-950/90 border-r border-slate-800">${displayIdx + 1}</td>
-          <!-- ① 設備編號 -->
-          <td class="p-3 font-mono font-bold text-emerald-400 whitespace-nowrap">${r.equipNo || '-'}</td>
-          <!-- ② 設備代碼 -->
-          <td class="p-3 font-mono text-slate-300 whitespace-nowrap">${r.equipCode || '-'}</td>
-          <!-- ③ 設備名稱 -->
-          <td class="p-3 font-bold text-slate-100 whitespace-nowrap">${r.equipName || '-'}</td>
-          <!-- ④ 機構編號 -->
-          <td class="p-3 font-mono text-slate-400 whitespace-nowrap">${r.orgId || '-'}</td>
-          <!-- ⑤ 機構名稱 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.orgName || '-'}</td>
-          <!-- ⑥ 設備所屬單位/部門 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.dept || '-'}</td>
-          <!-- ⑦ 設備詳細位置/樓層 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.location || '-'}</td>
-          <!-- ⑧ 設備數量 -->
+          <!-- 設備編號 -->
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.equipNo, 'font-mono font-bold text-emerald-400')}</td>
+          <!-- 設備名稱 -->
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.equipName, 'font-bold text-slate-100')}</td>
+          <!-- 設備所屬單位/部門 -->
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.dept, 'text-slate-300')}</td>
+          <!-- 設備詳細位置/樓層 -->
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.location, 'text-slate-300')}</td>
+          <!-- 設備數量 -->
           <td class="p-3 text-center font-mono text-slate-200 font-semibold">${r.quantity || 1}</td>
-          <!-- ⑨ 原(燃)物料代碼 -->
-          <td class="p-3 font-mono text-cyan-400 whitespace-nowrap">${r.materialCode || '-'}</td>
-          <!-- ⑩ 原(燃)物料名稱 -->
-          <td class="p-3 font-semibold text-slate-200 whitespace-nowrap">${r.materialName || '-'}</td>
-          <!-- ⑪ 直接/間接 -->
+          <!-- 原(燃)物料名稱 -->
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.materialName, 'font-semibold text-slate-200')}</td>
+          <!-- 直接/間接 -->
           <td class="p-3">${scopeBadge}</td>
-          <!-- ⑫ 排放型式 -->
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[10px] whitespace-nowrap">${r.emissionType || '-'}</span></td>
+          <!-- 排放型式 -->
+          <td class="p-3">${r.emissionType ? `<span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[10px] whitespace-nowrap">${r.emissionType}</span>` : emptyBadge}</td>
           <!-- 溫室氣體 -->
           <td class="p-3 whitespace-nowrap">${ghgDisplay}</td>
-          <!-- ⑬ 今年度有無使用 -->
+          <!-- 今年度有無使用 -->
           <td class="p-3 text-center">${inUseBadge}</td>
-          <!-- ⑭ 活動數據 (年總量) -->
-          <td class="p-3 text-right font-mono font-bold whitespace-nowrap">${hasAct ? `<span class="text-amber-300">${actVal.toLocaleString()}</span>` : '<span class="text-amber-400 font-semibold px-2 py-0.5 bg-amber-950/60 border border-amber-500/30 rounded text-[11px]">待填寫</span>'}</td>
-          <!-- ⑮ 分配比率% -->
+          <!-- 活動數據 (年總量) -->
+          <td class="p-3 text-right font-mono font-bold whitespace-nowrap">${hasAct ? `<span class="text-amber-300">${actVal.toLocaleString()}</span>` : emptyBadge}</td>
+          <!-- 分配比率% -->
           <td class="p-3 text-right font-mono text-slate-300">${ratioVal}%</td>
           <!-- 有效活動數據 -->
           <td class="p-3 text-right font-mono font-black whitespace-nowrap">${hasAct ? `<span class="text-emerald-400">${effectiveAct.toLocaleString()}</span>` : '<span class="text-slate-600">-</span>'}</td>
-          <!-- ⑯ 數據單位 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.unit || '-'}</td>
-          <!-- ⑰ 數據來源 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap"><div class="flex items-center gap-1"><span>${r.dataSource || '-'}</span>${auditBadge}</div></td>
-          <!-- ⑱ 保存單位 -->
-          <td class="p-3 text-slate-300 whitespace-nowrap">${r.custodyUnit || '-'}</td>
-          <!-- ⑲ 量測頻率 -->
-          <td class="p-3 text-slate-400 whitespace-nowrap">${r.measurementFrequency || '<span class="text-slate-600">-</span>'}</td>
-          <!-- ⑳ 量測儀器 -->
-          <td class="p-3 text-slate-400 whitespace-nowrap">${r.measurementInstrument || '<span class="text-slate-600">-</span>'}</td>
-          <!-- ㉑ 燃料熱值來源 -->
-          <td class="p-3 text-slate-400 whitespace-nowrap">${r.calorificValueSource || '<span class="text-slate-600">-</span>'}</td>
-          <!-- ㉒ 燃料低位熱值與單位 -->
-          <td class="p-3 text-slate-400 whitespace-nowrap">${calValStr}</td>
-          <!-- ㉓ 碳含量(%) -->
-          <td class="p-3 text-right text-slate-400 font-mono">${carbStr}</td>
+          <!-- 數據單位 -->
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.unit, 'text-slate-300')}</td>
+          <!-- 數據來源 -->
+          <td class="p-3 text-slate-300 whitespace-nowrap">${dataSourceDisplay}</td>
+          <!-- 保存單位 -->
+          <td class="p-3 whitespace-nowrap">${formatCellText(r.custodyUnit, 'text-slate-300')}</td>
           <!-- 操作 -->
           <td class="p-3 text-center sticky right-0 z-10 bg-slate-950/90 border-l border-slate-800 whitespace-nowrap">
             <div class="flex items-center justify-center gap-1.5">
@@ -4682,13 +4518,11 @@
       const s3Rows = emissionSources.map((es, i) => [i + 1, es.name, es.location, es.energy, es.quantity]);
       XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(s3Header.concat(s3Rows)), "三、排放源鑑別");
 
-      // Sheet 4: 活動數據填報 (完整 24 個欄位)
+      // Sheet 4: 活動數據填報
       const s4Header = [
-        "序號", "設備編號", "設備代碼", "設備名稱", "機構編號", "機構名稱",
-        "設備所屬單位/部門", "設備詳細位置/樓層", "設備數量", "原(燃)物料代碼", "原(燃)物料名稱",
-        "直接/間接", "排放型式", "今年度有無使用該項設備", "活動數據 (年總量)", "活動數據分配比率%",
-        "有效活動數據", "活動數據單位", "數據來源", "保存單位",
-        "量測頻率", "量測儀器", "燃料熱值來源", "燃料低位熱值", "燃料低位熱值單位", "碳含量(%)"
+        "序號", "設備編號", "設備名稱", "設備所屬單位/部門", "設備詳細位置/樓層", "設備數量",
+        "原(燃)物料名稱", "直接/間接", "排放型式", "溫室氣體種類", "今年度有無使用該項設備",
+        "活動數據 (年總量)", "活動數據分配比率%", "有效活動數據", "活動數據單位", "數據來源", "保存單位"
       ];
       const s4Rows = activityRecords.map((r, idx) => {
         const inUseFactor = r.inUse === '否' ? 0 : 1;
@@ -4696,33 +4530,24 @@
         return [
           idx + 1,
           r.equipNo,
-          r.equipCode,
           r.equipName,
-          r.orgId,
-          r.orgName,
-          r.dept,
-          r.location,
-          r.quantity,
-          r.materialCode,
+          r.dept || "",
+          r.location || "",
+          r.quantity || 1,
           r.materialName,
           r.scopeType,
           r.emissionType,
+          r.ghg || "",
           r.inUse,
-          r.activityData,
+          r.activityData !== '' ? r.activityData : "",
           `${r.ratio}%`,
           effAct,
           r.unit,
-          r.dataSource,
-          r.custodyUnit,
-          r.measurementFrequency || "",
-          r.measurementInstrument || "",
-          r.calorificValueSource || "",
-          r.netCalorificValue || "",
-          r.netCalorificValueUnit || "",
-          r.carbonContent ? `${r.carbonContent}%` : ""
+          r.dataSource || "",
+          r.custodyUnit || ""
         ];
       });
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([s4Header].concat(s4Rows)), "四、活動數據填報表(24欄位)");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([s4Header].concat(s4Rows)), "四、活動數據填報表");
 
       // Sheet 5: 定量盤查明細清冊 (Itemized)
       const { items, totalCarbon } = computeItemizedList();
