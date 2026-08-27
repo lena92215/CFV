@@ -2289,6 +2289,13 @@
       }
     }
 
+    function saveEmissionSourcesToStorage() {
+      try {
+        localStorage.setItem('cfv_emission_sources', JSON.stringify(emissionSources));
+        localStorage.setItem('CFV_EMISSION_SOURCES_V4', JSON.stringify(emissionSources));
+      } catch(e) { /* ignore */ }
+    }
+
     function addEmissionSource() {
       const equipId = document.getElementById('esEquipId').value.trim();
       const name = document.getElementById('esEquipName').value.trim();
@@ -2302,6 +2309,7 @@
       }
 
       emissionSources.push({ id: Date.now(), equipId, name, location, energy, quantity });
+      saveEmissionSourcesToStorage();
       document.getElementById('esEquipId').value = '';
       document.getElementById('esEquipName').value = '';
       document.getElementById('esLocation').value = '';
@@ -2317,6 +2325,7 @@
     function deleteEmissionSource(index) {
       if (confirm('確定要刪除此排放源設備嗎？')) {
         emissionSources.splice(index, 1);
+        saveEmissionSourcesToStorage();
         renderEmissionSourceTable();
       }
     }
@@ -2348,6 +2357,7 @@
         return;
       }
       emissionSources[index] = { ...emissionSources[index], equipId, name, location, energy, quantity };
+      saveEmissionSourcesToStorage();
       closeEditModal();
       renderEmissionSourceTable();
     }

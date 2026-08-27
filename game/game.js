@@ -273,49 +273,54 @@ function loadGameData() {
     }
   } catch(e) { /* ignore */ }
 
-  // 2. 設備清單
+  // 2. 設備清單 (支援多種 LocalStorage 鍵值)
   try {
-    const devicesRaw = localStorage.getItem('cfv_emission_sources');
+    const devicesRaw = localStorage.getItem('cfv_emission_sources') || localStorage.getItem('CFV_EMISSION_SOURCES_V4');
     if (devicesRaw) {
       const sources = JSON.parse(devicesRaw);
-      gameState.devices = sources.map((s, i) => {
-        const name = s.name || s.equipName || `設備 ${i+1}`;
-        const energy = s.energy || s.material || '';
-        const config = getDeviceConfig(name, energy);
-        return {
-          id: `dev_${i}`,
-          name: name,
-          energy: energy,
-          config: config,
-          quantity: parseInt(s.quantity) || 1,
-          location: s.location || s.process || '主要場域',
-          scope: s.scope || getScope(energy),
-          x: 80 + (i % 5) * 130,
-          y: 80 + Math.floor(i / 5) * 130,
-          isSim: false,
-          isUpgraded: false
-        };
-      });
+      if (Array.isArray(sources) && sources.length > 0) {
+        gameState.devices = sources.map((s, i) => {
+          const name = s.name || s.equipName || `設備 ${i+1}`;
+          const energy = s.energy || s.material || '';
+          const config = getDeviceConfig(name, energy);
+          return {
+            id: `dev_${i}`,
+            name: name,
+            energy: energy,
+            config: config,
+            quantity: parseInt(s.quantity) || 1,
+            location: s.location || s.process || '主要場域',
+            scope: s.scope || getScope(energy),
+            x: 80 + (i % 5) * 130,
+            y: 80 + Math.floor(i / 5) * 130,
+            isSim: false,
+            isUpgraded: false
+          };
+        });
+      }
     }
   } catch(e) { /* ignore */ }
 
-  // 若使用者未在【清冊填報】新增排放源，則維持完全空白 (無系統自動生成預設設備)
   if (!gameState.devices) {
     gameState.devices = [];
   }
 
-  // 3. 場地圖
+  // 3. 場地圖 (未上傳底圖時隱藏預設相片圖層，維持向量質感)
   try {
     const imgData = localStorage.getItem('cfv_floor_plan');
+    const overlayEl = document.getElementById('defaultMapOverlay');
     if (imgData) {
       const img = new Image();
       img.onload = () => {
         gameState.floorPlanImg = img;
-        document.getElementById('defaultMapOverlay').style.display = 'none';
+        if (overlayEl) overlayEl.style.display = 'none';
         redrawCanvas();
       };
       img.src = imgData;
       gameState.floorPlanBase64 = imgData;
+    } else {
+      if (overlayEl) overlayEl.style.display = 'none';
+      redrawCanvas();
     }
   } catch(e) { /* ignore */ }
 
