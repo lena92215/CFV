@@ -361,46 +361,52 @@ function loadODSDemoDevices() {
 // 5. 工具函式
 // =============================================
 function getDeviceConfig(name, energy) {
-  const targetStr = ((name || '') + ' ' + (energy || '')).toLowerCase();
+  const nameStr = (name || '').toLowerCase();
+  const fuelStr = (energy || '').toLowerCase();
   
-  if (targetStr.includes('鍋爐') || targetStr.includes('蒸氣') || targetStr.includes('鍋')) {
+  // 1. 優先根據「設備名稱 (name)」判定圖示，圖示完全不受「原/燃物料 (energy)」干擾
+  if (nameStr.includes('鍋爐') || nameStr.includes('蒸氣') || nameStr.includes('鍋')) {
     return { type: 'boiler', vectorKey: 'boiler', label: '蒸氣鍋爐', gwpFactor: 2.5 };
   }
-  if (targetStr.includes('渦輪') || targetStr.includes('風力') || targetStr.includes('turbine')) {
+  if (nameStr.includes('渦輪') || nameStr.includes('風力') || nameStr.includes('turbine')) {
     return { type: 'turbine', vectorKey: 'turbine', label: '渦輪機組', gwpFactor: 1.2 };
   }
-  if (targetStr.includes('焚化') || targetStr.includes('焚化爐') || targetStr.includes('廢棄物')) {
+  if (nameStr.includes('焚化') || nameStr.includes('焚化爐') || nameStr.includes('廢棄物')) {
     return { type: 'incinerator', vectorKey: 'incinerator', label: '焚化設施', gwpFactor: 3.2 };
   }
-  if (targetStr.includes('冷藏') || targetStr.includes('冷凍') || targetStr.includes('r404') || targetStr.includes('r408') || targetStr.includes('r417') || targetStr.includes('展示櫃')) {
-    return { type: 'fridge', vectorKey: 'fridge', label: '大型冷藏庫', gwpFactor: 0, gwpWarning: { refrigerant: 'R-404A', gwp: 3922 } };
+  if (nameStr.includes('冷藏') || nameStr.includes('冷凍') || nameStr.includes('展示櫃') || nameStr.includes('冰櫃') || nameStr.includes('冰箱')) {
+    const isHighR = fuelStr.includes('r404') || fuelStr.includes('r408') || fuelStr.includes('r417') || fuelStr.includes('r22');
+    return { type: 'fridge', vectorKey: 'fridge', label: '大型冷藏庫', gwpFactor: 0, gwpWarning: isHighR ? { refrigerant: 'R-404A', gwp: 3922 } : null };
   }
-  if (targetStr.includes('冷氣') || targetStr.includes('空調') || targetStr.includes('r410') || targetStr.includes('r32')) {
-    return { type: 'ac', vectorKey: 'ac', label: '門市冷氣', gwpFactor: 0, gwpWarning: { refrigerant: 'R-410A', gwp: 2088 } };
+  if (nameStr.includes('冷氣') || nameStr.includes('空調') || nameStr.includes('暖氣') || nameStr.includes('除濕')) {
+    const isHighR = fuelStr.includes('r410') || fuelStr.includes('r22') || fuelStr.includes('r407');
+    return { type: 'ac', vectorKey: 'ac', label: '門市冷氣', gwpFactor: 0, gwpWarning: isHighR ? { refrigerant: 'R-410A', gwp: 2088 } : null };
   }
-  if (targetStr.includes('車') || targetStr.includes('運輸') || targetStr.includes('汽油') || targetStr.includes('134a')) {
-    if (targetStr.includes('汽油') || targetStr.includes('小貨')) return { type: 'car', vectorKey: 'car', label: '汽油車輛', gwpFactor: 2.263 };
+  if (nameStr.includes('車') || nameStr.includes('卡車') || nameStr.includes('貨車') || nameStr.includes('運輸') || nameStr.includes('公車')) {
+    if (nameStr.includes('小貨') || nameStr.includes('小客') || nameStr.includes('轎車')) return { type: 'car', vectorKey: 'car', label: '汽油車輛', gwpFactor: 2.263 };
     return { type: 'truck', vectorKey: 'truck', label: '運輸車輛', gwpFactor: 2.606 };
   }
-  if (targetStr.includes('發電') || targetStr.includes('引擎')) {
+  if (nameStr.includes('發電') || nameStr.includes('引擎') || nameStr.includes('發電機')) {
     return { type: 'generator', vectorKey: 'generator', label: '柴油發電機', gwpFactor: 2.606 };
   }
-  if (targetStr.includes('化糞池') || targetStr.includes('污水') || targetStr.includes('水肥') || targetStr.includes('馬桶')) {
+  if (nameStr.includes('化糞池') || nameStr.includes('污水') || nameStr.includes('水肥') || nameStr.includes('馬桶')) {
     return { type: 'septic', vectorKey: 'septic', label: '化糞池/馬桶', gwpFactor: 1.5 };
   }
-  if (targetStr.includes('消防') || targetStr.includes('滅火') || targetStr.includes('乾粉')) {
+  if (nameStr.includes('消防') || nameStr.includes('滅火') || nameStr.includes('滅火器')) {
     return { type: 'fire', vectorKey: 'fire', label: '消防設施', gwpFactor: 1.0 };
   }
-  if (targetStr.includes('機') || targetStr.includes('機台') || targetStr.includes('設備')) {
+  if (nameStr.includes('機') || nameStr.includes('機台') || nameStr.includes('設備') || nameStr.includes('生產線')) {
     return { type: 'machine', vectorKey: 'machine', label: '工業機台', gwpFactor: 1.8 };
   }
-  if (targetStr.includes('電') || targetStr.includes('照明') || targetStr.includes('外購')) {
+  if (nameStr.includes('電錶') || nameStr.includes('電網') || nameStr.includes('照明') || nameStr.includes('用電')) {
     return { type: 'electricity', vectorKey: 'electricity', label: '電力設施', gwpFactor: 0.495 };
   }
-  if (targetStr.includes('瓦斯') || targetStr.includes('天然氣') || targetStr.includes('lpg')) {
+  if (nameStr.includes('瓦斯') || nameStr.includes('天然氣') || nameStr.includes('氣瓶')) {
     return { type: 'gas', vectorKey: 'gas', label: '天然氣/瓦斯', gwpFactor: 2.998 };
   }
-  return { ...DEFAULT_CONFIG };
+
+  // 2. 若無匹配特殊關鍵字，依一般設備呈現
+  return { type: 'machine', vectorKey: 'machine', label: name || '設備', gwpFactor: 1.0 };
 }
 
 function getScope(energy) {
